@@ -60,7 +60,7 @@ class AboutUsPageSeeder extends Seeder
 
             // 2. Intro
             [
-                'type' => 'section',
+                'type' => 'alt',
                 'rows' => [[
                     'columns' => [[
                         'width'   => 12,
@@ -78,86 +78,148 @@ class AboutUsPageSeeder extends Seeder
 
             // 3. Our Vision
             [
-                'type' => 'alt',
-                'rows' => [[
-                    'columns' => [[
-                        'width'   => 12,
-                        'widgets' => [[
-                            'type' => 'html',
-                            'settings' => [
-                                'html' => '<div class="sec-head" data-reveal>'
-                                    . '<span class="eyebrow">Our Guiding Light</span>'
-                                    . '<h2 class="sec-title">Our Vision</h2>'
-                                    . '</div>'
-                                    . '<div class="about-vision" data-reveal>'
-                                    . '<div class="about-vision-content">'
-                                    . '<p>Prayaag International School has as its vision and mission <strong>"Character Building and Man-Making"</strong> and its motto is <strong>"Discipline and Excellence"</strong>. Its belief is <strong>"Co-operation over Competition"</strong>.</p>'
-                                    . '<p>The goals of Prayaag International School, Panipat are defined by the verses of the Sthithaprajna from the <strong>Bhagvad Gita</strong> — namely true wisdom that transcends all text books.</p>'
-                                    . '</div>'
-                                    . '<div class="about-vision-image">'
-                                    . '<img src="' . $selfDefenceImg . '" alt="Self-defence practice at Prayaag International School" loading="lazy">'
-                                    . '</div>'
-                                    . '</div>',
-                            ],
+                'type' => 'section',
+                'rows' => [
+                    [
+                        'columns' => [[
+                            'width'   => 12,
+                            'widgets' => [[
+                                'type' => 'html',
+                                'settings' => [
+                                    'html' => '<div class="sec-head" data-reveal>'
+                                        . '<span class="eyebrow">Our Guiding Light</span>'
+                                        . '<h2 class="sec-title">Our Vision</h2>'
+                                        . '</div>',
+                                ],
+                            ]],
                         ]],
-                    ]],
-                ]],
+                    ],
+                    [
+                        'columns' => [
+                            [
+                                'width'   => 5,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div data-reveal class="about-img-card">'
+                                            . '<img src="' . $selfDefenceImg . '" alt="Self-defence practice at Prayaag International School" loading="lazy" class="about-rounded-img">'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                            [
+                                'width'   => 7,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div class="about-content-card" data-reveal>'
+                                            . '<p>Prayaag International School has as its vision and mission <strong>"Character Building and Man-Making"</strong> and its motto is <strong>"Discipline and Excellence"</strong>. Its belief is <strong>"Co-operation over Competition"</strong>.</p>'
+                                            . '<p>The goals of Prayaag International School, Panipat are defined by the verses of the Sthithaprajna from the <strong>Bhagvad Gita</strong> — namely true wisdom that transcends all text books.</p>'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             // 4. Principal's Message
             [
-                'type' => 'section',
-                'rows' => [[
-                    'columns' => [[
-                        'width'   => 12,
-                        'widgets' => [[
-                            'type' => 'html',
-                            'settings' => [
-                                'html' => '<div class="sec-head" data-reveal>'
-                                    . '<span class="eyebrow">From the Principal\'s Desk</span>'
-                                    . '<h2 class="sec-title">Message from Our Principal</h2>'
-                                    . '</div>'
-                                    . '<div class="about-principal" data-reveal>'
-                                    . '<div class="about-principal-image">'
-                                    . '<img src="' . $principalImg . '" alt="Principal - Prayaag International School" loading="lazy">'
-                                    . '</div>'
-                                    . '<div class="about-principal-content">'
-                                    . '<p>The distinguishing feature of Prayaag International, Panipat is its unique blend of Indian ethos and culture with contemporary teaching learning pedagogies. It is a school where the children can grow into confident and well-balanced youngsters. To unleash the latent powers of the child, the school provides opportunities, support and challenges at all stages of growth and development.</p>'
-                                    . '<p>We believe that — <strong>If a child cannot learn the way we teach, teach him the way he can learn</strong>. Skill and activity based learning together with technology have replaced rote learning. Prayaag International, Panipat provides a conducive learning environment where every student is respected for his potential and is encouraged to learn at a pace he can cope with and stimulated to excel according to individual aptitudes.</p>'
-                                    . '</div>'
-                                    . '</div>',
-                            ],
+                'type' => 'alt',
+                'rows' => [
+                    [
+                        'columns' => [[
+                            'width'   => 12,
+                            'widgets' => [[
+                                'type' => 'html',
+                                'settings' => [
+                                    'html' => '<div class="sec-head" data-reveal>'
+                                        . '<span class="eyebrow">From the Principal\'s Desk</span>'
+                                        . '<h2 class="sec-title">Message from Our Principal</h2>'
+                                        . '</div>',
+                                ],
+                            ]],
                         ]],
-                    ]],
-                ]],
+                    ],
+                    [
+                        'columns' => [
+                            [
+                                'width'   => 4,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div class="about-principal-img-wrapper" data-reveal>'
+                                            . '<img src="' . $principalImg . '" alt="Principal - Prayaag International School" loading="lazy" class="about-principal-img">'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                            [
+                                'width'   => 8,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div class="about-content-card about-principal-text" data-reveal>'
+                                            . '<p>The distinguishing feature of Prayaag International, Panipat is its unique blend of Indian ethos and culture with contemporary teaching learning pedagogies. It is a school where the children can grow into confident and well-balanced youngsters. To unleash the latent powers of the child, the school provides opportunities, support and challenges at all stages of growth and development.</p>'
+                                            . '<p>We believe that — <strong>If a child cannot learn the way we teach, teach him the way he can learn</strong>. Skill and activity based learning together with technology have replaced rote learning. Prayaag International, Panipat provides a conducive learning environment where every student is respected for his potential and is encouraged to learn at a pace he can cope with and stimulated to excel according to individual aptitudes.</p>'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             // 5. Our Mission
             [
                 'type' => 'navy',
-                'rows' => [[
-                    'columns' => [[
-                        'width'   => 12,
-                        'widgets' => [[
-                            'type' => 'html',
-                            'settings' => [
-                                'html' => '<div class="sec-head" data-reveal>'
-                                    . '<span class="eyebrow">Our Purpose</span>'
-                                    . '<h2 class="sec-title">Our Mission</h2>'
-                                    . '</div>'
-                                    . '<div class="about-mission" data-reveal>'
-                                    . '<div class="about-mission-content">'
-                                    . '<p>Our Mission is to provide a comprehensive and future-oriented education that empowers students to become lifelong learners, confident decision-makers, and compassionate individuals. We aim to foster an atmosphere of inclusivity and collaboration, where every student\'s unique talents are recognized and nurtured.</p>'
-                                    . '</div>'
-                                    . '<div class="about-mission-images">'
-                                    . '<div class="about-mission-img"><img src="' . $footballImg . '" alt="Student playing football" loading="lazy"></div>'
-                                    . '<div class="about-mission-img"><img src="' . $yogaImg . '" alt="Yoga at Prayaag International School" loading="lazy"></div>'
-                                    . '</div>'
-                                    . '</div>',
-                            ],
+                'rows' => [
+                    [
+                        'columns' => [[
+                            'width'   => 12,
+                            'widgets' => [[
+                                'type' => 'html',
+                                'settings' => [
+                                    'html' => '<div class="sec-head" data-reveal>'
+                                        . '<span class="eyebrow">Our Purpose</span>'
+                                        . '<h2 class="sec-title">Our Mission</h2>'
+                                        . '</div>',
+                                ],
+                            ]],
                         ]],
-                    ]],
-                ]],
+                    ],
+                    [
+                        'columns' => [
+                            [
+                                'width'   => 6,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div class="about-mission-text" data-reveal>'
+                                            . '<p>Our Mission is to provide a comprehensive and future-oriented education that empowers students to become lifelong learners, confident decision-makers, and compassionate individuals. We aim to foster an atmosphere of inclusivity and collaboration, where every student\'s unique talents are recognized and nurtured.</p>'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                            [
+                                'width'   => 6,
+                                'widgets' => [[
+                                    'type' => 'html',
+                                    'settings' => [
+                                        'html' => '<div class="about-mission-imgs" data-reveal>'
+                                            . '<div class="about-mission-imgs-inner">'
+                                            . '<img src="' . $footballImg . '" alt="Student playing football" loading="lazy" class="about-rounded-img">'
+                                            . '<img src="' . $yogaImg . '" alt="Yoga at Prayaag International School" loading="lazy" class="about-rounded-img">'
+                                            . '</div>'
+                                            . '</div>',
+                                    ],
+                                ]],
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             // 6. Our Values
@@ -173,9 +235,9 @@ class AboutUsPageSeeder extends Seeder
                                     . '<span class="eyebrow">What We Stand For</span>'
                                     . '<h2 class="sec-title">Our Values</h2>'
                                     . '</div>'
-                                    . '<div class="about-values" data-reveal>'
+                                    . '<div class="about-values-card" data-reveal>'
                                     . '<blockquote class="about-values-quote">"Pursuing Excellence and Embrace Responsibility"</blockquote>'
-                                    . '<p>We raise intellectual standard of our children by promoting a school ethos that is underpinned by the core value — growing by learning.</p>'
+                                    . '<p class="about-values-text">We raise intellectual standard of our children by promoting a school ethos that is underpinned by the core value — growing by learning.</p>'
                                     . '</div>',
                             ],
                         ]],

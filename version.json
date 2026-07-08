@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "date": "2026-07-08",
+  "feature": "Baseline - Session 1 complete",
+  "restore_point": "2026-07-08/001_baseline",
+  "description": "Instagram module + Popup Builder module (broken) + About page redesign + DB restored",
+  "status": "stable"
+}
