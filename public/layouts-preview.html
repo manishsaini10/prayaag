@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Layout Preview — all variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #f4f6fa; }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .lh { margin: 48px 0 16px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #0b2545; border-bottom: 2px solid #c79a3b; padding-bottom: 8px; }
+        .lh:first-of-type { margin-top: 8px; }
+        .note { font-family: 'Poppins', sans-serif; font-size: 13px; color: #555; background: #fff; border: 1px solid #e2e6ee; border-radius: 10px; padding: 14px 18px; margin-bottom: 8px; }
+    </style>
+    <script>
+        // Force-fresh CSS load (bypasses browser cache completely).
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = '/site.css?v=' + Date.now();
+        document.head.appendChild(l);
+    </script>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="note">
+        This page renders every layout variant with sample data, loading the latest <code>site.css</code> (cache-busted).
+        If the layouts look correct here, the CSS works — and any difference on a real page is just browser/Blade caching
+        (run <code>php artisan view:clear</code> and hard-refresh). If something looks broken <em>here</em>, it's a real CSS issue.
+    </div>
+
+    <div id="root"></div>
+
+</div>
+
+<script>
+    var TW_LAYOUTS = ['cards', 'grid2', 'compact', 'list', 'minimal', 'masonry', 'slider', 'bubble'];
+    var FX_LAYOUTS = ['grid', 'list', 'slider', 'masonry', 'timeline', 'magazine', 'overlay', 'minimal'];
+
+    var people = [
+        { n: 'Aarti Sharma', r: 'Parent of Grade III', q: 'The teachers genuinely care about every child. My daughter loves school every single day.' },
+        { n: 'Rohan Mehta', r: 'Alumnus, Class of 2018', q: 'The values I learned here shaped my career and the person I am today. Forever grateful.' },
+        { n: 'Pratap Singh', r: 'Father of Devika, XI', q: 'A wonderful balance of academics and activities. The faculty pushes students to their best.' },
+        { n: 'Neha Gupta', r: 'Parent of Grade VI', q: 'Smart classrooms and dedicated teachers make a real difference. Very happy with the progress.' },
+        { n: 'Priya Nair', r: 'Alumna, Class of 2020', q: 'The labs and library gave me a head start in college. Truly one of the top schools in Panipat.' },
+        { n: 'Imran Khan', r: 'Parent of Grade IX', q: 'Safe, caring and well organised. Communication with parents is excellent all year round.' }
+    ];
+
+    var posts = [
+        { img: 'https://picsum.photos/seed/a/600/400', e: 'News', t: 'Annual Day Celebration 2026', x: 'A spectacular evening of music, dance and drama by our talented students across all grades.', m: 'Jun 2, 2026' },
+        { img: 'https://picsum.photos/seed/b/600/400', e: 'Sports', t: 'Inter-House Athletics Meet', x: 'Records were broken and team spirit soared at this year\u2019s much-awaited athletics meet.', m: 'May 28, 2026' },
+        { img: 'https://picsum.photos/seed/c/600/400', e: 'Academics', t: 'Science Exhibition Winners', x: 'Young innovators showcased projects ranging from robotics to renewable energy models.', m: 'May 20, 2026' },
+        { img: 'https://picsum.photos/seed/d/600/400', e: 'Events', t: 'CBSE Workshop for Teachers', x: 'Faculty from across the region attended a hands-on pedagogy workshop on our campus.', m: 'May 12, 2026' },
+        { img: 'https://picsum.photos/seed/e/600/400', e: 'Culture', t: 'Janmashtami Festivities', x: 'Tiny tots dressed up and the whole school came alive with colour and devotion.', m: 'May 4, 2026' }
+    ];
+
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function initials(n) { var p = n.split(' '); return ((p[0] || '')[0] || '') + ((p[p.length - 1] || '')[0] || ''); }
+
+    function twItem(p) {
+        return '<figure class="tw-item">'
+            + '<blockquote class="tw-quote">' + esc(p.q) + '</blockquote>'
+            + '<figcaption class="tw-by"><span class="tw-av">' + esc(initials(p.n)) + '</span>'
+            + '<span class="tw-meta"><b>' + esc(p.n) + '</b><small>' + esc(p.r) + '</small></span></figcaption>'
+            + '</figure>';
+    }
+
+    function fxItem(p, withImg) {
+        var media = withImg
+            ? '<a class="fx-media" href="#" style="background-image:url(\'' + p.img + '\')"></a>'
+            : '<div class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg></div>';
+        return '<article class="fx-item">' + media
+            + '<div class="fx-body">'
+            + '<span class="fx-eyebrow">' + esc(p.e) + '</span>'
+            + '<h3 class="fx-title"><a href="#">' + esc(p.t) + '</a></h3>'
+            + '<p class="fx-text">' + esc(p.x) + '</p>'
+            + '<div class="fx-meta">' + esc(p.m) + '</div>'
+            + '</div></article>';
+    }
+
+    var root = document.getElementById('root');
+    var html = '';
+
+    html += '<h2 class="lh">Testimonials &mdash; 8 variants (.tw)</h2>';
+    TW_LAYOUTS.forEach(function (lay) {
+        html += '<h3 class="lh">tw &middot; ' + lay + '</h3>';
+        html += '<div class="tw tw--' + lay + '">' + people.map(twItem).join('') + '</div>';
+    });
+
+    html += '<h2 class="lh">Collection (Posts/Notices/Events/Downloads/Gallery) &mdash; 8 variants (.fx)</h2>';
+    FX_LAYOUTS.forEach(function (lay) {
+        var withImg = (lay !== 'minimal'); // minimal hides media anyway
+        html += '<h3 class="lh">fx &middot; ' + lay + '</h3>';
+        html += '<div class="fx fx--' + lay + '" style="--fx-accent:#c79a3b"><div class="fx-list">'
+            + posts.map(function (p) { return fxItem(p, withImg); }).join('') + '</div></div>';
+    });
+
+    root.innerHTML = html;
+
+    // Load the real site.js AFTER the markup exists, so the auto-scroll marquee
+    // initialises on these sliders. Cache-busted so it's always the latest.
+    var sj = document.createElement('script');
+    sj.src = '/site.js?v=' + Date.now();
+    document.body.appendChild(sj);
+</script>
+</body>
+</html>
