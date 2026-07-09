@@ -1,8 +1,8 @@
 {
-  "version": "1.0.0",
+  "version": "1.2.0",
   "date": "2026-07-08",
-  "feature": "Baseline - Session 1 complete",
-  "restore_point": "2026-07-08/001_baseline",
-  "description": "Instagram module + Popup Builder module (broken) + About page redesign + DB restored",
+  "feature": "Popup Module production-ready - 100% audit pass",
+  "restore_point": "2026-07-08/002_popup-responsive",
+  "description": "Full production readiness overhaul: critical tracking/frequency/image bugs fixed, XSS vectors closed (safeUrl helper, HTML escaping, SVG blocked), permissions enforced (Policy + @can gates + controller authorize), trigger/scheduling UI added, accessibility (focus trap, aria-label, sr-announce, restore focus), preview renders actual blocks, MutationObserver scoped, lazy images revealed, after_x_days frequency fixed, markShown() wired up, custom_js sandboxed, CSS focus-visible restored.",
   "status": "stable"
 }

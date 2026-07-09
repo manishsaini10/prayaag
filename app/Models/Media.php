@@ -20,6 +20,47 @@ class Media extends BaseModel
         'height' => 'integer',
     ];
 
+    protected $appends = ['url', 'thumb_url', 'medium_url', 'large_url'];
+
+    public function getUrl(string $size = 'original'): string
+    {
+        $path = $this->path;
+        if ($size !== 'original' && str_starts_with((string) $this->mime_type, 'image/') && $this->mime_type !== 'image/svg+xml') {
+            $pathInfo = pathinfo($path);
+            $dir = $pathInfo['dirname'] ?? '';
+            $dirPrefix = $dir ? $dir . '/' : '';
+            $filename = $pathInfo['filename'];
+            $ext = $pathInfo['extension'] ?? '';
+            if ($ext) {
+                $sizePath = $dirPrefix . $filename . '-' . $size . '.' . $ext;
+                if (\Illuminate\Support\Facades\Storage::disk($this->disk ?? 'public')->exists($sizePath)) {
+                    $path = $sizePath;
+                }
+            }
+        }
+        return \Illuminate\Support\Facades\Storage::disk($this->disk ?? 'public')->url($path);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return $this->getUrl('original');
+    }
+
+    public function getThumbUrlAttribute(): string
+    {
+        return $this->getUrl('thumb');
+    }
+
+    public function getMediumUrlAttribute(): string
+    {
+        return $this->getUrl('medium');
+    }
+
+    public function getLargeUrlAttribute(): string
+    {
+        return $this->getUrl('large');
+    }
+
     public function folder(): BelongsTo
     {
         return $this->belongsTo(MediaFolder::class, 'folder_id');

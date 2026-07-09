@@ -203,7 +203,12 @@ class PopupBuilderTest extends TestCase
     /** @test */
     public function it_tracks_analytics()
     {
-        $popup = Popup::factory()->create();
+        $popup = Popup::factory()->create([
+            'view_count' => 0,
+            'impression_count' => 0,
+            'click_count' => 0,
+            'conversion_count' => 0,
+        ]);
 
         $dto = new AnalyticsDTO(
             popupId: $popup->id,
@@ -220,6 +225,54 @@ class PopupBuilderTest extends TestCase
         ]);
 
         $this->assertEquals(1, $popup->fresh()->view_count);
+    }
+
+    /** @test */
+    public function it_tracks_analytics_from_browser_beacon_payloads()
+    {
+        $popup = Popup::factory()->create([
+            'view_count' => 0,
+            'impression_count' => 0,
+        ]);
+
+        $payload = json_encode([
+            'popup_id' => $popup->id,
+            'event_type' => 'impression',
+            'session_id' => 'beacon-session',
+            'url' => 'http://test.com/admissions',
+            'device_type' => 'mobile',
+        ]);
+
+        $this->call('POST', '/api/v1/popup/track', [], [], [], [
+            'CONTENT_TYPE' => 'text/plain;charset=UTF-8',
+        ], $payload)->assertOk()->assertJson(['success' => true]);
+
+        $popup->refresh();
+        $this->assertEquals(1, $popup->impression_count);
+        $this->assertDatabaseHas('popup_analytics', [
+            'popup_id' => $popup->id,
+            'event_type' => 'impression',
+            'session_id' => 'beacon-session',
+            'device_type' => 'mobile',
+        ]);
+    }
+
+    /** @test */
+    public function it_records_close_analytics_without_requiring_a_close_counter_column()
+    {
+        $popup = Popup::factory()->create();
+
+        $this->postJson('/api/v1/popup/track', [
+            'popup_id' => $popup->id,
+            'event_type' => 'close',
+            'session_id' => 'close-session',
+        ])->assertOk()->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('popup_analytics', [
+            'popup_id' => $popup->id,
+            'event_type' => 'close',
+            'session_id' => 'close-session',
+        ]);
     }
 
     /** @test */
@@ -263,6 +316,71 @@ class PopupBuilderTest extends TestCase
 
         $context2 = ['path' => '/about', 'url' => 'http://test.com/about'];
         $this->assertFalse($this->ruleEngine->evaluateDisplayRules($popup, $context2));
+    }
+
+    /** @test */
+    public function it_evaluates_page_targeting_rules_for_specific_pages()
+    {
+        $popup = Popup::factory()->active()->create();
+
+        $popup->rules()->create([
+            'type' => 'targeting',
+            'rule_key' => 'path',
+            'condition' => 'is',
+            'value' => 'about-us',
+        ]);
+
+        $this->assertTrue($this->ruleEngine->evaluateTargetingRules($popup, [
+            'path' => '/about-us',
+            'url' => 'http://test.com/about-us',
+        ]));
+
+        $this->assertFalse($this->ruleEngine->evaluateTargetingRules($popup, [
+            'path' => '/contact-us',
+            'url' => 'http://test.com/contact-us',
+        ]));
+    }
+
+    /** @test */
+    public function it_evaluates_page_targeting_rules_for_homepage_and_wildcards()
+    {
+        $homePopup = Popup::factory()->active()->create();
+        $homePopup->rules()->create([
+            'type' => 'targeting',
+            'rule_key' => 'path',
+            'condition' => 'is',
+            'value' => '/',
+        ]);
+
+        $this->assertTrue($this->ruleEngine->evaluateTargetingRules($homePopup, ['path' => '/home']));
+        $this->assertTrue($this->ruleEngine->evaluateTargetingRules($homePopup, ['path' => '/']));
+
+        $wildcardPopup = Popup::factory()->active()->create();
+        $wildcardPopup->rules()->create([
+            'type' => 'targeting',
+            'rule_key' => 'path',
+            'condition' => 'is',
+            'value' => 'events/*',
+        ]);
+
+        $this->assertTrue($this->ruleEngine->evaluateTargetingRules($wildcardPopup, ['path' => '/events/annual-day']));
+        $this->assertFalse($this->ruleEngine->evaluateTargetingRules($wildcardPopup, ['path' => '/about-us']));
+    }
+
+    /** @test */
+    public function it_excludes_selected_pages_when_targeting_mode_is_except()
+    {
+        $popup = Popup::factory()->active()->create();
+
+        $popup->rules()->create([
+            'type' => 'targeting',
+            'rule_key' => 'path',
+            'condition' => 'is_not',
+            'value' => 'admissions',
+        ]);
+
+        $this->assertFalse($this->ruleEngine->evaluateTargetingRules($popup, ['path' => '/admissions']));
+        $this->assertTrue($this->ruleEngine->evaluateTargetingRules($popup, ['path' => '/about-us']));
     }
 
     /** @test */
@@ -360,6 +478,7 @@ class PopupBuilderTest extends TestCase
             'variant_type' => 'original',
             'view_count' => 100,
             'conversion_count' => 5,
+            'structure' => ['version' => 'a'],
         ]);
 
         $variant = $test->variants()->create([
@@ -367,6 +486,7 @@ class PopupBuilderTest extends TestCase
             'variant_type' => 'variant',
             'view_count' => 100,
             'conversion_count' => 20,
+            'structure' => ['version' => 'b'],
         ]);
 
         $winner = $this->abTestEngine->determineWinner($test);
@@ -462,7 +582,9 @@ class PopupBuilderTest extends TestCase
     public function it_scopes_visible_popups()
     {
         $active = Popup::factory()->active()->create();
-        $scheduled = Popup::factory()->scheduled()->create();
+        $scheduled = Popup::factory()->scheduled()->create([
+            'starts_at' => now()->subDay(),
+        ]);
         $expired = Popup::factory()->expired()->create();
         $draft = Popup::factory()->draft()->create();
 

@@ -135,6 +135,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/m/media', [MediaLibraryController::class, 'index'])->name('admin.media.index');
     Route::get('/admin/m/media/more', [MediaLibraryController::class, 'loadMore'])->name('admin.media.more');
 
+    // Media Library API Endpoints for Modal & Picker
+    Route::get('/admin/media-library/api', [MediaLibraryController::class, 'apiList']);
+    Route::post('/admin/media-library/api/upload', [MediaLibraryController::class, 'apiUpload']);
+    Route::put('/admin/media-library/api/{id}', [MediaLibraryController::class, 'apiUpdate']);
+    Route::delete('/admin/media-library/api/{id}', [MediaLibraryController::class, 'apiDestroy']);
+    Route::get('/admin/media-library/api/{id}/usage', [MediaLibraryController::class, 'apiCheckUsage']);
+    Route::post('/admin/media-library/api/{id}/replace', [MediaLibraryController::class, 'apiReplace']);
+
     // Generic resource modules (config-driven CRUD via ResourceRegistry)
     Route::get('/admin/m/{resource}', [ResourceController::class, 'index'])->name('admin.resource.index');
     Route::get('/admin/m/{resource}/create', [ResourceController::class, 'create'])->name('admin.resource.create');
@@ -142,7 +150,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/m/{resource}/{id}/edit', [ResourceController::class, 'edit'])->name('admin.resource.edit');
     Route::put('/admin/m/{resource}/{id}', [ResourceController::class, 'update'])->name('admin.resource.update');
     Route::delete('/admin/m/{resource}/{id}', [ResourceController::class, 'destroy'])->name('admin.resource.destroy');
+
+    // --- Academic Calendar Admin CRUD ---
+    Route::middleware('role:admin|principal')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('academic-calendar-entries/import', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'show'])->name('academic-calendar-entries.import');
+        Route::get('academic-calendar-entries/import/sample', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'downloadSample'])->name('academic-calendar-entries.import.sample');
+        Route::post('academic-calendar-entries/import/csv', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'importCsv'])->name('academic-calendar-entries.import.csv');
+        Route::post('academic-calendar-entries/import/ai', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'importAi'])->name('academic-calendar-entries.import.ai');
+        Route::post('academic-calendar-entries/import/save-review', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'saveReviewed'])->name('academic-calendar-entries.import.save-review');
+
+        Route::resource('academic-calendar-entries', \App\Http\Controllers\Admin\AcademicCalendarEntryController::class);
+        Route::post('academic-sessions/{academic_session}/toggle', [\App\Http\Controllers\Admin\AcademicSessionController::class, 'toggle'])->name('academic-sessions.toggle');
+        Route::resource('academic-sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
+        Route::resource('academic-terms', \App\Http\Controllers\Admin\AcademicTermController::class);
+    });
 });
+
+// --- Academic Calendar Public Routes ---
+Route::get('/academic-calendar', [\App\Http\Controllers\AcademicCalendarController::class, 'index'])->name('academic-calendar.index');
+Route::get('/academic-calendar/feed', [\App\Http\Controllers\AcademicCalendarController::class, 'feed'])->name('academic-calendar.feed');
+Route::get('/academic-calendar/export-pdf', [\App\Http\Controllers\AcademicCalendarController::class, 'exportPdf'])->name('academic-calendar.pdf');
 
 // --- Instagram Feed (public API for load-more) ---
 Route::get('/__ig/feed', [\App\Http\Controllers\Cms\InstagramFeedController::class, 'feed']);

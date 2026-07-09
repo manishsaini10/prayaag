@@ -118,7 +118,7 @@ class PopupRepository
         $this->clearCache($popup->id);
     }
 
-    private function clearCache(string $popupId): void
+    public function clearCache(string $popupId): void
     {
         Cache::forget('popups:active');
         Cache::forget("popup:{$popupId}");

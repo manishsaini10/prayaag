@@ -20,6 +20,7 @@ class AnalyticsService
     public function track(AnalyticsDTO $dto): void
     {
         $data = $dto->toArray();
+        $data['device_type'] = $data['extra_data']['device_type'] ?? null;
 
         if (config('popup-builder.analytics.ip_anonymization', true) && $data['ip_address']) {
             $parts = explode('.', $data['ip_address']);
@@ -32,7 +33,18 @@ class AnalyticsService
         $this->model->create($data);
 
         // Update popup counters
-        Popup::where('id', $dto->popupId)->increment($dto->eventType . '_count');
+        $counterColumn = match ($dto->eventType) {
+            'view' => 'view_count',
+            'impression' => 'impression_count',
+            'click' => 'click_count',
+            'conversion' => 'conversion_count',
+            default => null,
+        };
+
+        if ($counterColumn) {
+            Popup::where('id', $dto->popupId)->increment($counterColumn);
+        }
+
         $this->clearCache($dto->popupId);
     }
 

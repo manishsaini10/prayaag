@@ -46,9 +46,15 @@ class PopupRender extends Component
             if ($this->popups->isNotEmpty()) {
                 $html = '';
                 foreach ($this->popups as $popup) {
-                    $popup->settings['trigger'] = $popup->trigger_config->first()['key'] ?? 'page_load';
-                    $popup->settings['delay'] = $popup->trigger_config->first()['value'] ?? 0;
-                    $popup->settings['clickSelector'] = $popup->trigger_config->first()['extra']['selector'] ?? '';
+                    $settings = $popup->settings;
+                    $firstTrigger = $popup->trigger_config->first();
+                    if ($firstTrigger && isset($firstTrigger['key'])) {
+                        $settings['trigger'] = $firstTrigger['key'];
+                        $settings['delay'] = $firstTrigger['value'] ?? 0;
+                        $settings['clickSelector'] = $firstTrigger['extra']['selector'] ?? '';
+                    }
+                    $settings['trigger'] ??= 'page_load';
+                    $popup->settings = $settings;
                     $html .= $this->engine->render($popup);
                 }
                 $this->html = $html;

@@ -2,13 +2,14 @@
 
 namespace App\Models\Popup;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PopupAsset extends Model
 {
-    use SoftDeletes;
+    use HasUlids, SoftDeletes;
 
     protected $table = 'popup_assets';
 

@@ -3,12 +3,14 @@
 namespace App\Models\Popup;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PopupRevision extends Model
 {
-    
+    use HasUlids;
+
     protected $table = 'popup_revisions';
 
     protected $fillable = [

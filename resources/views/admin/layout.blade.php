@@ -18,11 +18,22 @@
         })();
     </script>
 
-    @if (file_exists(public_path('build/manifest.json')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @php
+        $viteManifestPath = public_path('build/manifest.json');
+        $viteManifest = file_exists($viteManifestPath)
+            ? json_decode(file_get_contents($viteManifestPath), true)
+            : [];
+        $viteCss = $viteManifest['resources/css/app.css']['file'] ?? null;
+        $viteJs = $viteManifest['resources/js/app.js']['file'] ?? null;
+    @endphp
+    @if ($viteCss)
+        <link rel="stylesheet" href="{{ asset('build/'.$viteCss) }}">
     @else
-        {{-- No Vite build present — load the self-contained admin stylesheet (no build step needed). --}}
+        {{-- No Vite build present - load the self-contained admin stylesheet. --}}
         <link rel="stylesheet" href="{{ asset('admin.css') }}">
+    @endif
+    @if ($viteJs)
+        <script type="module" src="{{ asset('build/'.$viteJs) }}"></script>
     @endif
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -64,7 +75,11 @@
             <a href="{{ url('/admin/widgets') }}" class="nav-link {{ $is('admin/widgets*') }}"><x-admin.icon name="rectangle-stack"/><span x-show="!collapsed">Widget Builder</span></a>
             <a href="{{ url('/admin/menus') }}" class="nav-link {{ $is('admin/menus*') }}"><x-admin.icon name="menu"/><span x-show="!collapsed">Menus</span></a>
             @foreach ([['pencil','Posts','posts'],['tag','Categories','categories'],['megaphone','Notices','notices'],['calendar','Events','events'],['download','Downloads','downloads'],['star','Testimonials','testimonials'],['star','Achievements','achievements'],['collection','Gallery','galleries'],['photo','Sliders','sliders'],['calendar','Academic Calendar','academic_calendar']] as [$ic,$lbl,$key])
-                <a href="{{ url('/admin/m/'.$key) }}" class="nav-link {{ $is('admin/m/'.$key.'*') }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
+                @if ($key === 'academic_calendar')
+                    <a href="{{ route('admin.academic-calendar-entries.index') }}" class="nav-link {{ request()->is('admin/academic-calendar-entries*') || request()->is('admin/academic-sessions*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
+                @else
+                    <a href="{{ url('/admin/m/'.$key) }}" class="nav-link {{ $is('admin/m/'.$key.'*') }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
+                @endif
             @endforeach
 
             <div x-show="!collapsed" class="nav-section">Admissions</div>
@@ -85,12 +100,22 @@
             @endforeach
             @endcan
 
-            <div x-show="!collapsed" class="nav-section">Marketing</div>
-            <a href="{{ url('/admin/analytics') }}" class="nav-link {{ $is('admin/analytics*') }}"><x-admin.icon name="chart-bar"/><span x-show="!collapsed">Analytics</span></a>
-            <a href="{{ url('/admin/subscribers') }}" class="nav-link {{ $is('admin/subscribers*') }}"><x-admin.icon name="envelope"/><span x-show="!collapsed">Subscribers</span></a>
-            <a href="{{ url('/admin/seo') }}" class="nav-link {{ $is('admin/seo*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">SEO</span></a>
-            <a href="{{ url('/admin/m/redirects') }}" class="nav-link {{ $is('admin/m/redirects*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">Redirects</span></a>
-            <a href="{{ url('/admin/instagram') }}" class="nav-link {{ $is('admin/instagram*') }}"><x-admin.icon name="photo"/><span x-show="!collapsed">Instagram Feed</span></a>
+            <div x-data="{ marketingOpen: localStorage.getItem('mktg') !== '0' }" x-effect="localStorage.setItem('mktg', marketingOpen ? '1' : '0')" class="mb-1">
+                <button @click="marketingOpen = !marketingOpen" x-show="!collapsed" class="nav-section w-full flex items-center justify-between cursor-pointer" style="background:none;border:none;font:inherit;color:inherit;padding:6px 16px">
+                    <span>Marketing</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;transition:transform .2s" :class="{'rotate-180': marketingOpen}"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div x-show="marketingOpen || collapsed">
+                    <a href="{{ url('/admin/analytics') }}" class="nav-link {{ $is('admin/analytics*') }}"><x-admin.icon name="chart-bar"/><span x-show="!collapsed">Analytics</span></a>
+                    <a href="{{ url('/admin/subscribers') }}" class="nav-link {{ $is('admin/subscribers*') }}"><x-admin.icon name="envelope"/><span x-show="!collapsed">Subscribers</span></a>
+                    <a href="{{ url('/admin/seo') }}" class="nav-link {{ $is('admin/seo*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">SEO</span></a>
+                    <a href="{{ url('/admin/m/redirects') }}" class="nav-link {{ $is('admin/m/redirects*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">Redirects</span></a>
+                    <a href="{{ url('/admin/instagram') }}" class="nav-link {{ $is('admin/instagram*') }}"><x-admin.icon name="photo"/><span x-show="!collapsed">Instagram Feed</span></a>
+                    @can('popup.view')
+                    <a href="{{ url('/admin/popup-builder') }}" class="nav-link {{ $is('admin/popup-builder*') }}"><x-admin.icon name="collection"/><span x-show="!collapsed">Popup Manager</span></a>
+                    @endcan
+                </div>
+            </div>
 
             <div x-show="!collapsed" class="nav-section">System</div>
             <a href="{{ url('/admin/settings') }}" class="nav-link {{ $is('admin/settings*') }}"><x-admin.icon name="cog"/><span x-show="!collapsed">Settings</span></a>
@@ -262,6 +287,7 @@
             { label: 'Enquiries', href: '{{ url('/admin/enquiries') }}', group: 'Go', svg: ico('<path d="M4 13l2-8h12l2 8v6H4Z"/>') },
             { label: 'Analytics', href: '{{ url('/admin/analytics') }}', group: 'Go', svg: ico('<path d="M4 20V4M4 20h16"/><rect x="7" y="12" width="3" height="5"/><rect x="12" y="8" width="3" height="9"/>') },
             { label: 'Instagram Feed', href: '{{ url('/admin/instagram') }}', group: 'Go', svg: ico('<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/>') },
+            @can('popup.view'){ label: 'Popup Manager', href: '{{ url('/admin/popup-builder') }}', group: 'Go', svg: ico('<path d="M4 4h16v16H4z"/><path d="M9 4v16"/>') },@endcan
             { label: 'Settings', href: '{{ url('/admin/settings') }}', group: 'Go', svg: ico('<circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 6 9.4a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 11 4.6V4a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 11H21a2 2 0 0 1 0 4h-.09Z"/>') },
             { label: 'Create new page', href: '{{ url('/admin/pages/builder') }}', group: 'Action', svg: ico('<path d="M12 5v14M5 12h14"/>') },
             { label: 'View public site', href: '{{ url('/') }}', group: 'Action', svg: ico('<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/>') },

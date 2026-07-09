@@ -59,6 +59,17 @@ class AuthTest extends TestCase
             ->assertSee('Overview of content, admissions and site activity');
     }
 
+    public function test_admin_dashboard_loads_built_assets_when_vite_hot_file_exists(): void
+    {
+        file_put_contents(public_path('hot'), 'http://[::1]:5173');
+
+        $this->actingAs($this->user)
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('build/assets/app-', false)
+            ->assertDontSee('[::1]:5173', false);
+    }
+
     public function test_a_user_can_log_out(): void
     {
         $this->actingAs($this->user)

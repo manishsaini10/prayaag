@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Multi-tenancy removed: single-site CMS, no tenant-resolution middleware.
         $middleware->alias([
             'permission' => \App\Core\Auth\Middleware\EnsurePermission::class,
+            'role'       => \App\Http\Middleware\EnsureRole::class,
         ]);
 
         // SEO: perform configured 301/302 redirects on public GET requests.

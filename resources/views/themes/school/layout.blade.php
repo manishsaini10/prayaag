@@ -21,6 +21,7 @@
     {!! $themeHead ?? '' !!}
 
     @stack('head')
+    <x-popup-builder-assets />
 </head>
 <body>
     {!! $header !!}
@@ -29,6 +30,7 @@
 
     {!! $footer !!}
 
+    <x-popup-render />
     <script src="{{ asset('site.js') }}?v={{ @filemtime(public_path('site.js')) ?: '1' }}" defer></script>
     @stack('scripts')
 </body>

@@ -2,12 +2,14 @@
 
 namespace App\Models\Popup;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PopupIntegrationLog extends Model
 {
-    
+    use HasUlids;
+
     protected $table = 'popup_integration_logs';
 
     protected $fillable = [

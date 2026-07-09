@@ -21,14 +21,19 @@ class PopupTrackingController extends Controller
     public function track(Request $request): JsonResponse
     {
         try {
+            $payload = $this->payload($request);
+
             $dto = new AnalyticsDTO(
-                popupId: $request->input('popup_id'),
-                eventType: $request->input('event_type', 'view'),
-                sessionId: $request->input('session_id'),
+                popupId: $payload['popup_id'] ?? '',
+                eventType: $payload['event_type'] ?? 'view',
+                sessionId: $payload['session_id'] ?? null,
                 ipAddress: $request->ip(),
-                userAgent: $request->input('user_agent', $request->userAgent()),
-                url: $request->input('url'),
-                referrer: $request->input('referrer'),
+                userAgent: $payload['user_agent'] ?? $request->userAgent(),
+                url: $payload['url'] ?? null,
+                referrer: $payload['referrer'] ?? null,
+                extraData: [
+                    'device_type' => $payload['device_type'] ?? null,
+                ],
             );
 
             $this->trackAnalytics->execute($dto);
@@ -42,16 +47,17 @@ class PopupTrackingController extends Controller
     public function lead(Request $request): JsonResponse
     {
         try {
-            $formData = $request->input('form_data', []);
+            $payload = $this->payload($request);
+            $formData = $payload['form_data'] ?? [];
             $dto = new LeadDTO(
-                popupId: $request->input('popup_id'),
-                name: $formData['name'] ?? $request->input('name'),
-                email: $formData['email'] ?? $request->input('email'),
-                phone: $formData['phone'] ?? $request->input('phone'),
+                popupId: $payload['popup_id'] ?? '',
+                name: $formData['name'] ?? ($payload['name'] ?? null),
+                email: $formData['email'] ?? ($payload['email'] ?? null),
+                phone: $formData['phone'] ?? ($payload['phone'] ?? null),
                 formData: $formData,
-                source: $request->input('url'),
+                source: $payload['url'] ?? null,
                 ipAddress: $request->ip(),
-                userAgent: $request->input('user_agent', $request->userAgent()),
+                userAgent: $payload['user_agent'] ?? $request->userAgent(),
             );
 
             $this->captureLead->execute($dto);
@@ -65,14 +71,16 @@ class PopupTrackingController extends Controller
     public function conversion(Request $request): JsonResponse
     {
         try {
+            $payload = $this->payload($request);
+
             $dto = new AnalyticsDTO(
-                popupId: $request->input('popup_id'),
+                popupId: $payload['popup_id'] ?? '',
                 eventType: 'conversion',
-                sessionId: $request->input('session_id'),
+                sessionId: $payload['session_id'] ?? null,
                 ipAddress: $request->ip(),
-                userAgent: $request->input('user_agent', $request->userAgent()),
-                url: $request->input('url'),
-                extraData: $request->input('data', []),
+                userAgent: $payload['user_agent'] ?? $request->userAgent(),
+                url: $payload['url'] ?? null,
+                extraData: $payload['data'] ?? [],
             );
 
             $this->trackAnalytics->execute($dto);
@@ -81,5 +89,18 @@ class PopupTrackingController extends Controller
             Log::error('Popup conversion tracking error: ' . $e->getMessage());
             return response()->json(['success' => false], 500);
         }
+    }
+
+    private function payload(Request $request): array
+    {
+        $payload = $request->all();
+
+        if ($payload !== []) {
+            return $payload;
+        }
+
+        $decoded = json_decode($request->getContent(), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 }

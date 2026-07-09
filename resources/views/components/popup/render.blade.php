@@ -1,22 +1,38 @@
-<div class="popup-builder-output" style="display:none;">
-    {!! $css !!}
+<div class="popup-builder-output">
+    @if(trim($css) !== '')
+        <style>{!! $css !!}</style>
+    @endif
     <div class="popup-overlay" data-popup-id="{{ $popup->id }}" style="display:none;"></div>
-    <div class="popup" data-popup-id="{{ $popup->id }}"
-         data-type="{{ $popup->type }}"
-         data-animation="{{ $settings['animation'] ?? 'fade' }}"
-         data-position="{{ $settings['position'] ?? 'center-center' }}"
-         data-width="{{ $settings['width'] ?? 600 }}"
-         data-delay="{{ $settings['delay'] ?? 0 }}"
-         data-frequency="{{ $popup->frequency_type }}"
-         role="dialog"
-         aria-modal="true"
-         style="display:none; {{ $popup->type === 'floating_bar' ? 'position:fixed;bottom:0;left:0;right:0;z-index:' . ($settings['z_index'] ?? 999999) . ';' : '' }}">
+@php
+    $blocks = $popup->structure['blocks'] ?? [];
+    $isImageOnly = count($blocks) === 1 && (($blocks[0]['type'] ?? null) === 'image');
+    $popupClasses = 'popup' . ($isImageOnly ? ' popup--image-only' : '');
+    $config = array_filter([
+    'trigger' => $settings['trigger'] ?? null,
+    'delay' => $settings['delay'] ?? null,
+    'clickSelector' => $settings['clickSelector'] ?? null,
+    'scrollPercent' => $settings['scrollPercent'] ?? null,
+    'z_index' => $settings['z_index'] ?? null,
+    'autoClose' => $settings['autoClose'] ?? null,
+]); @endphp
+    <div class="{{ $popupClasses }}" data-popup-id="{{ $popup->id }}"
+          data-type="{{ $popup->type }}"
+          data-animation="{{ $settings['animation'] ?? 'fade' }}"
+          data-position="{{ $settings['position'] ?? 'center-center' }}"
+          data-width="{{ $settings['width'] ?? 600 }}"
+          data-delay="{{ $settings['delay'] ?? 0 }}"
+          data-frequency="{{ $popup->frequency_type }}"
+          data-config="{{ json_encode($config) }}"
+          role="dialog"
+          aria-modal="true"
+          aria-label="{{ $popup->title }}"
+          style="display:none; {{ $popup->type === 'floating_bar' ? 'position:fixed;bottom:0;left:0;right:0;z-index:' . ($settings['z_index'] ?? 999999) . ';' : '' }}">
         <div class="popup-content" style="
             background: {{ $design['background'] ?? '#ffffff' }};
             border-radius: {{ $design['borderRadius'] ?? '12' }}px;
             box-shadow: {{ $design['boxShadow'] ?? '0 25px 50px -12px rgba(0,0,0,0.25)' }};
             max-width: {{ $settings['width'] ?? 600 }}px;
-            width: 90%;
+            width: 100%;
             margin: 0 auto;
             position: relative;
             overflow: hidden;
@@ -35,7 +51,7 @@
         </div>
     </div>
     @if($popup->custom_js)
-        <script>{!! $popup->custom_js !!}</script>
+        <script>try { {!! $popup->custom_js !!} } catch(e) { console.warn('Popup custom JS error:', e); }</script>
     @endif
     <script>{!! $js !!}</script>
 </div>

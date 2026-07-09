@@ -31,7 +31,7 @@ class MediaManager
 
         [$width, $height] = $this->dimensions($file);
 
-        return Media::create([
+        $media = Media::create([
             'folder_id'     => $folder?->id,
             'disk'          => $disk,
             'path'          => $path,
@@ -43,6 +43,12 @@ class MediaManager
             'width'         => $width,
             'height'        => $height,
         ]);
+
+        if (str_starts_with((string) $media->mime_type, 'image/')) {
+            \App\Services\ImageOptimizerService::generateSizes($path, $media->mime_type, $disk);
+        }
+
+        return $media;
     }
 
     public function url(Media $media): string
@@ -52,6 +58,7 @@ class MediaManager
 
     public function delete(Media $media): void
     {
+        \App\Services\ImageOptimizerService::deleteSizes($media->path, $media->disk ?? 'public');
         Storage::disk($media->disk)->delete($media->path);
         $media->delete();
     }

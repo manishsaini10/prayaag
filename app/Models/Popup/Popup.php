@@ -3,16 +3,31 @@
 namespace App\Models\Popup;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Popup extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUlids, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::saved(function ($popup) {
+            Cache::forget('popups:active');
+            Cache::forget("popup:{$popup->id}");
+        });
+
+        static::deleted(function ($popup) {
+            Cache::forget('popups:active');
+            Cache::forget("popup:{$popup->id}");
+        });
+    }
 
     protected $table = 'popups';
 
