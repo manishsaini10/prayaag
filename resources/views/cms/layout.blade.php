@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }}</title>
     @php($seo = $seo ?? [])
     @if (!empty($seo['description']))
@@ -35,6 +36,9 @@
         .pb-button { display: inline-block; background: var(--primary); color: #fff; padding: .5rem 1rem; border-radius: 6px; text-decoration: none; }
         .site-footer { padding: 1.5rem 2rem; border-top: 1px solid #eee; color: #666; }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/chatbot/chatbot-runtime.css') }}">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="{{ asset('js/chatbot/chatbot-runtime.js') }}" defer></script>
 </head>
 <body>
     {!! $header !!}

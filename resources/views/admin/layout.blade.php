@@ -77,6 +77,8 @@
             @foreach ([['pencil','Posts','posts'],['tag','Categories','categories'],['megaphone','Notices','notices'],['calendar','Events','events'],['download','Downloads','downloads'],['star','Testimonials','testimonials'],['star','Achievements','achievements'],['collection','Gallery','galleries'],['photo','Sliders','sliders'],['calendar','Academic Calendar','academic_calendar']] as [$ic,$lbl,$key])
                 @if ($key === 'academic_calendar')
                     <a href="{{ route('admin.academic-calendar-entries.index') }}" class="nav-link {{ request()->is('admin/academic-calendar-entries*') || request()->is('admin/academic-sessions*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
+                @elseif ($key === 'testimonials')
+                    <a href="{{ route('admin.testimonials-console.index') }}" class="nav-link {{ request()->is('admin/testimonials-console*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
                 @else
                     <a href="{{ url('/admin/m/'.$key) }}" class="nav-link {{ $is('admin/m/'.$key.'*') }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
                 @endif
@@ -114,6 +116,7 @@
                     @can('popup.view')
                     <a href="{{ url('/admin/popup-builder') }}" class="nav-link {{ $is('admin/popup-builder*') }}"><x-admin.icon name="collection"/><span x-show="!collapsed">Popup Manager</span></a>
                     @endcan
+                    <a href="{{ url('/admin/chatbot') }}" class="nav-link {{ $is('admin/chatbot*') }}"><x-admin.icon name="inbox"/><span x-show="!collapsed">AI Chatbot</span></a>
                 </div>
             </div>
 

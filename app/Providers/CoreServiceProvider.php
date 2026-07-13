@@ -34,6 +34,7 @@ use App\Core\Builder\Widgets\SliderWidget;
 use App\Core\Builder\Widgets\StatsWidget;
 use App\Core\Builder\Widgets\TestimonialsWidget;
 use App\Core\Builder\Widgets\TestimonialsCardsWidget;
+use App\Core\Builder\Widgets\TestimonialFormWidget;
 use App\Core\Builder\Widgets\TextWidget;
 use App\Core\Builder\Widgets\UpcomingEventsWidget;
 use App\Core\Builder\Widgets\VideosWidget;
@@ -71,6 +72,7 @@ class CoreServiceProvider extends ServiceProvider
         GalleryWidget::class,
         // Forms
         ContactFormWidget::class,
+        TestimonialFormWidget::class,
         NewsletterWidget::class,
         // School home sections
         HeroWidget::class,

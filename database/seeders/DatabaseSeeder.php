@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SiteChromeSeeder::class,
             HomePageSeeder::class,
             MediaImageSeeder::class,
+            ChatbotPermissionSeeder::class,
         ]);
     }
 }

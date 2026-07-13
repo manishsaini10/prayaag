@@ -24,6 +24,10 @@ use App\Http\Controllers\Cms\SitemapController;
 use App\Http\Controllers\Cms\SubscriberController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSearchController;
+use App\Http\Controllers\Admin\AdminChatbotController;
+use App\Http\Controllers\Cms\PublicChatbotController;
+use App\Http\Controllers\Admin\AdminTestimonialController;
+use App\Http\Controllers\Cms\PublicTestimonialController;
 use Illuminate\Support\Facades\Route;
 
 // --- Authentication ---
@@ -164,6 +168,66 @@ Route::middleware('auth')->group(function () {
         Route::resource('academic-sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
         Route::resource('academic-terms', \App\Http\Controllers\Admin\AcademicTermController::class);
     });
+
+    // AI Chatbot Admin Console
+    Route::prefix('/admin/chatbot')->name('admin.chatbot.')->group(function () {
+        Route::get('/', [AdminChatbotController::class, 'index'])->name('index');
+        Route::post('/settings', [AdminChatbotController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/conversations', [AdminChatbotController::class, 'conversations'])->name('conversations');
+        Route::get('/conversations/list-json', [AdminChatbotController::class, 'listJson'])->name('conversations.list-json');
+        Route::get('/conversations/{id}/messages', [AdminChatbotController::class, 'getMessages'])->name('conversations.messages');
+        Route::post('/conversations/{id}/messages', [AdminChatbotController::class, 'sendMessage'])->name('conversations.send');
+        Route::post('/conversations/{id}/status', [AdminChatbotController::class, 'updateConversationStatus'])->name('conversations.status');
+        Route::post('/conversations/{id}/assign', [AdminChatbotController::class, 'assignConversation'])->name('conversations.assign');
+        Route::get('/kb', [AdminChatbotController::class, 'kb'])->name('kb');
+        Route::post('/kb/index-cms', [AdminChatbotController::class, 'indexCms'])->name('kb.index-cms');
+        Route::post('/kb/upload', [AdminChatbotController::class, 'uploadDoc'])->name('kb.upload');
+        Route::delete('/kb/{id}', [AdminChatbotController::class, 'deleteDoc'])->name('kb.delete');
+        Route::get('/leads', [AdminChatbotController::class, 'leads'])->name('leads');
+        Route::get('/flows', [AdminChatbotController::class, 'flows'])->name('flows');
+        Route::post('/flows', [AdminChatbotController::class, 'saveFlow'])->name('flows.save');
+    });
+
+    // Parent Testimonials Management Console
+    Route::prefix('/admin/testimonials-console')->name('admin.testimonials-console.')->group(function () {
+        Route::get('/', [AdminTestimonialController::class, 'index'])->name('index');
+        Route::get('/view/{id}', [AdminTestimonialController::class, 'view'])->name('view');
+        Route::post('/approve/{id}', [AdminTestimonialController::class, 'approve'])->name('approve');
+        Route::post('/reject/{id}', [AdminTestimonialController::class, 'reject'])->name('reject');
+        Route::post('/toggle-featured/{id}', [AdminTestimonialController::class, 'toggleFeatured'])->name('toggle-featured');
+        Route::post('/toggle-verified/{id}', [AdminTestimonialController::class, 'toggleVerified'])->name('toggle-verified');
+        Route::get('/export', [AdminTestimonialController::class, 'export'])->name('export');
+        Route::post('/import', [AdminTestimonialController::class, 'import'])->name('import');
+        Route::post('/bulk', [AdminTestimonialController::class, 'bulkAction'])->name('bulk');
+        Route::get('/settings', [AdminTestimonialController::class, 'settings'])->name('settings');
+        Route::post('/settings', [AdminTestimonialController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/edit/{id}', [AdminTestimonialController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [AdminTestimonialController::class, 'update'])->name('update');
+        Route::post('/duplicate/{id}', [AdminTestimonialController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/delete/{id}', [AdminTestimonialController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// AI Chatbot Widget APIs
+Route::prefix('/chatbot/widget')->name('chatbot.widget.')->group(function () {
+    Route::get('/config', [PublicChatbotController::class, 'config'])->name('config');
+    Route::post('/init', [PublicChatbotController::class, 'init'])->name('init');
+    Route::post('/send', [PublicChatbotController::class, 'send'])->name('send');
+    Route::post('/lead', [PublicChatbotController::class, 'submitLead'])->name('lead');
+    Route::get('/conversations/{id}/messages', [PublicChatbotController::class, 'getMessages'])->name('messages');
+    Route::post('/conversations/{id}/close', [PublicChatbotController::class, 'closeConversation'])->name('close');
+    Route::post('/upload', [PublicChatbotController::class, 'uploadFile'])->name('upload');
+    Route::post('/typing', [PublicChatbotController::class, 'typing'])->name('typing');
+    Route::post('/read', [PublicChatbotController::class, 'markRead'])->name('read');
+});
+
+// Visitor Tracking API (public, used by widget JS)
+Route::prefix('/chatbot/track')->name('chatbot.track.')->group(function () {
+    Route::post('/identify', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'identify'])->name('identify');
+    Route::post('/page', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'pageView'])->name('page');
+    Route::post('/event', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'event'])->name('event');
+    Route::post('/heartbeat', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'heartbeat'])->name('heartbeat');
+    Route::post('/end', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'endSession'])->name('end');
 });
 
 // --- Academic Calendar Public Routes ---
@@ -208,7 +272,13 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/legacy-home', [SiteController::class, 'home'])->name('legacy.home');
 Route::get('/search', [SiteSearchController::class, 'index'])->name('search');
 
+// --- Public custom testimonials ---
+Route::post('/testimonials', [PublicTestimonialController::class, 'store'])->middleware('throttle:10,1')->name('testimonials.store');
+Route::get('/testimonials', [PublicTestimonialController::class, 'index'])->name('testimonials.index');
+Route::get('/api/testimonials', [PublicTestimonialController::class, 'apiList'])->name('testimonials.api.list');
+Route::get('/api/featured-testimonials', [PublicTestimonialController::class, 'apiFeatured'])->name('testimonials.api.featured');
+
 // --- Public CMS (kept last; catch-all excludes reserved paths) ---
 Route::get('/cms-home', [PageController::class, 'home'])->name('cms.home'); // alias of /
 Route::get('/{slug}', [PageController::class, 'show'])
-    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|legacy-home$|cms-home$)[A-Za-z0-9\-_/]+');
+    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|legacy-home$|cms-home$|testimonials$|api$)[A-Za-z0-9\-_/]+');

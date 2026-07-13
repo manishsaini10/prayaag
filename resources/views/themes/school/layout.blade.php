@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Dynamic meta engine (SeoManager) --}}
     @include('themes.school.partials.seo-head')
@@ -22,6 +23,9 @@
 
     @stack('head')
     <x-popup-builder-assets />
+    <link rel="stylesheet" href="{{ asset('css/chatbot/chatbot-runtime.css') }}">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="{{ asset('js/chatbot/chatbot-runtime.js') }}" defer></script>
 </head>
 <body>
     {!! $header !!}

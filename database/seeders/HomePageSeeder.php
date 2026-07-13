@@ -47,6 +47,7 @@ class HomePageSeeder extends Seeder
             ['section', 'campus'],
             ['alt',     'admission-process'],
             ['section', 'parent-testimonials'],
+            ['alt',     'testimonial_form'],
             ['alt',     'achievements'],
             ['section', 'news-calendar'],
             ['alt',     'life'],

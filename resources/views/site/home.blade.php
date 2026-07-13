@@ -264,7 +264,7 @@
         ['Media', '/media/', []],
         ['Contact Us', '/contact-us/', []],
     ];
-    $testimonials = [
+    $fallbackTestimonials = [
         ['Choosing Prayaag International School for our child has been one of the best decisions we made as parents. The school’s caring and supportive staff, excellent infrastructure, and consistent academic achievements make it the top choice in Panipat.','Mr. Kamal Chuge','F/O Felix VII H'],
         ['Prayaag International School’s commitment to holistic education is commendable. The school’s focus on sports, arts, and cultural activities, along with academics, ensures that children receive a well-balanced education that prepares them for life.','Ms. Rajni','M/O Diksha IX Z'],
         ['I can confidently say that Prayaag International School is the best school in Panipat for promoting a love for learning. The teachers create an engaging and stimulating environment, fostering a passion for knowledge among the students.','Ms. Neelam','M/O Bhumi IX H'],
@@ -272,6 +272,10 @@
         ['We are extremely satisfied with our decision to enroll our child in Prayaag International School. The school’s strong focus on values, ethics, and discipline, combined with excellent academic programs, makes it the best choice in Panipat.','Mr. Vishal Garg','F/O Shalok Garg X P'],
         ['Prayaag International School provides a well-rounded education that prepares children for the future. The school’s commitment to innovation, technology integration, and experiential learning makes it stand out among the top schools in Panipat.','Ms. Pinki','M/O Shelly IX H'],
     ];
+
+    $testimonials = $dynamicTestimonials->isNotEmpty()
+        ? $dynamicTestimonials->map(fn($t) => [$t->testimonial, $t->name, $t->relation])
+        : $fallbackTestimonials;
     $achievements = [
         ['2016', ['Laid the foundation stone of the school']],
         ['2019', ['District Level Karate Competition','Wrestling Competition (Block level)','Capacity Building Programme By CBSE','Annual Function – Let Me Fly']],
