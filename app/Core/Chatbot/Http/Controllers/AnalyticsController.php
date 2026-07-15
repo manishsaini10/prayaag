@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chatbot\Enterprise\Report;
 use App\Models\Chatbot\ChatbotConversation;
 use App\Models\Chatbot\ChatbotMessage;
+use App\Models\Chatbot\ChatbotLead;
 use App\Models\Chatbot\Enterprise\Ticket;
 use App\Models\Chatbot\Enterprise\AgentStatus;
 use Illuminate\Http\Request;
@@ -18,17 +19,29 @@ class AnalyticsController extends Controller
         Gate::authorize('chatbot.analytics.view');
         $totalConversations = ChatbotConversation::count();
         $totalMessages = ChatbotMessage::count();
-        $totalTickets = Ticket::count();
+        $openTickets = Ticket::whereIn('status', ['open', 'pending'])->count();
         $activeAgents = AgentStatus::where('status', 'online')->count();
+
+        $now = now();
+        $todayStart = $now->copy()->startOfDay();
+        $weekStart = $now->copy()->startOfWeek();
+        $monthStart = $now->copy()->startOfMonth();
+
+        $metrics = [
+            ['label' => 'Conversations', 'today' => ChatbotConversation::where('created_at', '>=', $todayStart)->count(), 'week' => ChatbotConversation::where('created_at', '>=', $weekStart)->count(), 'month' => ChatbotConversation::where('created_at', '>=', $monthStart)->count(), 'all' => $totalConversations],
+            ['label' => 'Messages', 'today' => ChatbotMessage::where('created_at', '>=', $todayStart)->count(), 'week' => ChatbotMessage::where('created_at', '>=', $weekStart)->count(), 'month' => ChatbotMessage::where('created_at', '>=', $monthStart)->count(), 'all' => $totalMessages],
+            ['label' => 'Leads', 'today' => ChatbotLead::where('created_at', '>=', $todayStart)->count(), 'week' => ChatbotLead::where('created_at', '>=', $weekStart)->count(), 'month' => ChatbotLead::where('created_at', '>=', $monthStart)->count(), 'all' => ChatbotLead::count()],
+            ['label' => 'Tickets', 'today' => Ticket::where('created_at', '>=', $todayStart)->count(), 'week' => Ticket::where('created_at', '>=', $weekStart)->count(), 'month' => Ticket::where('created_at', '>=', $monthStart)->count(), 'all' => Ticket::count()],
+        ];
 
         if (request()->wantsJson()) {
             return response()->json(compact(
-                'totalConversations', 'totalMessages', 'totalTickets', 'activeAgents'
+                'totalConversations', 'totalMessages', 'openTickets', 'activeAgents', 'metrics'
             ));
         }
 
         return view('chatbot.admin.analytics.index', compact(
-            'totalConversations', 'totalMessages', 'totalTickets', 'activeAgents'
+            'totalConversations', 'totalMessages', 'openTickets', 'activeAgents', 'metrics'
         ));
     }
 
@@ -40,9 +53,22 @@ class AnalyticsController extends Controller
         $activeAgents = AgentStatus::where('status', 'online')->count();
         $pendingTickets = Ticket::where('status', 'open')->count();
 
-        return response()->json(compact(
-            'activeConversations', 'messagesLastHour', 'activeAgents', 'pendingTickets'
-        ));
+        $days = collect(range(29, 0))->map(function ($i) {
+            $date = now()->subDays($i);
+            return [
+                'label' => $date->format('M d'),
+                'value' => ChatbotConversation::whereDate('created_at', $date)->count(),
+            ];
+        });
+
+        return response()->json([
+            'activeConversations' => $activeConversations,
+            'messagesLastHour' => $messagesLastHour,
+            'activeAgents' => $activeAgents,
+            'pendingTickets' => $pendingTickets,
+            'labels' => $days->pluck('label'),
+            'values' => $days->pluck('value'),
+        ]);
     }
 
     public function reports()
@@ -61,15 +87,19 @@ class AnalyticsController extends Controller
     {
         Gate::authorize('chatbot.analytics.reports');
         $data = $request->validate([
-            'name' => 'required|string|max:255',
             'type' => 'required|string|max:30',
-            'config' => 'required|json',
-            'schedule' => 'nullable|string|max:30',
-            'recipients' => 'nullable|json',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date',
         ]);
 
-        $data['created_by'] = auth()->id();
-        $report = Report::create($data);
+        $report = Report::create([
+            'type' => $data['type'],
+            'name' => $data['type'] . ' Report',
+            'date_from' => $data['date_from'] ?? null,
+            'date_to' => $data['date_to'] ?? null,
+            'config' => json_encode([]),
+            'created_by' => auth()->id(),
+        ]);
 
         if ($request->wantsJson()) {
             return response()->json($report, 201);

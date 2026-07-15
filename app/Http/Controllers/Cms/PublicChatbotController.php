@@ -9,6 +9,7 @@ use App\Core\Chatbot\Events\MessageRead;
 use App\Core\Chatbot\Repositories\ChatbotRepository;
 use App\Core\Chatbot\Services\ChatbotAIService;
 use App\Core\Chatbot\Services\ChatbotRAGService;
+use App\Models\Chatbot\ChatbotFormField;
 use App\Models\Chatbot\ChatbotLead;
 use App\Models\Chatbot\ChatbotConversation;
 use App\Models\Chatbot\ChatbotMessage;
@@ -40,6 +41,21 @@ class PublicChatbotController extends Controller
             'ws_scheme' => config('broadcasting.connections.reverb.options.scheme', 'http'),
         ];
         return response()->json($data);
+    }
+
+    public function formFields()
+    {
+        $fields = ChatbotFormField::active()->ordered()->get()->map(fn($f) => [
+            'id' => $f->id,
+            'label' => $f->label,
+            'field_key' => $f->field_key,
+            'field_type' => $f->field_type,
+            'placeholder' => $f->placeholder,
+            'options' => $f->options ?? [],
+            'is_required' => $f->is_required,
+        ]);
+
+        return response()->json($fields);
     }
 
     public function init(Request $request)
@@ -198,28 +214,50 @@ class PublicChatbotController extends Controller
     {
         $request->validate([
             'session_id' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
+            'form_data' => 'nullable|array',
+            'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'class' => 'nullable|string|max:50',
             'interest' => 'nullable|string|max:255',
         ]);
 
+        $dynamicFields = ChatbotFormField::active()->ordered()->get();
+
+        $formData = $request->input('form_data', []);
+        $errors = [];
+
+        foreach ($dynamicFields as $field) {
+            $value = $formData[$field->field_key] ?? $request->input($field->field_key, '');
+            $formData[$field->field_key] = $value;
+
+            if ($field->is_required && empty($value)) {
+                $errors[$field->field_key] = "{$field->label} is required.";
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json(['success' => false, 'errors' => $errors], 422);
+        }
+
         $visitor = $this->repository->findOrCreateVisitor($request->input('session_id'));
 
-        $visitor->update([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'phone' => $request->input('phone'),
-        ]);
+        $visitorData = [];
+        if (!empty($formData['name'])) $visitorData['name'] = $formData['name'];
+        if (!empty($formData['email'])) $visitorData['email'] = $formData['email'];
+        if (!empty($formData['phone'])) $visitorData['phone'] = $formData['phone'];
+        if (!empty($visitorData)) {
+            $visitor->update($visitorData);
+        }
 
         $lead = ChatbotLead::create([
             'visitor_id' => $visitor->id,
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'phone' => $request->input('phone'),
-            'admission_class' => $request->input('class'),
-            'interest' => $request->input('interest') ?? 'Admission Inquiry',
+            'name' => $formData['name'] ?? $request->input('name', ''),
+            'email' => $formData['email'] ?? $request->input('email'),
+            'phone' => $formData['phone'] ?? $request->input('phone'),
+            'admission_class' => $formData['class'] ?? $request->input('class'),
+            'interest' => $formData['interest'] ?? $request->input('interest') ?? 'Admission Inquiry',
+            'form_data' => $formData,
             'status' => 'new',
             'source' => 'chatbot',
         ]);

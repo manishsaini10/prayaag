@@ -2,9 +2,17 @@
 
 namespace App\Models\Chatbot\Enterprise;
 
-use App\Core\Models\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class AnalyticsEvent extends BaseModel
+class AnalyticsEvent extends Model
 {
-    protected $table = 'chatbot_analytics_events';
+    protected $fillable = [
+        'event_type',
+        'session_id',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
 }

@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -18,11 +19,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Core\Auth\Middleware\EnsurePermission::class,
             'role'       => \App\Http\Middleware\EnsureRole::class,
+            'cors'       => \App\Http\Middleware\CorsMiddleware::class,
         ]);
 
         // SEO: perform configured 301/302 redirects on public GET requests.
         $middleware->web(append: [
             \App\Http\Middleware\HandleRedirects::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'chatbot/widget/*',
+            'testimonials',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

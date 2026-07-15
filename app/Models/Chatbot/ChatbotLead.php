@@ -12,6 +12,7 @@ class ChatbotLead extends BaseModel
 
     protected $casts = [
         'follow_up_date' => 'date',
+        'form_data' => 'array',
     ];
 
     public function visitor(): BelongsTo

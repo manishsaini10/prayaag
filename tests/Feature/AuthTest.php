@@ -35,6 +35,11 @@ class AuthTest extends TestCase
             ->assertRedirect('/admin');
 
         $this->assertAuthenticatedAs($this->user);
+
+        $this->assertDatabaseHas('admin_notifications', [
+            'type'  => 'login',
+            'title' => 'User Admin logged in successfully',
+        ]);
     }
 
     public function test_login_fails_with_a_bad_password(): void

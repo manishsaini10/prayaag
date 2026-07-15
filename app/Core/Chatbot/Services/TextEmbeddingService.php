@@ -15,7 +15,7 @@ class TextEmbeddingService
     public function embed(string $content, string $model = 'text-embedding-004'): array
     {
         $settings = ChatbotSetting::first();
-        $aiConfig = $settings?->settings_data['ai'] ?? [];
+        $aiConfig = ($settings?->settings_data ?? [])['ai'] ?? [];
         $apiKey = $aiConfig['api_key'] ?? '';
 
         if (empty($apiKey)) {
@@ -66,7 +66,7 @@ class TextEmbeddingService
                 'embedding_vector' => $vector,
                 'model' => 'text-embedding-004',
                 'dimensions' => count($vector),
-                'token_count' => mb_strlen($content) / 4,
+                'token_count' => (int) ceil(mb_strlen($content) / 4),
             ]
         );
     }

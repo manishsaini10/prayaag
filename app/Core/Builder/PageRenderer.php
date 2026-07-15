@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Cache;
  */
 class PageRenderer
 {
+    protected array $renderContext = [];
+
     public function __construct(protected WidgetRegistry $widgets)
     {
     }
@@ -23,6 +25,14 @@ class PageRenderer
     public function render(Page $page): string
     {
         $page->loadMissing('sections.rows.columns.widgets');
+
+        $this->renderContext = [
+            'page_id'    => $page->id,
+            'page_slug'  => $page->slug,
+            'page_title' => $page->title,
+            'page_url'   => url($page->slug === 'home' ? '/' : $page->slug),
+            'page_seo'   => $page->seo ?? [],
+        ];
 
         $html = '';
         foreach ($page->sections as $section) {
@@ -40,6 +50,8 @@ class PageRenderer
      */
     public function renderTree(array $sections): string
     {
+        $this->renderContext = [];
+
         $html = '';
 
         foreach ($sections as $section) {
@@ -52,6 +64,7 @@ class PageRenderer
                         $widgets .= $this->widgets->render(
                             (string) ($widget['type'] ?? ''),
                             (array) ($widget['settings'] ?? []),
+                            $this->renderContext,
                         );
                     }
                     $width = (int) ($column['width'] ?? 12);
@@ -187,6 +200,7 @@ class PageRenderer
         return $this->widgets->render(
             $widget->widget_type,
             (array) ($widget->settings ?? []),
+            $this->renderContext,
         );
     }
 }

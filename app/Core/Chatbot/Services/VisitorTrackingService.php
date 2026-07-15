@@ -15,7 +15,7 @@ class VisitorTrackingService
 {
     public function identifyVisitor(Request $request): array
     {
-        $sessionToken = $request->input('session_id') ?? Str::random(32);
+        $sessionToken = $request->filled('session_id') ? $request->input('session_id') : Str::random(32);
         $ip = $request->ip();
         $agent = $request->userAgent();
 
@@ -61,9 +61,6 @@ class VisitorTrackingService
 
     public function trackPageView(Request $request, ChatbotVisitor $visitor, VisitorSession $session): VisitorPage
     {
-        if (!$visitor->exists) $visitor = ChatbotVisitor::findOrFail($visitor->id);
-        if (!$session->exists) $session = VisitorSession::findOrFail($session->id);
-
         $visitor->update(['current_page' => $request->input('url', url()->current())]);
 
         $page = VisitorPage::create([
@@ -191,7 +188,7 @@ class VisitorTrackingService
             if ($response === false) return null;
 
             $data = json_decode($response, true);
-            if (!($data['status'] ?? '') === 'success') return null;
+            if (($data['status'] ?? '') !== 'success') return null;
 
             return [
                 'country' => $data['country'] ?? null,
@@ -288,7 +285,7 @@ class VisitorTrackingService
         foreach ($visitor->conversations as $conv) {
             $timeline[] = [
                 'type' => 'conversation',
-                'label' => "Conversation #{$conv->short_id}",
+                'label' => "Conversation #{$conv->id}",
                 'status' => $conv->status,
                 'time' => $conv->created_at,
             ];

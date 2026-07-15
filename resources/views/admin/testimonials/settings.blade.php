@@ -70,6 +70,36 @@
 
         <hr style="border-top:1px solid var(--border)">
 
+        {{-- Display options --}}
+        <div>
+            <h3 class="text-lg font-bold text-gray-800">Display & Layout Configurations</h3>
+            <p class="text-sm text-gray-500 mt-1">Configure layout, limit, and autoplay interval for public pages.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Default Display Style</label>
+                <select name="display_style" class="w-full text-sm p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    <option value="slider" {{ $config['display_style'] === 'slider' ? 'selected' : '' }}>Slider (Carousel)</option>
+                    <option value="grid" {{ $config['display_style'] === 'grid' ? 'selected' : '' }}>Grid Layout</option>
+                    <option value="list" {{ $config['display_style'] === 'list' ? 'selected' : '' }}>Vertical List</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Used on the homepage components.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Display Limit (Count)</label>
+                <input type="number" name="display_limit" value="{{ $config['display_limit'] }}" min="1" max="100" class="w-full text-sm p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <p class="text-xs text-gray-400 mt-1">Maximum number of testimonials to load.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-gray-700">Slider Autoplay (Seconds)</label>
+                <input type="number" name="slider_autoplay_interval" value="{{ $config['slider_autoplay_interval'] }}" min="1" max="60" class="w-full text-sm p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <p class="text-xs text-gray-400 mt-1">Time between auto-sliding in seconds.</p>
+            </div>
+        </div>
+
+        <hr style="border-top:1px solid var(--border)">
+
         {{-- Spam words --}}
         <div>
             <h3 class="text-lg font-bold text-gray-800">Spam Prevention & Content Moderation</h3>

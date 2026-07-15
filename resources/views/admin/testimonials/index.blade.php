@@ -47,10 +47,33 @@
         <div class="flex items-center gap-3 flex-wrap">
             {{-- Status Tabs --}}
             <div class="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
-                @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'archived' => 'Archived'] as $key => $lbl)
+                @foreach([
+                    'all' => ['All', $stats['total']],
+                    'pending' => ['Pending', $stats['pending']],
+                    'approved' => ['Approved', $stats['approved']],
+                    'rejected' => ['Rejected', $stats['rejected']],
+                    'archived' => ['Archived', $stats['archived']]
+                ] as $key => $tabData)
+                    @php
+                        [$lbl, $count] = $tabData;
+                        $isActive = ($status === $key);
+                        $isPendingAlert = ($key === 'pending' && $stats['pending'] > 0);
+                    @endphp
                     <a href="{{ route('admin.testimonials-console.index', ['status' => $key, 'q' => $search]) }}" 
-                       class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all {{ $status === $key ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-800' }}">
+                       class="relative px-3 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 
+                       {{ $isActive ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-800' }}
+                       {{ $isPendingAlert && !$isActive ? 'border border-amber-300 bg-amber-50/50 text-amber-800 hover:bg-amber-100/70' : '' }}">
                         {{ $lbl }}
+                        <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full 
+                            {{ $isActive ? 'bg-gray-100 text-gray-700' : ($isPendingAlert ? 'bg-amber-500 text-white animate-pulse' : 'bg-gray-200/70 text-gray-500') }}">
+                            {{ $count }}
+                        </span>
+                        @if($isPendingAlert)
+                            <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                        @endif
                     </a>
                 @endforeach
             </div>
@@ -77,7 +100,7 @@
     </div>
 
     {{-- Bulk Action Form --}}
-    <form action="{{ route('admin.testimonials-console.bulk') }}" method="POST">
+    <form id="bulk-form" action="{{ route('admin.testimonials-console.bulk') }}" method="POST">
         @csrf
         
         <div class="flex items-center gap-2 mb-3 bg-gray-50 p-3 rounded-lg border">
@@ -92,6 +115,7 @@
             </select>
             <button type="submit" class="btn-secondary py-1.5 px-3 text-xs font-bold" onclick="return confirm('Apply this bulk action to selected testimonials?')">Apply</button>
         </div>
+    </form>
 
         {{-- Data Table --}}
         <div class="card p-0 overflow-hidden">
@@ -116,7 +140,7 @@
                         @forelse($testimonials as $t)
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="p-4">
-                                    <input type="checkbox" name="ids[]" value="{{ $t->id }}" class="bulk-checkbox">
+                                    <input type="checkbox" name="ids[]" value="{{ $t->id }}" class="bulk-checkbox" form="bulk-form">
                                 </td>
                                 <td class="p-4">
                                     @if($t->image)
@@ -171,7 +195,6 @@
                                 </td>
                                 <td class="p-4 text-xs text-gray-500">
                                     {{ $t->created_at->format('M j, Y') }}
-                                </td>
                                 <td class="p-4 text-right">
                                     <div class="flex justify-end gap-1.5 items-center">
                                         {{-- View Details Trigger --}}
@@ -180,37 +203,55 @@
                                         </button>
 
                                         @if($t->status !== 'approved')
-                                            <button type="submit" formAction="{{ route('admin.testimonials-console.approve', $t->id) }}" class="p-1 text-emerald-600 hover:bg-emerald-50 rounded" title="Approve">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>
-                                            </button>
+                                            <form action="{{ route('admin.testimonials-console.approve', $t->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="p-1 text-emerald-600 hover:bg-emerald-50 rounded" title="Approve">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>
+                                                </button>
+                                            </form>
                                         @endif
 
                                         @if($t->status !== 'rejected')
-                                            <button type="submit" formAction="{{ route('admin.testimonials-console.reject', $t->id) }}" class="p-1 text-rose-600 hover:bg-rose-50 rounded" title="Reject">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                                            </button>
+                                            <form action="{{ route('admin.testimonials-console.reject', $t->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="p-1 text-rose-600 hover:bg-rose-50 rounded" title="Reject">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                                                </button>
+                                            </form>
                                         @endif
 
-                                        <button type="submit" formAction="{{ route('admin.testimonials-console.toggle-verified', $t->id) }}" class="p-1 {{ $t->is_verified ? 'text-emerald-600' : 'text-gray-400' }} hover:bg-emerald-50 rounded" title="Toggle Verified">
-                                            <svg viewBox="0 0 24 24" fill="{{ $t->is_verified ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                                        </button>
+                                        <form action="{{ route('admin.testimonials-console.toggle-verified', $t->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="p-1 {{ $t->is_verified ? 'text-emerald-600' : 'text-gray-400' }} hover:bg-emerald-50 rounded" title="Toggle Verified">
+                                                <svg viewBox="0 0 24 24" fill="{{ $t->is_verified ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                                            </button>
+                                        </form>
 
-                                        <button type="submit" formAction="{{ route('admin.testimonials-console.toggle-featured', $t->id) }}" class="p-1 {{ $t->featured ? 'text-purple-600' : 'text-gray-400' }} hover:bg-purple-50 rounded" title="Toggle Featured">
-                                            <svg viewBox="0 0 24 24" fill="{{ $t->featured ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        </button>
+                                        <form action="{{ route('admin.testimonials-console.toggle-featured', $t->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="p-1 {{ $t->featured ? 'text-purple-600' : 'text-gray-400' }} hover:bg-purple-50 rounded" title="Toggle Featured">
+                                                <svg viewBox="0 0 24 24" fill="{{ $t->featured ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                            </button>
+                                        </form>
 
                                         <a href="{{ route('admin.testimonials-console.edit', $t->id) }}" class="p-1 hover:bg-gray-100 rounded text-gray-600" title="Edit">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                         </a>
 
-                                        <button type="submit" formAction="{{ route('admin.testimonials-console.duplicate', $t->id) }}" class="p-1 text-gray-500 hover:bg-gray-100 rounded" title="Duplicate">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                        </button>
+                                        <form action="{{ route('admin.testimonials-console.duplicate', $t->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="p-1 text-gray-500 hover:bg-gray-100 rounded" title="Duplicate">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                            </button>
+                                        </form>
 
-                                        <button type="submit" formAction="{{ route('admin.testimonials-console.destroy', $t->id) }}" class="p-1 text-rose-600 hover:bg-rose-50 rounded" title="Delete Permanently" onclick="return confirm('Permanently delete this testimonial?')">
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                        </button>
+                                        <form action="{{ route('admin.testimonials-console.destroy', $t->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-1 text-rose-600 hover:bg-rose-50 rounded" title="Delete Permanently" onclick="return confirm('Permanently delete this testimonial?')">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -229,7 +270,6 @@
         <div class="mt-4">
             {{ $testimonials->appends(request()->query())->links() }}
         </div>
-    </form>
 
     {{-- Import CSV Modal --}}
     <div x-show="importModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak>

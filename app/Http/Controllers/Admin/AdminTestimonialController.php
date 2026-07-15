@@ -46,6 +46,7 @@ class AdminTestimonialController extends Controller
             'pending' => Testimonial::where('status', 'pending')->count(),
             'approved' => Testimonial::where('status', 'approved')->count(),
             'rejected' => Testimonial::where('status', 'rejected')->count(),
+            'archived' => Testimonial::where('status', 'archived')->count(),
             'featured' => Testimonial::where('featured', true)->count(),
         ];
 
@@ -333,6 +334,9 @@ class AdminTestimonialController extends Controller
             'max_chars' => Settings::get('testimonial_max_chars', 500),
             'min_chars' => Settings::get('testimonial_min_chars', 50),
             'blocked_words' => Settings::get('testimonial_blocked_words', 'abuse,fake,spam,cheat,worst,bad,worstschool,fraud'),
+            'display_style' => Settings::get('testimonial_display_style', 'slider'),
+            'display_limit' => Settings::get('testimonial_display_limit', 6),
+            'slider_autoplay_interval' => Settings::get('testimonial_slider_autoplay_interval', 5),
         ];
 
         return view('admin.testimonials.settings', compact('config'));
@@ -346,6 +350,9 @@ class AdminTestimonialController extends Controller
         Settings::set('testimonial_max_chars', (int) $request->get('max_chars', 500), 'integer');
         Settings::set('testimonial_min_chars', (int) $request->get('min_chars', 50), 'integer');
         Settings::set('testimonial_blocked_words', (string) $request->get('blocked_words', ''), 'string');
+        Settings::set('testimonial_display_style', (string) $request->get('display_style', 'slider'), 'string');
+        Settings::set('testimonial_display_limit', (int) $request->get('display_limit', 6), 'integer');
+        Settings::set('testimonial_slider_autoplay_interval', (int) $request->get('slider_autoplay_interval', 5), 'integer');
 
         return back()->with('success', 'Settings updated successfully.');
     }

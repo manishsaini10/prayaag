@@ -195,6 +195,18 @@ class ChatbotFeatureTest extends TestCase
         $this->assertFalse((bool) $convo->ai_handled); // Disables AI responses
     }
 
+    public function test_embed_script_serves_valid_javascript(): void
+    {
+        $response = $this->get(route('chatbot.embed.js'));
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/javascript');
+        $response->assertHeader('Access-Control-Allow-Origin', '*');
+        $content = $response->getContent();
+        $this->assertStringContainsString('Prayaag Help Desk', $content);
+        $this->assertStringContainsString('BASE_URL', $content);
+        $this->assertStringContainsString('chatbot-widget-container', $content);
+    }
+
     public function test_visitor_can_close_chat_session(): void
     {
         $visitor = ChatbotVisitor::create([

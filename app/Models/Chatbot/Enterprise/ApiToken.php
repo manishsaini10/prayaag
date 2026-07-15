@@ -2,9 +2,25 @@
 
 namespace App\Models\Chatbot\Enterprise;
 
-use App\Core\Models\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class ApiToken extends BaseModel
+class ApiToken extends Model
 {
-    protected $table = 'chatbot_api_tokens';
+    protected $fillable = [
+        'name',
+        'token',
+        'permissions',
+        'rate_limit',
+        'expires_at',
+        'revoked_at',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'permissions' => 'array',
+        'expires_at' => 'datetime',
+        'revoked_at' => 'datetime',
+    ];
+
+    protected $hidden = ['token'];
 }

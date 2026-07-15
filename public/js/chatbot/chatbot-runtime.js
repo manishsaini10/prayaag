@@ -8,6 +8,7 @@
             this.conversationId = null;
             this.renderedMessageIds = new Set();
             this.pollingInterval = null;
+            this.heartbeatInterval = null;
             this.pusher = null;
             this.pusherChannel = null;
             this.mediaRecorder = null;
@@ -223,10 +224,8 @@
         showScreen() {
             if (this.config.enable_departments && !this.departmentId) {
                 this.renderDepartmentSelector();
-            } else if (!this.sessionId || !this.visitorName) {
-                this.renderPreChatForm();
             } else {
-                this.initChatSession();
+                this.renderPreChatForm();
             }
         }
 
@@ -277,6 +276,55 @@
             const dept = this.config.departments?.find(d => d.id === this.departmentId);
             const deptLabel = dept ? ` — ${this.escHtml(dept.name)}` : '';
 
+            const self = this;
+
+            fetch('/chatbot/widget/form-fields', { headers: { 'Accept': 'application/json' } })
+                .then(r => { if (!r.ok) throw new Error('Form fields error'); return r.json(); })
+                .then(fields => {
+                    self.renderDynamicForm(fields, deptLabel);
+                })
+                .catch(() => {
+                    self.renderDynamicForm([], deptLabel);
+                });
+        }
+
+        renderDynamicForm(fields, deptLabel) {
+            const dept = this.config.departments?.find(d => d.id === this.departmentId);
+
+            let fieldsHtml = '';
+            if (fields.length === 0) {
+                fieldsHtml = `
+                    <input type="text" name="name" placeholder="Full Name" required value="${this.escHtml(this.visitorName || '')}">
+                    <input type="email" name="email" placeholder="Email Address (Optional)">
+                    <input type="text" name="phone" placeholder="Phone Number (Optional)">
+                    <select name="class">
+                        <option value="">Select Admission Class (Optional)</option>
+                        <option value="nursery">Nursery / KG</option>
+                        <option value="primary">Primary (1 - 5)</option>
+                        <option value="middle">Middle (6 - 8)</option>
+                        <option value="secondary">Secondary (9 - 12)</option>
+                    </select>
+                `;
+            } else {
+                fields.forEach(f => {
+                    const requiredAttr = f.is_required ? 'required' : '';
+                    const value = f.field_key === 'name' && this.visitorName ? this.escHtml(this.visitorName) : '';
+                    const ph = f.placeholder ? this.escHtml(f.placeholder) : '';
+                    if (f.field_type === 'select') {
+                        let opts = '<option value="">' + (ph || 'Select ' + f.label) + '</option>';
+                        (f.options || []).forEach(o => {
+                            opts += '<option value="' + this.escHtml(o) + '">' + this.escHtml(o) + '</option>';
+                        });
+                        fieldsHtml += `<select name="${this.escHtml(f.field_key)}" ${requiredAttr}>${opts}</select>`;
+                    } else if (f.field_type === 'textarea') {
+                        fieldsHtml += `<textarea name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr}></textarea>`;
+                    } else {
+                        const inputType = f.field_type === 'email' ? 'email' : f.field_type === 'tel' ? 'tel' : f.field_type === 'number' ? 'number' : 'text';
+                        fieldsHtml += `<input type="${inputType}" name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr} value="${value}">`;
+                    }
+                });
+            }
+
             this.bodyContent.innerHTML = `
                 <form class="chatbot-prechat-form">
                     ${this.config.enable_departments && this.departmentId ? `
@@ -289,16 +337,7 @@
                     ` : ''}
                     <h4>Start Chat${deptLabel}</h4>
                     <p class="chatbot-form-subtitle">Please introduce yourself to start the chat assistant.</p>
-                    <input type="text" name="name" placeholder="Full Name" required value="${this.escHtml(this.visitorName || '')}">
-                    <input type="email" name="email" placeholder="Email Address (Optional)">
-                    <input type="text" name="phone" placeholder="Phone Number (Optional)">
-                    <select name="class">
-                        <option value="">Select Admission Class (Optional)</option>
-                        <option value="nursery">Nursery / KG</option>
-                        <option value="primary">Primary (1 - 5)</option>
-                        <option value="middle">Middle (6 - 8)</option>
-                        <option value="secondary">Secondary (9 - 12)</option>
-                    </select>
+                    ${fieldsHtml}
                     <button type="submit" style="background:${this.config.primary_color};color:#ffffff">Start Conversation</button>
                 </form>
             `;
@@ -320,24 +359,26 @@
                 const btn = form.querySelector('button[type="submit"]');
                 if (btn) { btn.disabled = true; btn.innerText = 'Connecting...'; }
 
+                const formData = {};
+                fd.forEach((value, key) => { formData[key] = value; });
+
+                const interest = dept ? dept.name : 'Admission Inquiry';
+
                 fetch('/chatbot/widget/lead', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': this.getCsrfToken() },
                     body: JSON.stringify({
                         session_id: localSid,
-                        name: fd.get('name'),
-                        email: fd.get('email'),
-                        phone: fd.get('phone'),
-                        class: fd.get('class'),
-                        interest: dept ? dept.name : 'Admission Inquiry',
+                        form_data: formData,
+                        interest: interest,
                     })
                 })
                 .then(r => { if (!r.ok) return r.json().then(e => { throw new Error(e.message || 'Server error'); }); return r.json(); })
                 .then(() => {
                     localStorage.setItem('chatbot_session_id', localSid);
-                    localStorage.setItem('chatbot_visitor_name', fd.get('name'));
+                    localStorage.setItem('chatbot_visitor_name', formData['name'] || '');
                     this.sessionId = localSid;
-                    this.visitorName = fd.get('name');
+                    this.visitorName = formData['name'] || '';
                     this.initChatSession();
                 })
                 .catch(err => {
@@ -424,10 +465,12 @@
             if (attachBtn) attachBtn.addEventListener('click', () => fileInput.click());
             if (fileInput) fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
 
-            this.endChatBtn?.addEventListener('click', (e) => {
+            this.endChatBtn?.removeEventListener('click', this.endChatHandler);
+            this.endChatHandler = (e) => {
                 e.stopPropagation();
                 if (confirm('Are you sure you want to end this chat session?')) this.endChatSession();
-            });
+            };
+            this.endChatBtn?.addEventListener('click', this.endChatHandler);
         }
 
         initSession() {
@@ -551,9 +594,9 @@
                 const fileType = (metadata.file_type || '').toLowerCase();
                 const icon = fileType.startsWith('image') ? '🖼️' : fileType.startsWith('audio') ? '🎵' : fileType.startsWith('video') ? '🎬' : '📎';
                 if (fileType.startsWith('image') && fileUrl) {
-                    bubble.innerHTML = `<img src="${fileUrl}" alt="${this.escHtml(fileName)}" class="chatbot-msg-img" loading="lazy">`;
+                    bubble.innerHTML = `<img src="${this.escHtml(fileUrl)}" alt="${this.escHtml(fileName)}" class="chatbot-msg-img" loading="lazy">`;
                 } else {
-                    bubble.innerHTML = `<span class="chatbot-file-badge">${icon} <a href="${fileUrl}" target="_blank" rel="noopener">${this.escHtml(fileName)}</a></span>`;
+                    bubble.innerHTML = `<span class="chatbot-file-badge">${icon} <a href="${this.escHtml(fileUrl)}" target="_blank" rel="noopener">${this.escHtml(fileName)}</a></span>`;
                 }
             } else {
                 bubble.innerText = text;
@@ -699,13 +742,11 @@
                 if (!q) return;
                 grid.innerHTML = '<div class="chatbot-gif-loading">Searching...</div>';
                 const apiKey = this.config.gif_api_key || '';
-                const url = apiKey
-                    ? `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(q)}&key=${apiKey}&limit=12`
-                    : `https://api.giphy.com/v1/gifs/search?api_key=${apiKey || 'l3K9b3P0X4S0Q6Y7jW'}&q=${encodeURIComponent(q)}&limit=12`;
                 if (!apiKey) {
                     grid.innerHTML = '<div class="chatbot-gif-loading">GIF search requires API key configuration in settings.</div>';
                     return;
                 }
+                const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(q)}&key=${apiKey}&limit=12`;
                 fetch(url).then(r => r.json()).then(data => {
                     grid.innerHTML = '';
                     const results = data.results || data.data || [];
@@ -762,6 +803,7 @@
                 this.mediaRecorder.stop();
             }
             this.isRecording = false;
+            this.audioChunks = [];
             const btn = this.bodyContent.querySelector('.chatbot-voice-btn');
             if (btn) btn.classList.remove('recording');
         }
@@ -772,7 +814,8 @@
             fd.append('file', blob, 'voice-' + Date.now() + '.webm');
             fd.append('conversation_id', this.conversationId);
 
-            this.appendMessage('visitor', '🎵 Voice message', 'voice_' + Date.now());
+            const tempId = 'voice_' + Date.now();
+            this.appendMessage('visitor', '🎵 Voice message', tempId);
             this.showTypingIndicator();
 
             fetch('/chatbot/widget/upload', {
@@ -783,6 +826,7 @@
             .then(r => r.json())
             .then(data => {
                 this.removeTypingIndicator();
+                this.renderedMessageIds.delete(tempId);
                 if (data.message) {
                     this.renderedMessageIds.add(data.message.id);
                 }
@@ -790,6 +834,7 @@
             .catch(err => {
                 console.error('Upload Error:', err);
                 this.removeTypingIndicator();
+                this.renderedMessageIds.delete(tempId);
             });
         }
 
@@ -800,7 +845,8 @@
             fd.append('file', files[0]);
             fd.append('conversation_id', this.conversationId);
 
-            this.appendMessage('visitor', '📎 ' + files[0].name, 'file_' + Date.now());
+            const tempId = 'file_' + Date.now();
+            this.appendMessage('visitor', '📎 ' + files[0].name, tempId);
             this.showTypingIndicator();
 
             fetch('/chatbot/widget/upload', {
@@ -811,11 +857,13 @@
             .then(r => r.json())
             .then(data => {
                 this.removeTypingIndicator();
+                this.renderedMessageIds.delete(tempId);
                 if (data.message) this.renderedMessageIds.add(data.message.id);
             })
             .catch(err => {
                 console.error('Upload Error:', err);
                 this.removeTypingIndicator();
+                this.renderedMessageIds.delete(tempId);
             });
 
             e.target.value = '';
@@ -824,6 +872,7 @@
         playNotificationSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') ctx.resume();
                 const osc1 = ctx.createOscillator();
                 const osc2 = ctx.createOscillator();
                 const gain = ctx.createGain();

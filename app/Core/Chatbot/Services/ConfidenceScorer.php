@@ -22,7 +22,6 @@ class ConfidenceScorer
     public function score(string $response, string $intent): array
     {
         $lower = strtolower($response);
-        $length = strlen($response);
         $lowHits = 0;
         $highHits = 0;
 

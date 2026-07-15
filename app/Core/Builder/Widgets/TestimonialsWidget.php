@@ -99,6 +99,14 @@ class TestimonialsWidget extends AbstractWidget
                 $meta .= '<small>' . $this->e($role) . '</small>';
             }
 
+            // Image / Avatar rendering
+            $image = $t->image;
+            if ($image) {
+                $avHtml = '<img src="' . asset($image) . '" class="tw-av" style="object-fit:cover">';
+            } else {
+                $avHtml = '<span class="tw-av">' . $this->e($this->initials($author)) . '</span>';
+            }
+
             // Slider items scroll horizontally (off-screen right), so a scroll
             // reveal would leave them invisible — skip data-reveal for slider.
             $reveal = $layout === 'slider' ? '' : ' data-reveal data-reveal-delay="' . (($i % 3) + 1) . '"';
@@ -106,7 +114,7 @@ class TestimonialsWidget extends AbstractWidget
                 . $stars
                 . '<blockquote class="tw-quote">' . $this->e($quote) . '</blockquote>'
                 . '<figcaption class="tw-by">'
-                . '<span class="tw-av">' . $this->e($this->initials($author)) . '</span>'
+                . $avHtml
                 . '<span class="tw-meta">' . $meta . '</span>'
                 . '</figcaption></figure>';
             $i++;

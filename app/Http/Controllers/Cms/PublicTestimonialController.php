@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
 use App\Core\Settings\Settings;
+use App\Core\Theme\ThemeRenderer;
 use App\Services\SpamFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -89,7 +90,9 @@ class PublicTestimonialController extends Controller
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
             $filename = uniqid('parent_') . '.' . $file->getClientOriginalExtension();
-            $destDir = public_path('uploads/testimonials');
+            $isTesting = app()->environment('testing');
+            $subFolder = $isTesting ? 'uploads/testimonials_test' : 'uploads/testimonials';
+            $destDir = public_path($subFolder);
 
             if (!file_exists($destDir)) {
                 mkdir($destDir, 0755, true);
@@ -102,7 +105,7 @@ class PublicTestimonialController extends Controller
             $this->resizeAndCropGD($file->getPathname(), $mainPath, 800, $file->getClientOriginalExtension());
             $this->resizeAndCropGD($file->getPathname(), $thumbPath, 250, $file->getClientOriginalExtension());
 
-            $imagePath = 'uploads/testimonials/main_' . $filename;
+            $imagePath = $subFolder . '/main_' . $filename;
         }
 
         // Save Testimonial
@@ -125,6 +128,19 @@ class PublicTestimonialController extends Controller
             'ip_address'       => $ip,
             'browser'          => $request->userAgent(),
         ]);
+
+        // Create Admin Notification Alert if pending moderation
+        if ($status === 'pending') {
+            try {
+                \App\Models\AdminNotification::record('testimonial', "New testimonial from {$testimonial->name} is pending moderation", [
+                    'level' => 'info',
+                    'url'   => '/admin/testimonials-console?status=pending',
+                    'icon'  => 'star',
+                ]);
+            } catch (\Throwable $e) {
+                Log::error("Failed to record admin notification for pending testimonial: " . $e->getMessage());
+            }
+        }
 
         // Send Email Alert to Admin
         try {
@@ -151,7 +167,7 @@ class PublicTestimonialController extends Controller
         return back()->with('success', $successMsg);
     }
 
-    public function index(Request $request)
+    public function index(Request $request, ThemeRenderer $theme)
     {
         $rating = $request->get('rating');
         $class = $request->get('class');
@@ -190,7 +206,40 @@ class PublicTestimonialController extends Controller
             'avg'   => round(Testimonial::published()->avg('rating') ?? 5.0, 1),
         ];
 
-        return view('themes.school.testimonials', compact('testimonials', 'ratingStats', 'search', 'rating', 'class'));
+        $content = view('themes.school.testimonials', compact('testimonials', 'ratingStats', 'search', 'rating', 'class'))->render();
+
+        return view('themes.school.layout', [
+            'title'        => 'Parent Testimonials',
+            'siteName'     => Settings::get('site_name', 'Prayaag International School'),
+            'content'      => $content,
+            'header'       => $theme->header(),
+            'footer'       => $theme->footer(),
+            'themeHead'    => $theme->themeHead(),
+            'primaryColor' => Settings::get('theme_primary_color', '#0b2545'),
+            'seo'          => [
+                'title' => 'Parents Testimonials | Prayaag International School',
+                'description' => 'Read what our parents say about the academic excellence, student support, and infrastructure at Prayaag International School.',
+            ]
+        ]);
+    }
+
+    public function showForm(Request $request, ThemeRenderer $theme)
+    {
+        $content = view('themes.school.post-testimonial')->render();
+
+        return view('themes.school.layout', [
+            'title'        => 'Post Your Testimonial',
+            'siteName'     => Settings::get('site_name', 'Prayaag International School'),
+            'content'      => $content,
+            'header'       => $theme->header(),
+            'footer'       => $theme->footer(),
+            'themeHead'    => $theme->themeHead(),
+            'primaryColor' => Settings::get('theme_primary_color', '#0b2545'),
+            'seo'          => [
+                'title' => 'Post Your Testimonial | Prayaag International School',
+                'description' => 'Share your feedback and experience with the Prayaag International School community.',
+            ]
+        ]);
     }
 
     public function apiList()

@@ -25,6 +25,7 @@ use App\Http\Controllers\Cms\SubscriberController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSearchController;
 use App\Http\Controllers\Admin\AdminChatbotController;
+use App\Http\Controllers\Admin\AdminPreChatFormController;
 use App\Http\Controllers\Cms\PublicChatbotController;
 use App\Http\Controllers\Admin\AdminTestimonialController;
 use App\Http\Controllers\Cms\PublicTestimonialController;
@@ -34,6 +35,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// 2FA Challenge (user must be logged in, but no admin layout)
+Route::middleware('auth')->group(function () {
+    Route::get('/2fa/challenge', [\App\Http\Controllers\Auth\TwoFactorController::class, 'showChallenge'])->name('2fa.challenge');
+    Route::post('/2fa/verify', [\App\Http\Controllers\Auth\TwoFactorController::class, 'verify'])->name('2fa.verify');
+});
 
 // --- Admin (authenticated) ---
 Route::middleware('auth')->group(function () {
@@ -186,7 +193,54 @@ Route::middleware('auth')->group(function () {
         Route::get('/leads', [AdminChatbotController::class, 'leads'])->name('leads');
         Route::get('/flows', [AdminChatbotController::class, 'flows'])->name('flows');
         Route::post('/flows', [AdminChatbotController::class, 'saveFlow'])->name('flows.save');
+
+        // Pre-Chat Form Builder
+        Route::get('/form-fields', [AdminPreChatFormController::class, 'fields'])->name('form-fields');
+        Route::post('/form-fields', [AdminPreChatFormController::class, 'storeField'])->name('form-fields.store');
+        Route::put('/form-fields/{id}', [AdminPreChatFormController::class, 'updateField'])->name('form-fields.update');
+        Route::delete('/form-fields/{id}', [AdminPreChatFormController::class, 'destroyField'])->name('form-fields.destroy');
+        Route::post('/form-fields/{id}/toggle', [AdminPreChatFormController::class, 'toggleField'])->name('form-fields.toggle');
+        Route::post('/form-fields/reorder', [AdminPreChatFormController::class, 'reorderFields'])->name('form-fields.reorder');
+        Route::get('/form-fields/submissions', [AdminPreChatFormController::class, 'submissions'])->name('form-fields.submissions');
+
+        // Campaigns
+        Route::resource('campaigns', \App\Http\Controllers\Admin\CampaignController::class)->except(['show']);
+        Route::post('/campaigns/{id}/send', [\App\Http\Controllers\Admin\CampaignController::class, 'send'])->name('campaigns.send');
+        Route::post('/campaigns/{id}/duplicate', [\App\Http\Controllers\Admin\CampaignController::class, 'duplicate'])->name('campaigns.duplicate');
+
+        // Webhooks
+        Route::resource('webhooks', \App\Http\Controllers\Admin\WebhookController::class);
+        Route::post('/webhooks/{id}/test', [\App\Http\Controllers\Admin\WebhookController::class, 'test'])->name('webhooks.test');
+
+        // Webhook Logs
+        Route::get('/webhook-logs', [\App\Http\Controllers\Admin\WebhookController::class, 'logs'])->name('webhook-logs');
+        Route::get('/webhook-logs/{id}', [\App\Http\Controllers\Admin\WebhookController::class, 'showLog'])->name('webhook-logs.show');
+
+        // Analytics (already defined via enterprise module but add explicit route)
+        Route::get('/analytics', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
+        Route::get('/analytics/reports', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'reports'])->name('analytics.reports');
+        Route::post('/analytics/generate-report', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'generateReport'])->name('analytics.generate-report');
+        Route::get('/analytics/realtime', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'realtime'])->name('analytics.realtime');
     });
+
+    // 2FA
+    Route::prefix('2fa')->name('2fa.')->group(function () {
+        Route::get('/setup', [\App\Http\Controllers\Auth\TwoFactorController::class, 'showSetup'])->name('setup');
+        Route::post('/enable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'enable'])->name('enable');
+        Route::post('/disable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'disable'])->name('disable');
+    });
+
+    // API Tokens
+    Route::prefix('/admin/api-tokens')->name('admin.api-tokens.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ApiTokenController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\ApiTokenController::class, 'store'])->name('store');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\ApiTokenController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/revoke', [\App\Http\Controllers\Admin\ApiTokenController::class, 'revoke'])->name('revoke');
+    });
+
+    // Funnel Analytics
+    Route::get('/admin/funnel', [\App\Http\Controllers\Admin\FunnelController::class, 'index'])->name('admin.funnel');
+    Route::get('/admin/funnel/data', [\App\Http\Controllers\Admin\FunnelController::class, 'data'])->name('admin.funnel.data');
 
     // Parent Testimonials Management Console
     Route::prefix('/admin/testimonials-console')->name('admin.testimonials-console.')->group(function () {
@@ -208,9 +262,13 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// AI Chatbot Widget APIs
-Route::prefix('/chatbot/widget')->name('chatbot.widget.')->group(function () {
+// Embeddable chatbot JS (cross-site, served with CORS)
+Route::get('/chatbot/embed.js', [\App\Http\Controllers\Cms\ChatbotEmbedController::class, 'embedJs'])->name('chatbot.embed.js');
+
+// AI Chatbot Widget APIs (with CORS for cross-site embedding)
+Route::prefix('/chatbot/widget')->middleware('cors')->name('chatbot.widget.')->group(function () {
     Route::get('/config', [PublicChatbotController::class, 'config'])->name('config');
+    Route::get('/form-fields', [PublicChatbotController::class, 'formFields'])->name('form-fields');
     Route::post('/init', [PublicChatbotController::class, 'init'])->name('init');
     Route::post('/send', [PublicChatbotController::class, 'send'])->name('send');
     Route::post('/lead', [PublicChatbotController::class, 'submitLead'])->name('lead');
@@ -222,7 +280,7 @@ Route::prefix('/chatbot/widget')->name('chatbot.widget.')->group(function () {
 });
 
 // Visitor Tracking API (public, used by widget JS)
-Route::prefix('/chatbot/track')->name('chatbot.track.')->group(function () {
+Route::prefix('/chatbot/track')->middleware('cors')->name('chatbot.track.')->group(function () {
     Route::post('/identify', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'identify'])->name('identify');
     Route::post('/page', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'pageView'])->name('page');
     Route::post('/event', [\App\Http\Controllers\Cms\VisitorTrackController::class, 'event'])->name('event');

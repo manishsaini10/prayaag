@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Testimonials;
 
+use App\Models\Page;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Core\Builder\PageRenderer;
+use App\Core\Builder\PageTreeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -29,7 +32,7 @@ class ParentTestimonialsTest extends TestCase
 
     protected function cleanUpUploads(): void
     {
-        $dir = public_path('uploads/testimonials');
+        $dir = public_path('uploads/testimonials_test');
         if (file_exists($dir)) {
             $files = glob($dir . '/*');
             foreach ($files as $file) {
@@ -64,6 +67,11 @@ class ParentTestimonialsTest extends TestCase
             'name' => 'Ramesh Kumar',
             'phone' => '9876543210',
             'status' => 'pending', // defaults to pending
+        ]);
+
+        $this->assertDatabaseHas('admin_notifications', [
+            'type'  => 'testimonial',
+            'title' => 'New testimonial from Ramesh Kumar is pending moderation',
         ]);
 
         // Legacy compatibility sync assertions
@@ -136,7 +144,7 @@ class ParentTestimonialsTest extends TestCase
         
         $t = Testimonial::where('name', 'Image Submitter')->first();
         $this->assertNotNull($t->image);
-        $this->assertStringContainsString('uploads/testimonials/main_', $t->image);
+        $this->assertStringContainsString('uploads/testimonials_test/main_', $t->image);
 
         // Verify physical files exist and are correct dimensions (GD cropped)
         $mainPath = public_path($t->image);
@@ -285,5 +293,41 @@ class ParentTestimonialsTest extends TestCase
         $response->assertStatus(302);
         $this->assertSoftDeleted('testimonials', ['id' => $t1->id]);
         $this->assertSoftDeleted('testimonials', ['id' => $t2->id]);
+    }
+
+    public function test_post_testimonial_page_renders_successfully(): void
+    {
+        $page = Page::firstOrCreate(
+            ['slug' => 'post-testimonial'],
+            ['title' => 'Post Your Testimonial', 'status' => 'published']
+        );
+        $page->update([
+            'status' => 'published',
+            'seo' => ['title' => 'Post Your Testimonial', 'description' => 'Share your experience'],
+        ]);
+        app(PageTreeService::class)->sync($page, [
+            [
+                'type' => 'flush',
+                'rows' => [
+                    [
+                        'columns' => [
+                            [
+                                'width' => 12,
+                                'widgets' => [
+                                    ['type' => 'testimonial_page', 'settings' => []],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        app(PageRenderer::class)->forget($page);
+
+        $response = $this->get('/post-testimonial');
+
+        $response->assertStatus(200);
+        $response->assertSee('Post Your Testimonial');
+        $response->assertSee('Share Your Experience');
     }
 }

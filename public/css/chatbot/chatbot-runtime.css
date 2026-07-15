@@ -125,7 +125,7 @@
 }
 .chatbot-dept-card:hover {
     border-color: var(--dept-color, var(--cb-primary));
-    box-shadow: 0 0 0 2px rgba(from var(--dept-color, var(--cb-primary)) r g b / 0.1);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--dept-color, var(--cb-primary)) 10%, transparent);
     background: var(--cb-bg-secondary);
 }
 .chatbot-dept-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }

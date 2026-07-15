@@ -11,6 +11,7 @@ use App\Core\Builder\Widgets\FacilitiesWidget;
 use App\Core\Builder\Widgets\FloatingActionWidget;
 use App\Core\Builder\Widgets\MapWidget;
 use App\Core\Builder\Widgets\AdmissionCtaWidget;
+use App\Core\Builder\Widgets\BreadcrumbWidget;
 use App\Core\Builder\Widgets\ButtonWidget;
 use App\Core\Builder\Widgets\CampusWidget;
 use App\Core\Builder\Widgets\ContactFormWidget;
@@ -35,6 +36,7 @@ use App\Core\Builder\Widgets\StatsWidget;
 use App\Core\Builder\Widgets\TestimonialsWidget;
 use App\Core\Builder\Widgets\TestimonialsCardsWidget;
 use App\Core\Builder\Widgets\TestimonialFormWidget;
+use App\Core\Builder\Widgets\TestimonialPageWidget;
 use App\Core\Builder\Widgets\TextWidget;
 use App\Core\Builder\Widgets\UpcomingEventsWidget;
 use App\Core\Builder\Widgets\VideosWidget;
@@ -73,6 +75,7 @@ class CoreServiceProvider extends ServiceProvider
         // Forms
         ContactFormWidget::class,
         TestimonialFormWidget::class,
+        TestimonialPageWidget::class,
         NewsletterWidget::class,
         // School home sections
         HeroWidget::class,
@@ -87,6 +90,8 @@ class CoreServiceProvider extends ServiceProvider
         GlimpsesWidget::class,
         VideosWidget::class,
         AdmissionCtaWidget::class,
+        // Navigation
+        BreadcrumbWidget::class,
         // School sections (additional / reusable)
         AnnouncementBarWidget::class,
         AdmissionProcessWidget::class,

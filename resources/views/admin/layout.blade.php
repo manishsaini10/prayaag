@@ -116,7 +116,12 @@
                     @can('popup.view')
                     <a href="{{ url('/admin/popup-builder') }}" class="nav-link {{ $is('admin/popup-builder*') }}"><x-admin.icon name="collection"/><span x-show="!collapsed">Popup Manager</span></a>
                     @endcan
-                    <a href="{{ url('/admin/chatbot') }}" class="nav-link {{ $is('admin/chatbot*') }}"><x-admin.icon name="inbox"/><span x-show="!collapsed">AI Chatbot</span></a>
+                    <a href="{{ url('/admin/chatbot') }}" class="nav-link {{ $is('admin/chatbot') }}"><x-admin.icon name="inbox"/><span x-show="!collapsed">Chatbot</span></a>
+                    <a href="{{ url('/admin/chatbot/form-fields') }}" class="nav-link {{ $is('admin/chatbot/form-fields*') }}"><x-admin.icon name="collection"/><span x-show="!collapsed">Pre-Chat Form</span></a>
+                    <a href="{{ url('/admin/chatbot/campaigns') }}" class="nav-link {{ $is('admin/chatbot/campaigns*') }}"><x-admin.icon name="megaphone"/><span x-show="!collapsed">Campaigns</span></a>
+                    <a href="{{ url('/admin/chatbot/webhooks') }}" class="nav-link {{ $is('admin/chatbot/webhooks*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">Webhooks</span></a>
+                    <a href="{{ url('/admin/chatbot/analytics') }}" class="nav-link {{ $is('admin/chatbot/analytics') }}"><x-admin.icon name="chart-bar"/><span x-show="!collapsed">Chatbot Analytics</span></a>
+                    <a href="{{ url('/admin/funnel') }}" class="nav-link {{ $is('admin/funnel*') }}"><x-admin.icon name="trending-up"/><span x-show="!collapsed">Funnel Analytics</span></a>
                 </div>
             </div>
 
@@ -126,6 +131,8 @@
             <a href="{{ url('/admin/m/activitylog') }}" class="nav-link {{ $is('admin/m/activitylog*') }}"><x-admin.icon name="bolt"/><span x-show="!collapsed">Activity Logs</span></a>
             <a href="{{ url('/admin/notifications') }}" class="nav-link {{ $is('admin/notifications*') }}"><x-admin.icon name="bell"/><span x-show="!collapsed">Notifications</span></a>
             <a href="{{ url('/admin/system-health') }}" class="nav-link {{ $is('admin/system-health*') }}"><x-admin.icon name="server"/><span x-show="!collapsed">System Health</span></a>
+            <a href="{{ url('/admin/api-tokens') }}" class="nav-link {{ $is('admin/api-tokens*') }}"><x-admin.icon name="lock"/><span x-show="!collapsed">API Tokens</span></a>
+            <a href="{{ url('/2fa/setup') }}" class="nav-link {{ $is('2fa/setup') }}"><x-admin.icon name="shield"/><span x-show="!collapsed">2FA</span></a>
         </nav>
 
         {{-- Collapse toggle (desktop) --}}

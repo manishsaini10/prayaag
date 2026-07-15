@@ -68,6 +68,108 @@ class AppServiceProvider extends ServiceProvider
         Page::saved($onPageChange);
         Page::deleted(fn () => Cache::forget('sitemap.images'));
 
+        // --- Generate admin notifications for login, page, post, event, notice, achievement updates ---
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function (\Illuminate\Auth\Events\Login $event) {
+            $user = $event->user;
+            $ip = request()->ip() ?? 'unknown';
+            AdminNotification::record('login', "User {$user->name} logged in successfully", [
+                'level' => 'success',
+                'body'  => "IP: {$ip} | Time: " . now()->format('M j, g:i a'),
+                'url'   => url('/admin'),
+                'icon'  => 'users',
+            ]);
+        });
+
+        Page::created(function (Page $page) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('page', "New page created: '{$page->title}'", [
+                'body' => "Created by {$adminName}",
+                'url'  => url('/admin/pages'),
+                'icon' => 'document',
+            ]);
+        });
+
+        Page::updated(function (Page $page) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('page', "Page updated: '{$page->title}'", [
+                'body' => "Updated by {$adminName}",
+                'url'  => url('/admin/pages'),
+                'icon' => 'pencil',
+            ]);
+        });
+
+        \App\Models\Post::created(function (\App\Models\Post $post) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('post', "New post published: '{$post->title}'", [
+                'body' => "Published by {$adminName}",
+                'url'  => url('/admin/m/posts'),
+                'icon' => 'megaphone',
+            ]);
+        });
+
+        \App\Models\Post::updated(function (\App\Models\Post $post) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('post', "Post updated: '{$post->title}'", [
+                'body' => "Updated by {$adminName}",
+                'url'  => url('/admin/m/posts'),
+                'icon' => 'pencil-square',
+            ]);
+        });
+
+        \App\Models\Event::created(function (\App\Models\Event $event) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('event', "New event scheduled: '{$event->title}'", [
+                'body' => "Scheduled by {$adminName}",
+                'url'  => url('/admin/m/events'),
+                'icon' => 'calendar',
+            ]);
+        });
+
+        \App\Models\Event::updated(function (\App\Models\Event $event) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('event', "Event updated: '{$event->title}'", [
+                'body' => "Updated by {$adminName}",
+                'url'  => url('/admin/m/events'),
+                'icon' => 'calendar',
+            ]);
+        });
+
+        \App\Models\Notice::created(function (\App\Models\Notice $notice) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('notice', "New notice posted: '{$notice->title}'", [
+                'body' => "Posted by {$adminName}",
+                'url'  => url('/admin/m/notices'),
+                'icon' => 'bell',
+            ]);
+        });
+
+        \App\Models\Notice::updated(function (\App\Models\Notice $notice) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('notice', "Notice updated: '{$notice->title}'", [
+                'body' => "Updated by {$adminName}",
+                'url'  => url('/admin/m/notices'),
+                'icon' => 'pencil',
+            ]);
+        });
+
+        \App\Models\Achievement::created(function (\App\Models\Achievement $achievement) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('achievement', "New achievement added: '{$achievement->title}'", [
+                'body' => "Added by {$adminName}",
+                'url'  => url('/admin/m/achievements'),
+                'icon' => 'star',
+            ]);
+        });
+
+        \App\Models\Achievement::updated(function (\App\Models\Achievement $achievement) {
+            $adminName = auth()->user()?->name ?? 'System';
+            AdminNotification::record('achievement', "Achievement updated: '{$achievement->title}'", [
+                'body' => "Updated by {$adminName}",
+                'url'  => url('/admin/m/achievements'),
+                'icon' => 'star',
+            ]);
+        });
+
         // --- Feed the header bell on every admin page (guarded) ---
         View::composer('admin.layout', function ($view) {
             [$count, $items] = rescue(fn () => [
