@@ -18,7 +18,7 @@
    Carefully chosen light + dark palettes (dark is not a raw inversion).
    ===================================================================== */
 :root {
-    --bg: #f6f7f9;
+    --bg: #f8fafc;
     --surface: #ffffff;
     --surface-2: #f9fafb;
     --surface-hover: #f3f4f6;
@@ -26,7 +26,7 @@
     --border-strong: #d8dce1;
     --text: #0f172a;
     --text-soft: #475569;
-    --text-muted: #94a3b8;
+    --text-muted: #64748b;
     --primary: #4f46e5;
     --primary-strong: #4338ca;
     --primary-soft: #eef2ff;
@@ -45,15 +45,15 @@
 }
 
 .dark {
-    --bg: #0a0e16;
-    --surface: #111824;
-    --surface-2: #0e1520;
-    --surface-hover: #1a2231;
-    --border: #1e2836;
-    --border-strong: #2a3647;
-    --text: #e8edf4;
-    --text-soft: #aab6c6;
-    --text-muted: #6b7a8d;
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #0f172a;
+    --surface-hover: #1e293b;
+    --border: #243044;
+    --border-strong: #334155;
+    --text: #f1f5f9;
+    --text-soft: #cbd5e1;
+    --text-muted: #94a3b8;
     --primary: #6366f1;
     --primary-strong: #818cf8;
     --primary-soft: #1e1b4b;
@@ -81,6 +81,39 @@
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
+    }
+
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
+    select,
+    textarea {
+        background-color: var(--surface) !important;
+        border-color: var(--border-strong) !important;
+        color: var(--text) !important;
+        font-family: var(--font-sans);
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: var(--text-muted) !important; opacity: .85; }
+
+    select {
+        color-scheme: light;
+        accent-color: var(--primary);
+    }
+
+    html.dark select { color-scheme: dark; }
+
+    select option,
+    select optgroup {
+        background-color: var(--surface) !important;
+        color: var(--text) !important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px var(--ring);
     }
 
     ::selection { background: var(--ring); }
@@ -231,12 +264,15 @@
     /* ---- Command palette ---- */
     .cmdk-backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(4px); }
     .cmdk-panel { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 16px; box-shadow: var(--shadow-lg); }
-    .cmdk-item { display: flex; align-items: center; gap: 11px; padding: 10px 14px; border-radius: 10px; color: var(--text-soft); cursor: pointer; font-size: 14px; }
+    .cmdk-item { display: flex; align-items: center; gap: 11px; padding: 10px 14px; border-radius: 10px; color: var(--text-soft); cursor: pointer; font-size: 14px; text-decoration: none; background: transparent; border: 0; }
     .cmdk-item svg { width: 18px; height: 18px; opacity: .8; }
+    .cmdk-item:hover { background: var(--surface-hover); color: var(--text); }
     .cmdk-item.active { background: var(--primary-soft); color: var(--primary-strong); }
 
     /* ---- Dropdown surfaces ---- */
-    .pop { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; box-shadow: var(--shadow-lg); }
+    .pop { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; box-shadow: var(--shadow-lg); color: var(--text); }
+    .pop a,
+    .pop button { color: inherit; }
 
     /* ---- Keyboard hint ---- */
     .kbd { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text-muted); font-family: ui-monospace, monospace; }

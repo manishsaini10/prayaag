@@ -7,9 +7,9 @@
    ===================================================================== */
 
 :root {
-    --bg:#f6f7f9; --surface:#fff; --surface-2:#f9fafb; --surface-hover:#f3f4f6;
+    --bg:#f8fafc; --surface:#fff; --surface-2:#f9fafb; --surface-hover:#f3f4f6;
     --border:#e8eaed; --border-strong:#d8dce1;
-    --text:#0f172a; --text-soft:#475569; --text-muted:#94a3b8;
+    --text:#0f172a; --text-soft:#475569; --text-muted:#64748b;
     --primary:#4f46e5; --primary-strong:#4338ca; --primary-soft:#eef2ff; --primary-fg:#fff;
     --success:#16a34a; --success-soft:#dcfce7; --warning:#d97706; --warning-soft:#fef3c7;
     --danger:#dc2626; --danger-soft:#fee2e2; --ring:rgba(79,70,229,.35);
@@ -19,9 +19,9 @@
     --glass:rgba(255,255,255,.72);
 }
 .dark {
-    --bg:#0a0e16; --surface:#111824; --surface-2:#0e1520; --surface-hover:#1a2231;
-    --border:#1e2836; --border-strong:#2a3647;
-    --text:#e8edf4; --text-soft:#aab6c6; --text-muted:#6b7a8d;
+    --bg:#0b1120; --surface:#111827; --surface-2:#0f172a; --surface-hover:#1e293b;
+    --border:#243044; --border-strong:#334155;
+    --text:#f1f5f9; --text-soft:#cbd5e1; --text-muted:#94a3b8;
     --primary:#6366f1; --primary-strong:#818cf8; --primary-soft:#1e1b4b; --primary-fg:#fff;
     --success:#22c55e; --success-soft:#052e16; --warning:#f59e0b; --warning-soft:#422006;
     --danger:#ef4444; --danger-soft:#450a0a; --ring:rgba(99,102,241,.45);
@@ -39,6 +39,12 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Instrument San
 a{color:inherit}
 button{font-family:inherit}
 input,select,textarea{font-family:inherit}
+input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]),select,textarea{background-color:var(--surface)!important;border-color:var(--border-strong)!important;color:var(--text)!important;font-family:'Instrument Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif}
+input::placeholder,textarea::placeholder{color:var(--text-muted)!important;opacity:.85}
+select{color-scheme:light;accent-color:var(--primary)}
+html.dark select{color-scheme:dark}
+select option,select optgroup{background-color:var(--surface)!important;color:var(--text)!important}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)!important;box-shadow:0 0 0 3px var(--ring)}
 h1,h2,h3,h4,p,figure{margin:0}
 canvas{max-width:100%}
 
@@ -94,8 +100,8 @@ tr:hover td{background:var(--surface-2)}
 .stat{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin:0 12px 12px 0;box-shadow:var(--shadow-sm)} .stat b{display:block;font-size:24px;font-weight:700} .stat span{color:var(--text-muted);font-size:12px}
 .cmdk-backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(4px)}
 .cmdk-panel{background:var(--surface);border:1px solid var(--border-strong);border-radius:16px;box-shadow:var(--shadow-lg)}
-.cmdk-item{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;color:var(--text-soft);cursor:pointer;font-size:14px;text-decoration:none} .cmdk-item svg{width:18px;height:18px;opacity:.8} .cmdk-item.active{background:var(--primary-soft);color:var(--primary-strong)}
-.pop{background:var(--surface);border:1px solid var(--border-strong);border-radius:14px;box-shadow:var(--shadow-lg)}
+.cmdk-item{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;color:var(--text-soft);cursor:pointer;font-size:14px;text-decoration:none;background:transparent;border:0} .cmdk-item svg{width:18px;height:18px;opacity:.8} .cmdk-item:hover{background:var(--surface-hover);color:var(--text)} .cmdk-item.active{background:var(--primary-soft);color:var(--primary-strong)}
+.pop{background:var(--surface);border:1px solid var(--border-strong);border-radius:14px;box-shadow:var(--shadow-lg);color:var(--text)} .pop a,.pop button{color:inherit}
 .kbd{font-size:11px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text-muted);font-family:ui-monospace,monospace}
 .skeleton{background:linear-gradient(90deg,var(--surface-hover) 25%,var(--border) 37%,var(--surface-hover) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:8px}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
