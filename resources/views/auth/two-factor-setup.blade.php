@@ -9,6 +9,19 @@
             <div class="mb-6 px-4 py-3 rounded-xl text-sm" style="background:#dcfce7;color:#166534">
                 2FA is currently enabled.
             </div>
+
+            @if(count($recoveryCodes) > 0)
+                <div class="card p-5 text-left mb-6" style="border:1px solid var(--border)">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:var(--text-muted)">Your Active Recovery Codes</h3>
+                    <p class="text-xs mb-4" style="color:var(--text-muted)">Save these codes. Each code can only be used once for emergency verification login.</p>
+                    <div class="grid grid-cols-2 gap-2 font-mono text-sm" style="color:var(--text)">
+                        @foreach($recoveryCodes as $code)
+                            <div class="p-2 rounded border text-center" style="border-color:var(--border); background:var(--surface-2)">{{ $code }}</div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('2fa.disable') }}" onsubmit="return confirm('Disable 2FA?')">
                 @csrf
                 <button type="submit" class="btn-secondary" style="color:#dc2626">Disable 2FA</button>
@@ -20,7 +33,8 @@
             </p>
 
             <div class="mb-6 inline-block p-4 rounded-xl" style="background:#fff;border:2px dashed var(--border)">
-                <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={{ urlencode($qrCodeUrl) }}&choe=UTF-8" alt="QR Code" width="200" height="200" style="border-radius:8px">
+                <p style="color:var(--text-muted); font-size:0.8rem;">QR URL: {{ $qrCodeUrl }}</p>
+                                {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(200)->generate($qrCodeUrl) !!}
             </div>
 
             <div class="mb-4 font-mono text-sm p-3 rounded-lg break-all" style="background:var(--surface-2);color:var(--text-muted)">

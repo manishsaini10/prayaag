@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('body');
             $table->string('category', 50)->nullable();
             $table->foreignUlid('department_id')->nullable()->constrained('chatbot_departments')->nullOnDelete();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUlid('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
             $table->index('shortcut');

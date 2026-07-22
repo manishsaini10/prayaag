@@ -19,7 +19,7 @@ class PageApiTest extends TestCase
     {
         parent::setUp();
 
-        $role = Role::create(['name' => 'Super Admin', 'slug' => 'super-admin']);
+        $role = Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
         $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@demo.test', 'password' => Hash::make('x')]);
         $this->admin->assignRole($role);
     }

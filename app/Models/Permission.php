@@ -2,16 +2,8 @@
 
 namespace App\Models;
 
-use App\Core\Models\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-/**
- * Global ability catalog (e.g. pages.create). Roles decide who is granted them.
- */
-class Permission extends BaseModel
+class Permission extends SpatiePermission
 {
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class);
-    }
 }

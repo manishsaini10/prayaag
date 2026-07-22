@@ -42,7 +42,26 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 3. POPUPS (main table)
+        // 3. A/B TESTS (Moved up to prevent foreign key errors in popups)
+        Schema::create('popup_ab_tests', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->string('name');
+            $table->string('status', 20)->default('draft');
+            $table->string('goal_type', 30)->default('click'); // click, conversion, form_submit
+            $table->string('winner_determination', 30)->default('conversion_rate');
+            $table->decimal('min_confidence', 5, 2)->default(95.00);
+            $table->integer('min_sample_size')->default(100);
+            $table->integer('traffic_split')->default(50);      // % for original/variant A
+            $table->boolean('auto_winner')->default(false);
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('ended_at')->nullable();
+            $table->string('winner_id')->nullable();
+            $table->json('results')->nullable();                // aggregated results
+            $table->softDeletes();
+            $table->timestamps();
+        });
+
+        // 4. POPUPS (main table)
         Schema::create('popups', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('title');
@@ -102,7 +121,22 @@ return new class extends Migration
             $table->index('priority');
         });
 
-        // 4. POPUP RULES (polymorphic - trigger, display, targeting, frequency)
+        // 5. A/B TEST VARIANTS (Moved up to prevent foreign key errors in popup_analytics)
+        Schema::create('popup_ab_test_variants', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->foreignUlid('ab_test_id')->constrained('popup_ab_tests')->cascadeOnDelete();
+            $table->string('name');
+            $table->string('variant_type', 10)->default('variant'); // original, variant
+            $table->json('structure');
+            $table->json('settings')->nullable();
+            $table->json('design')->nullable();
+            $table->bigInteger('view_count')->default(0);
+            $table->bigInteger('conversion_count')->default(0);
+            $table->softDeletes();
+            $table->timestamps();
+        });
+
+        // 6. POPUP RULES (polymorphic - trigger, display, targeting, frequency)
         Schema::create('popup_rules', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('popup_id')->constrained('popups')->cascadeOnDelete();
@@ -119,7 +153,7 @@ return new class extends Migration
             $table->index('rule_key');
         });
 
-        // 5. POPUP SCHEDULES
+        // 7. POPUP SCHEDULES
         Schema::create('popup_schedules', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('popup_id')->constrained('popups')->cascadeOnDelete();
@@ -132,7 +166,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 6. POPUP ANALYTICS
+        // 8. POPUP ANALYTICS (Referenced tables are now created first)
         Schema::create('popup_analytics', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('popup_id')->constrained('popups')->cascadeOnDelete();
@@ -156,40 +190,6 @@ return new class extends Migration
 
             $table->index(['popup_id', 'event_type'], 'popup_analytics_event_idx');
             $table->index('occurred_at', 'popup_analytics_occurred_idx');
-        });
-
-        // 7. A/B TESTS
-        Schema::create('popup_ab_tests', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->string('name');
-            $table->string('status', 20)->default('draft');
-            $table->string('goal_type', 30)->default('click'); // click, conversion, form_submit
-            $table->string('winner_determination', 30)->default('conversion_rate');
-            $table->decimal('min_confidence', 5, 2)->default(95.00);
-            $table->integer('min_sample_size')->default(100);
-            $table->integer('traffic_split')->default(50);      // % for original/variant A
-            $table->boolean('auto_winner')->default(false);
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('ended_at')->nullable();
-            $table->string('winner_id')->nullable();
-            $table->json('results')->nullable();                // aggregated results
-            $table->softDeletes();
-            $table->timestamps();
-        });
-
-        // 8. A/B TEST VARIANTS
-        Schema::create('popup_ab_test_variants', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->foreignUlid('ab_test_id')->constrained('popup_ab_tests')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('variant_type', 10)->default('variant'); // original, variant
-            $table->json('structure');
-            $table->json('settings')->nullable();
-            $table->json('design')->nullable();
-            $table->bigInteger('view_count')->default(0);
-            $table->bigInteger('conversion_count')->default(0);
-            $table->softDeletes();
-            $table->timestamps();
         });
 
         // 9. POPUP LEADS
@@ -305,8 +305,8 @@ return new class extends Migration
         $tables = [
             'popup_activity_logs', 'popup_revisions', 'popup_assets',
             'popup_integration_logs', 'popup_integrations', 'popup_leads',
-            'popup_ab_test_variants', 'popup_ab_tests', 'popup_analytics',
-            'popup_schedules', 'popup_rules', 'popups',
+            'popup_analytics', 'popup_ab_test_variants', 'popup_schedules', 
+            'popup_rules', 'popups', 'popup_ab_tests',
             'popup_templates', 'popup_categories',
         ];
         foreach ($tables as $table) {

@@ -123,4 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-];
+    'aliases' => [
+        'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+    ],
+    ];

@@ -8,6 +8,8 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Mess Menu Widget Safelist (no longer needed — widget uses inline CSS with school design tokens) */
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
@@ -246,10 +248,11 @@
     .status-dot.down { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
 
     /* ---- Tables (legacy module pages render through the new shell) ---- */
-    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-    .card table th, .widget table th, table th { text-align: left; padding: 11px 16px; background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border); }
-    .card table td, .widget table td, table td { text-align: left; padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; color: var(--text); }
-    table tr:hover td { background: var(--surface-2); }
+    /* Scoped to admin .card/.widget only — public widgets use Tailwind utility classes */
+    .card table, .widget table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .card table th, .widget table th { text-align: left; padding: 11px 16px; background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border); }
+    .card table td, .widget table td { text-align: left; padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; color: var(--text); }
+    .card table tr:hover td, .widget table tr:hover td { background: var(--surface-2); }
 
     /* ---- Misc legacy helpers ---- */
     .muted { color: var(--text-muted); }

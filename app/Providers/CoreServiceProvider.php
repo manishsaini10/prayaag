@@ -42,6 +42,7 @@ use App\Core\Builder\Widgets\UpcomingEventsWidget;
 use App\Core\Builder\Widgets\VideosWidget;
 use App\Core\Builder\WidgetRegistry;
 use App\Core\Builder\Widgets\DynamicWidget;
+use App\Core\Builder\Widgets\MessMenuWidget;
 use App\Models\WidgetDefinition;
 use App\Core\Media\MediaManager;
 use App\Core\Menu\MenuManager;
@@ -100,6 +101,7 @@ class CoreServiceProvider extends ServiceProvider
         MapWidget::class,
         FloatingActionWidget::class,
         InstagramWidget::class,
+        MessMenuWidget::class,
     ];
 
     public function register(): void
@@ -115,14 +117,8 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Resolve every ability against the user's RBAC:
-        // super-admins pass everything; others pass if they hold the permission.
         Gate::before(function ($user, string $ability) {
             if (method_exists($user, 'hasRole') && $user->hasRole('super-admin')) {
-                return true;
-            }
-
-            if (method_exists($user, 'hasPermission') && $user->hasPermission($ability)) {
                 return true;
             }
 

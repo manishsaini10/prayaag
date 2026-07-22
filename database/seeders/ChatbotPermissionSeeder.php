@@ -24,29 +24,20 @@ class ChatbotPermissionSeeder extends Seeder
         ];
 
         $permissions = collect($catalog)->map(function (string $slug) {
-            [$prefix] = explode('.', $slug, 2);
             return Permission::firstOrCreate(
-                ['slug' => $slug],
-                ['name' => $this->makeName($slug), 'group' => $prefix]
+                ['name' => $slug, 'guard_name' => 'web'],
+                ['name' => $slug, 'guard_name' => 'web']
             );
         });
 
-        $superAdmin = Role::where('slug', 'super-admin')->first();
+        $superAdmin = Role::where('name', 'super-admin')->first();
         if ($superAdmin) {
-            $superAdmin->permissions()->syncWithoutDetaching($permissions->pluck('id'));
+            $superAdmin->givePermissionTo($permissions);
         }
     }
 
     private function group(string $prefix, string $group, string ...$actions): array
     {
         return array_map(fn (string $action) => "$prefix.$action", $actions);
-    }
-
-    private function makeName(string $slug): string
-    {
-        $parts = explode('.', $slug);
-        $group = $parts[1] ?? '';
-        $action = $parts[2] ?? $parts[1] ?? '';
-        return ucfirst($group) . ' ' . ucfirst(str_replace('-', ' ', $action));
     }
 }

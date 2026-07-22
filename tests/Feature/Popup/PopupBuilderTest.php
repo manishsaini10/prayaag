@@ -50,7 +50,7 @@ class PopupBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $role = Role::create(['name' => 'Super Admin', 'slug' => 'super-admin', 'description' => '']);
+        $role = Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
         $this->admin = User::factory()->create(['email' => 'admin@test.com']);
         $this->admin->assignRole($role);
 

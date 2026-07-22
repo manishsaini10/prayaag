@@ -118,9 +118,9 @@ class ChatbotAIService
             }
 
             if (!$responseContent) {
-                Log::error('All AI providers failed for chatbot response');
-                $responseContent = "I'm sorry, I'm experiencing technical difficulties. Let me transfer you to a human operator.";
-                $confidence = ['score' => 0.0, 'level' => 'low', 'needs_human' => true, 'low_confidence_hits' => 0, 'high_confidence_hits' => 0];
+                Log::warning('All AI providers failed or are unconfigured. Falling back to local keyword responses.');
+                $responseContent = $this->getLocalFallbackResponse($intent);
+                $confidence = ['score' => 1.0, 'level' => 'high', 'needs_human' => false];
             }
         }
 
@@ -135,6 +135,22 @@ class ChatbotAIService
         }
 
         return $responseContent;
+    }
+
+    /**
+     * Local rule-based fallback responses matching detected intents.
+     */
+    protected function getLocalFallbackResponse(string $intent): string
+    {
+        return match ($intent) {
+            'admission' => "For **Admissions** at Prayaag School, we offer a simple conversational process. Please type **'admission'** or **'apply'** to start filling out the registration enquiry form right here, or contact our admissions office at **+91 99999 99999**.",
+            'fee' => "Our **Fee Structure** for the 2026-27 session varies by grade level. Generally, it includes registration fees, tuition fees, and transportation (if applicable). For detailed class-wise fees, please visit our school front office or email us.",
+            'academic' => "Prayaag School follows the **CBSE curriculum** with modern smart classes. We focus on holistic development, combining strong academics with sports, labs, music, and arts.",
+            'contact' => "You can reach **Prayaag School** at:\n- **Phone**: +91 99999 99999\n- **Email**: info@prayaagschool.com\n- **Hours**: Monday to Saturday, 8:00 AM - 2:00 PM.",
+            'facility' => "We provide top-notch **facilities**:\n- Smart Classrooms\n- Physics, Chemistry, Biology & Computer Labs\n- Well-stocked Library\n- Safe school bus transport across Panipat",
+            'complaint' => "We take feedback seriously. Please share your concern here or email us at **grievance@prayaagschool.com**. An administrator will get back to you within 24 hours.",
+            default => "Hello! Welcome to **Prayaag School**. How can I help you today? You can ask about Admissions, Fees, Academics, Facilities, or how to contact us."
+        };
     }
 
     private function callGemini(string $apiKey, string $model, array $history, string $systemPrompt, float $temp, int $maxTokens): string

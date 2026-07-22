@@ -12,7 +12,7 @@ class PopupPolicy
 
     public function before(User $user): ?bool
     {
-        if ($user->hasRole('Super Admin')) {
+        if ($user->hasRole('super-admin')) {
             return true;
         }
         return null;
@@ -20,56 +20,56 @@ class PopupPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('popup.view');
+        return $user->hasPermissionTo('popup.view');
     }
 
     public function view(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.view');
+        return $user->hasPermissionTo('popup.view');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermission('popup.create');
+        return $user->hasPermissionTo('popup.create');
     }
 
     public function update(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.update');
+        return $user->hasPermissionTo('popup.update');
     }
 
     public function delete(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.delete');
+        return $user->hasPermissionTo('popup.delete');
     }
 
     public function restore(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.restore');
+        return $user->hasPermissionTo('popup.restore');
     }
 
     public function forceDelete(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.force-delete');
+        return $user->hasPermissionTo('popup.force-delete');
     }
 
     public function publish(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.publish');
+        return $user->hasPermissionTo('popup.publish');
     }
 
     public function duplicate(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.duplicate');
+        return $user->hasPermissionTo('popup.duplicate');
     }
 
     public function manageLeads(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.manage-leads');
+        return $user->hasPermissionTo('popup.manage-leads');
     }
 
     public function viewAnalytics(User $user, Popup $popup): bool
     {
-        return $user->hasPermission('popup.analytics');
+        return $user->hasPermissionTo('popup.analytics');
     }
 }

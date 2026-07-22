@@ -12,11 +12,12 @@ class ChatbotConversation extends BaseModel
     protected $table = 'chatbot_conversations';
 
     protected $casts = [
-        'tags' => 'array',
-        'ai_handled' => 'boolean',
-        'cost' => 'decimal:4',
-        'rating' => 'integer',
-        'response_time' => 'integer',
+        'tags'            => 'array',
+        'meta'            => 'array',
+        'ai_handled'      => 'boolean',
+        'cost'            => 'decimal:4',
+        'rating'          => 'integer',
+        'response_time'   => 'integer',
         'resolution_time' => 'integer',
     ];
 

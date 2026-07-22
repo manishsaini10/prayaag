@@ -1,25 +1,91 @@
 name: Deploy to Hostinger
+
 on:
   push:
     branches: [main]
+
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci && npm run build
-      - uses: actions/setup-pHP@v4
+          php-version: '8.3'
+          extensions: mbstring, dom, fileinfo, mysql, gd, zip
+          coverage: none
+
+      - name: Copy .env.testing
+        run: cp .env.example .env
+
+      - name: Install Composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Install NPM & Build Assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run PHPUnit Tests
+        run: php artisan test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
-          tools: composer:v2
-      - run: composer install --no-dev --optimize-autoloader
-      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+          php-version: '8.3'
+          extensions: zip
+
+      - name: Install Composer Dependencies (Production)
+        run: composer install --no-dev -q --no-ansi --no-interaction --optimize-autoloader --prefer-dist
+
+      - name: Install NPM & Build Production Assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          server: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          password: ${{ secrets.HOSTINGER_PASS }}
-          server-dir: /home/uXXXXXX/htdocs/
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Add Hostinger to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.HOSTINGER_PORT }} ${{ secrets.HOSTINGER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.HOSTINGER_PORT }}" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='storage/app/public' \
+            --exclude='.env' \
+            ./ ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH }}
+
+      - name: Run Post-Deploy Commands
+        run: |
+          ssh -p ${{ secrets.HOSTINGER_PORT }} ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} "
+            cd ${{ secrets.HOSTINGER_PATH }} &&
+            php artisan migrate --force &&
+            php artisan config:cache &&
+            php artisan route:cache &&
+            php artisan view:cache &&
+            php artisan queue:restart &&
+            php artisan storage:link
+          "

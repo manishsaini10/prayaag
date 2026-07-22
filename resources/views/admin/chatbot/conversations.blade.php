@@ -159,13 +159,39 @@
                         <button class="text-xs border px-2.5 py-1 rounded-full hover:bg-surface-2 transition shrink-0" style="border-color:var(--border); color:var(--text)" @click="quickSend('Admission details have been sent. How else can we help?')">Admission details</button>
                         <button class="text-xs border px-2.5 py-1 rounded-full hover:bg-surface-2 transition shrink-0" style="border-color:var(--border); color:var(--text)" @click="quickSend('Please share your phone number so we can call you.')">Request Phone</button>
                         <button class="text-xs border px-2.5 py-1 rounded-full hover:bg-surface-2 transition shrink-0" style="border-color:var(--border); color:var(--text)" @click="quickSend('The fee structure for the academic session 2026 has been published.')">Fees</button>
+                        <button class="text-xs border px-2.5 py-1 rounded-full hover:bg-surface-2 transition shrink-0" style="border-color:var(--border); color:var(--text); background:rgba(99,102,241,.12)" @click="replyText='/'; $nextTick(() => onReplyInput())">⚡ Canned</button>
                     </div>
-                    
-                    <div class="flex gap-2">
-                        <input type="text" x-model="replyText" @keydown.enter="sendReply()" placeholder="Type a reply and press enter..." class="flex-grow text-sm">
+
+                    {{-- Canned Response Dropdown --}}
+                    <div x-show="cannedOpen" x-transition style="position:relative;">
+                        <div style="position:absolute; bottom:0; left:0; right:0; background:#1a1f2e; border:1px solid #2a2f3e; border-radius:10px; max-height:220px; overflow-y:auto; z-index:50; box-shadow:0 8px 32px rgba(0,0,0,.5);">
+                            <div style="padding:8px 12px; font-size:11px; color:#64748b; border-bottom:1px solid #2a2f3e; font-weight:600;">
+                                ⚡ CANNED RESPONSES — <span x-text="cannedList.length"></span> found
+                            </div>
+                            <template x-for="cr in cannedList" :key="cr.id">
+                                <div @click="insertCanned(cr.body)"
+                                     style="padding:10px 14px; cursor:pointer; border-bottom:1px solid #1e2435; transition:background .15s;"
+                                     @mouseenter="$el.style.background='rgba(99,102,241,.12)'"
+                                     @mouseleave="$el.style.background=''">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
+                                        <span style="background:rgba(99,102,241,.2); color:#a5b4fc; padding:1px 8px; border-radius:5px; font-family:monospace; font-size:12px; font-weight:700;" x-text="'/' + cr.shortcut"></span>
+                                        <span x-show="cr.category" style="background:rgba(16,185,129,.12); color:#6ee7b7; padding:1px 6px; border-radius:10px; font-size:10px; font-weight:600; text-transform:uppercase;" x-text="cr.category"></span>
+                                    </div>
+                                    <div style="font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" x-text="cr.body.substring(0,80) + (cr.body.length > 80 ? '...' : '')"></div>
+                                </div>
+                            </template>
+                            <div x-show="cannedList.length === 0" style="padding:16px; text-align:center; color:#475569; font-size:13px;">
+                                No canned responses found. <a href="{{ url('/admin/chatbot/canned') }}" style="color:#6366f1;">Create one →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2" style="position:relative;">
+                        <input type="text" x-model="replyText" @input="onReplyInput()" @keydown.enter="sendReply()" @keydown.escape="cannedOpen=false" placeholder="Type / for canned responses or write a reply…" class="flex-grow text-sm">
                         <button class="btn-primary" @click="sendReply()">Send</button>
                     </div>
                 </div>
+
             </div>
 
             {{-- Empty State View --}}
@@ -256,6 +282,9 @@ function liveChat(initConvos, initAgents) {
         status: 'open',
         operatorId: '',
         mobileView: 'list', // list, chat, details
+        cannedOpen: false,
+        cannedList: [],
+        _cannedTimer: null,
 
         init() {
             // Keep fetching new messages and chat lists every 5 seconds
@@ -363,6 +392,33 @@ function liveChat(initConvos, initAgents) {
         quickSend(text) {
             this.replyText = text;
             this.sendReply();
+        },
+
+        onReplyInput() {
+            const val = this.replyText;
+            if (val.startsWith('/')) {
+                this.cannedOpen = true;
+                clearTimeout(this._cannedTimer);
+                this._cannedTimer = setTimeout(() => this.fetchCanned(val.slice(1)), 150);
+            } else {
+                this.cannedOpen = false;
+                this.cannedList = [];
+            }
+        },
+
+        fetchCanned(q) {
+            fetch(`{{ url('/admin/chatbot/canned/suggest') }}?q=/${q}`, {
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': this.getCsrfToken() }
+            })
+            .then(r => r.json())
+            .then(data => { this.cannedList = data; })
+            .catch(() => {});
+        },
+
+        insertCanned(body) {
+            this.replyText = body;
+            this.cannedOpen = false;
+            this.cannedList = [];
         },
 
         assignChat() {

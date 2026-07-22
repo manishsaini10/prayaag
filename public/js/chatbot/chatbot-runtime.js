@@ -563,14 +563,23 @@
             })
             .then(r => { if (!r.ok) throw new Error('Send HTTP ' + r.status); return r.json(); })
             .then(data => {
-                this.removeTypingIndicator();
                 if (data.visitor_message) {
                     this.renderedMessageIds.delete(tempId);
                     this.renderedMessageIds.add(data.visitor_message.id);
                 }
+                
                 if (data.bot_message) {
-                    this.appendMessage('bot', data.bot_message.message_text, data.bot_message.id);
-                    if (this.config.enable_sound_notification) this.playNotificationSound();
+                    // Dynamic typing delay based on message length (e.g. 15ms per character, min 800ms, max 2000ms)
+                    const textLen = data.bot_message.message_text.length;
+                    const delay = Math.min(2000, Math.max(800, textLen * 15));
+
+                    setTimeout(() => {
+                        this.removeTypingIndicator();
+                        this.appendMessage('bot', data.bot_message.message_text, data.bot_message.id);
+                        if (this.config.enable_sound_notification) this.playNotificationSound();
+                    }, delay);
+                } else {
+                    this.removeTypingIndicator();
                 }
             })
             .catch(err => {

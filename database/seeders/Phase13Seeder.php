@@ -88,16 +88,7 @@ class Phase13Seeder extends Seeder
         }
 
         // Academic calendar (incl. holidays)
-        foreach ([
-            ['Summer Break', 'holiday', '2026-05-15', '2026-06-15'],
-            ['Term 1 Begins', 'term', '2026-04-01', null],
-            ['Mid-term Exams', 'exam', '2026-07-20', '2026-07-28'],
-        ] as [$title, $type, $start, $end]) {
-            AcademicCalendarEntry::firstOrCreate(
-                ['title' => $title],
-                ['type' => $type, 'starts_on' => $start, 'ends_on' => $end]
-            );
-        }
+        $this->call(AcademicCalendarSeeder::class);
 
         // Subscribers
         foreach (['parent1@example.test', 'parent2@example.test'] as $email) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TwoFactorController extends Controller
 {
@@ -14,7 +15,7 @@ class TwoFactorController extends Controller
         $qrCodeUrl = null;
 
         if (!$secret) {
-            $secret = \Illuminate\Support\Str::random(32);
+            $secret = strtoupper(Str::random(16));
             $user->update(['two_factor_secret' => $secret]);
         }
 
@@ -26,7 +27,16 @@ class TwoFactorController extends Controller
             urlencode(config('app.name'))
         );
 
-        return view('auth.two-factor-setup', compact('secret', 'qrCodeUrl'));
+        $recoveryCodes = [];
+        if ($user->two_factor_recovery_codes) {
+            try {
+                $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true) ?: [];
+            } catch (\Exception $e) {
+                $recoveryCodes = [];
+            }
+        }
+
+        return view('auth.two-factor-setup', compact('secret', 'qrCodeUrl', 'recoveryCodes'));
     }
 
     public function enable(Request $request)
@@ -53,12 +63,26 @@ class TwoFactorController extends Controller
             return back()->withErrors(['code' => 'Invalid code. Please try again.']);
         }
 
+        // Generate 8 recovery codes
+        $recoveryCodes = [];
+        for ($i = 0; $i < 8; $i++) {
+            $recoveryCodes[] = sprintf(
+                '%04x-%04x',
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff)
+            );
+        }
+
         $user->update([
             'two_factor_enabled' => true,
             'two_factor_confirmed_at' => now(),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Two-factor authentication enabled.');
+        // Keep 2fa_passed active for current session once set up successfully
+        session(['2fa_passed' => true]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Two-factor authentication enabled successfully. Please record your recovery codes below!');
     }
 
     public function disable()
@@ -68,7 +92,10 @@ class TwoFactorController extends Controller
             'two_factor_secret' => null,
             'two_factor_enabled' => false,
             'two_factor_confirmed_at' => null,
+            'two_factor_recovery_codes' => null,
         ]);
+
+        session()->forget('2fa_passed');
 
         return back()->with('success', 'Two-factor authentication disabled.');
     }
@@ -89,17 +116,43 @@ class TwoFactorController extends Controller
     public function verify(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|size:6',
+            'code' => 'required|string',
         ]);
 
         $user = auth()->user();
-        $secret = $user->two_factor_secret;
+        $code = $request->code;
 
+        // 1. Check recovery codes if matches format (e.g. contains hyphen or length > 6)
+        if (strlen($code) > 6 && str_contains($code, '-')) {
+            $storedCodes = [];
+            if ($user->two_factor_recovery_codes) {
+                try {
+                    $storedCodes = json_decode(decrypt($user->two_factor_recovery_codes), true) ?: [];
+                } catch (\Exception $e) {
+                    $storedCodes = [];
+                }
+            }
+
+            if (($key = array_search($code, $storedCodes)) !== false) {
+                unset($storedCodes[$key]);
+                $user->update([
+                    'two_factor_recovery_codes' => encrypt(json_encode(array_values($storedCodes))),
+                ]);
+
+                session(['2fa_passed' => true]);
+                return redirect()->intended(route('admin.dashboard'));
+            }
+
+            return back()->withErrors(['code' => 'Invalid recovery code. Please try again.']);
+        }
+
+        // 2. Validate standard 6-digit TOTP code
+        $secret = $user->two_factor_secret;
         $valid = false;
         $timeSlice = floor(time() / 30);
         for ($i = -1; $i <= 1; $i++) {
             $generated = $this->generateTOTP($secret, $timeSlice + $i);
-            if (hash_equals($generated, $request->code)) {
+            if (hash_equals($generated, $code)) {
                 $valid = true;
                 break;
             }

@@ -38,7 +38,8 @@ class Media extends BaseModel
                 }
             }
         }
-        return \Illuminate\Support\Facades\Storage::disk($this->disk ?? 'public')->url($path);
+        $url = \Illuminate\Support\Facades\Storage::disk($this->disk ?? 'public')->url($path);
+        return \App\Core\Media\Services\CdnUrlService::url($url);
     }
 
     public function getUrlAttribute(): string

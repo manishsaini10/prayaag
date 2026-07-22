@@ -24,6 +24,28 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // --- Register custom 'google' storage driver ---
+        \Illuminate\Support\Facades\Storage::extend('google', function ($app, $config) {
+            $client = new \Google\Client();
+            $client->setClientId($config['clientId'] ?? '');
+            $client->setClientSecret($config['clientSecret'] ?? '');
+            $client->refreshToken($config['refreshToken'] ?? '');
+
+            $service = new \Google\Service\Drive($client);
+            $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $config['folder'] ?? '/');
+            $driver = new \League\Flysystem\Filesystem($adapter);
+
+            return new \Illuminate\Filesystem\FilesystemAdapter($driver, $adapter);
+        });
+
+        // --- Register public-forms Rate Limiter ---
+        \Illuminate\Support\Facades\RateLimiter::for('public-forms', function (\Illuminate\Http\Request $request) {
+            return [
+                \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip()),
+                \Illuminate\Cache\RateLimiting\Limit::perDay(20)->by($request->ip()),
+            ];
+        });
+
         // --- Generate admin notifications from incoming public events ---
         // AdminNotification::record() is self-guarding (rescue), so a missing
         // table or any failure can never break a public form submission.
@@ -56,6 +78,25 @@ class AppServiceProvider extends ServiceProvider
         Menu::deleted($forgetChrome);
         MenuItem::saved($forgetChrome);
         MenuItem::deleted($forgetChrome);
+
+        // --- Keep cached pages fresh when Mess Menu updates ---
+        $clearPageCache = function () {
+            try {
+                $pages = \App\Models\Page::all();
+                $renderer = app(\App\Core\Builder\PageRenderer::class);
+                foreach ($pages as $page) {
+                    $renderer->forget($page);
+                }
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+        };
+        \App\Models\Mess\MessMenu::saved($clearPageCache);
+        \App\Models\Mess\MessMenu::deleted($clearPageCache);
+        \App\Models\Mess\MessMenuItem::saved($clearPageCache);
+        \App\Models\Mess\MessMenuItem::deleted($clearPageCache);
+        \App\Models\Mess\MessMenuSpecialDay::saved($clearPageCache);
+        \App\Models\Mess\MessMenuSpecialDay::deleted($clearPageCache);
 
         // --- SEO: on page change, refresh the image sitemap + ping IndexNow ---
         $onPageChange = function (Page $page) {

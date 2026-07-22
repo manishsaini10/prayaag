@@ -111,7 +111,7 @@
         <div class="widget__body" style="padding-top:6px;padding-bottom:6px">
             @forelse ($activity as $entry)
                 @php
-                    $map = ['pages'=>'document','posts'=>'pencil','media'=>'photo','enquiries'=>'inbox','job_applications'=>'briefcase','subscribers'=>'envelope','events'=>'calendar','notices'=>'megaphone','users'=>'users','settings'=>'cog','sliders'=>'photo','galleries'=>'collection','testimonials'=>'star','achievements'=>'star','academic_calendar'=>'calendar'];
+                    $map = ['pages'=>'document','posts'=>'pencil','media'=>'photo','enquiries'=>'inbox','job_applications'=>'briefcase','subscribers'=>'envelope','events'=>'calendar','notices'=>'megaphone','users'=>'users','settings'=>'cog','sliders'=>'photo','galleries'=>'collection','testimonials'=>'star','achievements'=>'star','academic_calendar'=>'calendar','mess_menus'=>'utensils'];
                     $ic = $map[$entry->log_name] ?? 'bolt';
                 @endphp
                 <div class="activity-item">

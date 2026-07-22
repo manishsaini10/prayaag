@@ -74,9 +74,11 @@
             <a href="{{ url('/admin/pages/builder') }}" class="nav-link {{ $is('admin/pages/builder') }}"><x-admin.icon name="rectangle-stack"/><span x-show="!collapsed">Page Builder</span></a>
             <a href="{{ url('/admin/widgets') }}" class="nav-link {{ $is('admin/widgets*') }}"><x-admin.icon name="rectangle-stack"/><span x-show="!collapsed">Widget Builder</span></a>
             <a href="{{ url('/admin/menus') }}" class="nav-link {{ $is('admin/menus*') }}"><x-admin.icon name="menu"/><span x-show="!collapsed">Menus</span></a>
-            @foreach ([['pencil','Posts','posts'],['tag','Categories','categories'],['megaphone','Notices','notices'],['calendar','Events','events'],['download','Downloads','downloads'],['star','Testimonials','testimonials'],['star','Achievements','achievements'],['collection','Gallery','galleries'],['photo','Sliders','sliders'],['calendar','Academic Calendar','academic_calendar']] as [$ic,$lbl,$key])
+            @foreach ([['pencil','Posts','posts'],['tag','Categories','categories'],['megaphone','Notices','notices'],['calendar','Events','events'],['download','Downloads','downloads'],['star','Testimonials','testimonials'],['star','Achievements','achievements'],['collection','Gallery','galleries'],['photo','Sliders','sliders'],['calendar','Academic Calendar','academic_calendar'],['utensils','Mess Menu','mess_menu']] as [$ic,$lbl,$key])
                 @if ($key === 'academic_calendar')
                     <a href="{{ route('admin.academic-calendar-entries.index') }}" class="nav-link {{ request()->is('admin/academic-calendar-entries*') || request()->is('admin/academic-sessions*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
+                @elseif ($key === 'mess_menu')
+                    <a href="{{ route('admin.mess-menus.index') }}" class="nav-link {{ request()->is('admin/mess-menus*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
                 @elseif ($key === 'testimonials')
                     <a href="{{ route('admin.testimonials-console.index') }}" class="nav-link {{ request()->is('admin/testimonials-console*') ? 'active' : '' }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
                 @else
@@ -100,6 +102,8 @@
             @foreach ([['users','Users','users'],['shield','Roles','roles'],['shield','Permissions','permissions']] as [$ic,$lbl,$key])
                 <a href="{{ url('/admin/m/'.$key) }}" class="nav-link {{ $is('admin/m/'.$key.'*') }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
             @endforeach
+            <a href="{{ url('/admin/role-permissions') }}" class="nav-link {{ $is('admin/role-permissions*') }}"><x-admin.icon name="adjustments"/><span x-show="!collapsed">Role Permissions</span></a>
+            <a href="{{ url('/admin/user-roles') }}" class="nav-link {{ $is('admin/user-roles*') }}"><x-admin.icon name="users"/><span x-show="!collapsed">User Roles</span></a>
             @endcan
 
             <div x-data="{ marketingOpen: localStorage.getItem('mktg') !== '0' }" x-effect="localStorage.setItem('mktg', marketingOpen ? '1' : '0')" class="mb-1">
@@ -118,6 +122,8 @@
                     @endcan
                     <a href="{{ url('/admin/chatbot') }}" class="nav-link {{ $is('admin/chatbot') }}"><x-admin.icon name="inbox"/><span x-show="!collapsed">Chatbot</span></a>
                     <a href="{{ url('/admin/chatbot/form-fields') }}" class="nav-link {{ $is('admin/chatbot/form-fields*') }}"><x-admin.icon name="collection"/><span x-show="!collapsed">Pre-Chat Form</span></a>
+                    <a href="{{ url('/admin/chatbot/canned') }}" class="nav-link {{ $is('admin/chatbot/canned*') }}"><x-admin.icon name="lightning-bolt"/><span x-show="!collapsed">Canned Responses</span></a>
+                    <a href="{{ url('/admin/chatbot/assistant') }}" class="nav-link {{ $is('admin/chatbot/assistant*') }}"><x-admin.icon name="sparkles"/><span x-show="!collapsed">AI Assistants</span></a>
                     <a href="{{ url('/admin/chatbot/campaigns') }}" class="nav-link {{ $is('admin/chatbot/campaigns*') }}"><x-admin.icon name="megaphone"/><span x-show="!collapsed">Campaigns</span></a>
                     <a href="{{ url('/admin/chatbot/webhooks') }}" class="nav-link {{ $is('admin/chatbot/webhooks*') }}"><x-admin.icon name="globe"/><span x-show="!collapsed">Webhooks</span></a>
                     <a href="{{ url('/admin/chatbot/analytics') }}" class="nav-link {{ $is('admin/chatbot/analytics') }}"><x-admin.icon name="chart-bar"/><span x-show="!collapsed">Chatbot Analytics</span></a>
@@ -339,6 +345,7 @@
         };
     }
 </script>
+@include('admin.partials.ai-content-assistant')
 @stack('scripts')
 </body>
 </html>

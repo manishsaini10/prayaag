@@ -131,7 +131,7 @@ DROP TABLE IF EXISTS `role_user`;
 CREATE TABLE `role_user` (
   `role_id` VARCHAR(26) NOT NULL,
   `user_id` VARCHAR(26) NOT NULL,
-  PRIMARY KEY (`role_id`),
+  PRIMARY KEY (`role_id`, `user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -140,7 +140,7 @@ DROP TABLE IF EXISTS `permission_role`;
 CREATE TABLE `permission_role` (
   `permission_id` VARCHAR(26) NOT NULL,
   `role_id` VARCHAR(26) NOT NULL,
-  PRIMARY KEY (`permission_id`),
+  PRIMARY KEY (`permission_id`, `role_id`),
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -404,7 +404,7 @@ DROP TABLE IF EXISTS `post_tag`;
 CREATE TABLE `post_tag` (
   `post_id` VARCHAR(26) NOT NULL,
   `tag_id` VARCHAR(26) NOT NULL,
-  PRIMARY KEY (`post_id`),
+  PRIMARY KEY (`post_id`, `tag_id`),
   FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -861,7 +861,7 @@ CREATE TABLE `popups` (
   `frequency_x_days` INT,
   `max_views_per_user` INT,
   `is_ab_test` TINYINT(1) NOT NULL DEFAULT '0',
-  `ab_test_id` BIGINT UNSIGNED,
+  `ab_test_id` VARCHAR(255),
   `view_count` INT NOT NULL DEFAULT '0',
   `impression_count` INT NOT NULL DEFAULT '0',
   `click_count` INT NOT NULL DEFAULT '0',
@@ -906,7 +906,7 @@ DROP TABLE IF EXISTS `popup_analytics`;
 CREATE TABLE `popup_analytics` (
   `id` VARCHAR(26) NOT NULL,
   `popup_id` VARCHAR(26) NOT NULL,
-  `variation_id` BIGINT UNSIGNED,
+  `variation_id` VARCHAR(255),
   `event_type` VARCHAR(255) NOT NULL,
   `session_id` VARCHAR(255),
   `ip_address` VARCHAR(255),
@@ -1392,7 +1392,7 @@ CREATE TABLE `popup_ab_tests` (
 DROP TABLE IF EXISTS `popup_ab_test_variants`;
 CREATE TABLE `popup_ab_test_variants` (
   `id` VARCHAR(255) NOT NULL,
-  `ab_test_id` BIGINT UNSIGNED NOT NULL,
+  `ab_test_id` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `variant_type` VARCHAR(255) NOT NULL DEFAULT 'variant',
   `structure` LONGTEXT,
@@ -1427,7 +1427,7 @@ CREATE TABLE `popup_integrations` (
 DROP TABLE IF EXISTS `popup_integration_logs`;
 CREATE TABLE `popup_integration_logs` (
   `id` VARCHAR(255) NOT NULL,
-  `integration_id` BIGINT UNSIGNED,
+  `integration_id` VARCHAR(255),
   `popup_id` VARCHAR(26),
   `event_type` VARCHAR(255) NOT NULL,
   `status` VARCHAR(255) NOT NULL,
@@ -1521,7 +1521,7 @@ CREATE TABLE `chatbot_settings` (
 DROP TABLE IF EXISTS `chatbot_kb_chunks`;
 CREATE TABLE `chatbot_kb_chunks` (
   `id` VARCHAR(255) NOT NULL,
-  `document_id` BIGINT UNSIGNED NOT NULL,
+  `document_id` VARCHAR(255) NOT NULL,
   `chunk_text` LONGTEXT,
   `meta` LONGTEXT,
   `created_at` TIMESTAMP NULL,
@@ -1637,7 +1637,7 @@ DROP TABLE IF EXISTS `chatbot_visitor_pages`;
 CREATE TABLE `chatbot_visitor_pages` (
   `id` VARCHAR(255) NOT NULL,
   `visitor_id` VARCHAR(26) NOT NULL,
-  `session_id` BIGINT UNSIGNED NOT NULL,
+  `session_id` VARCHAR(255) NOT NULL,
   `url` VARCHAR(255) NOT NULL,
   `title` VARCHAR(255),
   `referrer` VARCHAR(255),
@@ -1655,7 +1655,7 @@ DROP TABLE IF EXISTS `chatbot_visitor_events`;
 CREATE TABLE `chatbot_visitor_events` (
   `id` VARCHAR(255) NOT NULL,
   `visitor_id` VARCHAR(26) NOT NULL,
-  `session_id` BIGINT UNSIGNED,
+  `session_id` VARCHAR(255),
   `event_type` VARCHAR(255) NOT NULL,
   `event_category` VARCHAR(255),
   `event_label` VARCHAR(255),
@@ -1711,7 +1711,7 @@ CREATE TABLE `chatbot_kb_categories` (
   `slug` VARCHAR(255) NOT NULL,
   `description` LONGTEXT,
   `icon` VARCHAR(255),
-  `parent_id` BIGINT UNSIGNED,
+  `parent_id` VARCHAR(255),
   `sort_order` INT NOT NULL DEFAULT '0',
   `is_active` TINYINT(1) NOT NULL DEFAULT '1',
   `deleted_at` TIMESTAMP NULL,
@@ -1735,7 +1735,7 @@ CREATE TABLE `chatbot_kb_documents` (
   `deleted_at` TIMESTAMP NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
-  `category_id` BIGINT UNSIGNED,
+  `category_id` VARCHAR(255),
   `file_type` VARCHAR(255),
   `file_size` INT,
   `word_count` INT NOT NULL DEFAULT '0',
@@ -1807,12 +1807,12 @@ CREATE TABLE `chatbot_companies` (
 
 DROP TABLE IF EXISTS `chatbot_company_contact`;
 CREATE TABLE `chatbot_company_contact` (
-  `company_id` BIGINT UNSIGNED NOT NULL,
+  `company_id` VARCHAR(255) NOT NULL,
   `contact_id` VARCHAR(26) NOT NULL,
   `role` VARCHAR(255),
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
-  PRIMARY KEY (`company_id`),
+  PRIMARY KEY (`company_id`, `contact_id`),
   FOREIGN KEY (`contact_id`) REFERENCES `chatbot_contacts` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (`company_id`) REFERENCES `chatbot_companies` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1834,7 +1834,7 @@ CREATE TABLE `chatbot_pipelines` (
 DROP TABLE IF EXISTS `chatbot_pipeline_stages`;
 CREATE TABLE `chatbot_pipeline_stages` (
   `id` VARCHAR(255) NOT NULL,
-  `pipeline_id` BIGINT UNSIGNED NOT NULL,
+  `pipeline_id` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `color` VARCHAR(255) NOT NULL DEFAULT '#6366f1',
   `sort_order` INT NOT NULL DEFAULT '0',
@@ -1854,9 +1854,9 @@ CREATE TABLE `chatbot_deals` (
   `id` VARCHAR(255) NOT NULL,
   `title` VARCHAR(255) NOT NULL,
   `contact_id` VARCHAR(26) NOT NULL,
-  `company_id` BIGINT UNSIGNED,
-  `pipeline_id` BIGINT UNSIGNED NOT NULL,
-  `stage_id` BIGINT UNSIGNED NOT NULL,
+  `company_id` VARCHAR(255),
+  `pipeline_id` VARCHAR(255) NOT NULL,
+  `stage_id` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NOT NULL DEFAULT '0',
   `currency` VARCHAR(255) NOT NULL DEFAULT 'INR',
   `owner_id` VARCHAR(26),
@@ -1972,7 +1972,7 @@ CREATE TABLE `chatbot_campaigns` (
 DROP TABLE IF EXISTS `chatbot_campaign_logs`;
 CREATE TABLE `chatbot_campaign_logs` (
   `id` VARCHAR(255) NOT NULL,
-  `campaign_id` BIGINT UNSIGNED NOT NULL,
+  `campaign_id` VARCHAR(255) NOT NULL,
   `recipient_type` VARCHAR(255) NOT NULL,
   `recipient_id` VARCHAR(255),
   `recipient_email` VARCHAR(255),
@@ -2030,7 +2030,7 @@ CREATE TABLE `chatbot_webhooks` (
 DROP TABLE IF EXISTS `chatbot_webhook_logs`;
 CREATE TABLE `chatbot_webhook_logs` (
   `id` VARCHAR(255) NOT NULL,
-  `webhook_id` BIGINT UNSIGNED NOT NULL,
+  `webhook_id` VARCHAR(255) NOT NULL,
   `event` VARCHAR(255) NOT NULL,
   `payload` LONGTEXT,
   `response_status` INT,
@@ -2162,7 +2162,7 @@ DROP TABLE IF EXISTS `chatbot_translations`;
 CREATE TABLE `chatbot_translations` (
   `id` VARCHAR(255) NOT NULL,
   `key` VARCHAR(255) NOT NULL,
-  `language_id` BIGINT UNSIGNED NOT NULL,
+  `language_id` VARCHAR(255) NOT NULL,
   `value` LONGTEXT,
   `group` VARCHAR(255) NOT NULL DEFAULT 'widget',
   `created_at` TIMESTAMP NULL,

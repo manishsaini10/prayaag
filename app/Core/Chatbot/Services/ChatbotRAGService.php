@@ -55,10 +55,11 @@ class ChatbotRAGService
             ]
         );
 
-        $doc->chunks()->delete();
+        $chunkIds = $doc->chunks()->pluck('id')->toArray();
         Embedding::where('embeddingable_type', ChatbotKbChunk::class)
-            ->whereIn('embeddingable_id', $doc->chunks()->pluck('id'))
+            ->whereIn('embeddingable_id', $chunkIds)
             ->delete();
+        $doc->chunks()->delete();
 
         $chunks = $this->chunkText($content, $title, $type, $sourceId);
 

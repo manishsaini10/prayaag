@@ -7,7 +7,8 @@ use App\Providers\ChatbotServiceProvider;
 
 return [
     AppServiceProvider::class,
-    CoreServiceProvider::class,
+    App\Providers\CoreServiceProvider::class,
+    SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
     PopupBuilderServiceProvider::class,
     ChatbotServiceProvider::class,
 ];

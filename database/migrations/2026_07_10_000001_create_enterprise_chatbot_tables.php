@@ -181,11 +181,12 @@ return new class extends Migration
 
         // 3.2 READ RECEIPTS
         Schema::create('chatbot_read_receipts', function (Blueprint $table) {
+            $table->ulid('id')->primary();
             $table->foreignUlid('message_id')->constrained('chatbot_messages')->cascadeOnDelete();
             $table->foreignUlid('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('reader_type', 20);
             $table->timestamp('read_at');
-            $table->primary(['message_id', 'user_id', 'reader_type']);
+            $table->index(['message_id', 'user_id', 'reader_type'], 'chatbot_read_receipts_idx');
         });
 
         // 3.3 CONVERSATION TAGS
@@ -243,61 +244,7 @@ return new class extends Migration
         });
 
         // ====================================================================
-        // SECTION 5: TICKET SYSTEM
-        // ====================================================================
-
-        Schema::create('chatbot_tickets', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->string('ticket_number')->unique();
-            $table->foreignUlid('conversation_id')->nullable()->constrained('chatbot_conversations')->nullOnDelete();
-            $table->foreignUlid('visitor_id')->nullable()->constrained('chatbot_visitors')->nullOnDelete();
-            $table->foreignUlid('contact_id')->nullable()->constrained('chatbot_contacts')->nullOnDelete();
-            $table->string('subject');
-            $table->text('description')->nullable();
-            $table->string('status', 20)->default('open');
-            $table->string('priority', 20)->default('medium');
-            $table->string('category', 30)->nullable();
-            $table->foreignUlid('department_id')->nullable()->constrained('chatbot_departments')->nullOnDelete();
-            $table->foreignUlid('assigned_agent_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignUlid('assigned_team_id')->nullable()->constrained('chatbot_teams')->nullOnDelete();
-            $table->string('source', 30)->default('chatbot');
-            $table->string('channel', 30)->default('web');
-            $table->json('tags')->nullable();
-            $table->json('custom_fields')->nullable();
-            $table->timestamp('first_response_at')->nullable();
-            $table->timestamp('resolved_at')->nullable();
-            $table->timestamp('closed_at')->nullable();
-            $table->integer('response_time_seconds')->default(0);
-            $table->integer('resolution_time_seconds')->default(0);
-            $table->integer('sla_minutes')->nullable();
-            $table->boolean('sla_breached')->default(false);
-            $table->integer('satisfaction_rating')->nullable();
-            $table->text('satisfaction_comment')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
-
-            $table->index(['status', 'priority']);
-            $table->index('ticket_number');
-            $table->index('assigned_agent_id');
-        });
-
-        Schema::create('chatbot_ticket_replies', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->foreignUlid('ticket_id')->constrained('chatbot_tickets')->cascadeOnDelete();
-            $table->foreignUlid('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('replier_type', 20);
-            $table->text('body');
-            $table->json('attachments')->nullable();
-            $table->boolean('is_internal')->default(false);
-            $table->boolean('is_solution')->default(false);
-            $table->softDeletes();
-            $table->timestamps();
-
-            $table->index('ticket_id');
-        });
-
-        // ====================================================================
-        // SECTION 6: CRM (CONTACTS, COMPANIES, PIPELINES)
+        // SECTION 6: CRM (CONTACTS, COMPANIES, PIPELINES) (Moved up for constraint order)
         // ====================================================================
 
         // 6.1 CONTACTS
@@ -424,6 +371,60 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        // ====================================================================
+        // SECTION 5: TICKET SYSTEM
+        // ====================================================================
+
+        Schema::create('chatbot_tickets', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->string('ticket_number')->unique();
+            $table->foreignUlid('conversation_id')->nullable()->constrained('chatbot_conversations')->nullOnDelete();
+            $table->foreignUlid('visitor_id')->nullable()->constrained('chatbot_visitors')->nullOnDelete();
+            $table->foreignUlid('contact_id')->nullable()->constrained('chatbot_contacts')->nullOnDelete();
+            $table->string('subject');
+            $table->text('description')->nullable();
+            $table->string('status', 20)->default('open');
+            $table->string('priority', 20)->default('medium');
+            $table->string('category', 30)->nullable();
+            $table->foreignUlid('department_id')->nullable()->constrained('chatbot_departments')->nullOnDelete();
+            $table->foreignUlid('assigned_agent_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUlid('assigned_team_id')->nullable()->constrained('chatbot_teams')->nullOnDelete();
+            $table->string('source', 30)->default('chatbot');
+            $table->string('channel', 30)->default('web');
+            $table->json('tags')->nullable();
+            $table->json('custom_fields')->nullable();
+            $table->timestamp('first_response_at')->nullable();
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamp('closed_at')->nullable();
+            $table->integer('response_time_seconds')->default(0);
+            $table->integer('resolution_time_seconds')->default(0);
+            $table->integer('sla_minutes')->nullable();
+            $table->boolean('sla_breached')->default(false);
+            $table->integer('satisfaction_rating')->nullable();
+            $table->text('satisfaction_comment')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+
+            $table->index(['status', 'priority']);
+            $table->index('ticket_number');
+            $table->index('assigned_agent_id');
+        });
+
+        Schema::create('chatbot_ticket_replies', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->foreignUlid('ticket_id')->constrained('chatbot_tickets')->cascadeOnDelete();
+            $table->foreignUlid('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('replier_type', 20);
+            $table->text('body');
+            $table->json('attachments')->nullable();
+            $table->boolean('is_internal')->default(false);
+            $table->boolean('is_solution')->default(false);
+            $table->softDeletes();
+            $table->timestamps();
+
+            $table->index('ticket_id');
         });
 
         // ====================================================================

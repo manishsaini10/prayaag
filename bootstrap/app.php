@@ -17,9 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Multi-tenancy removed: single-site CMS, no tenant-resolution middleware.
         $middleware->alias([
-            'permission' => \App\Core\Auth\Middleware\EnsurePermission::class,
-            'role'       => \App\Http\Middleware\EnsureRole::class,
-            'cors'       => \App\Http\Middleware\CorsMiddleware::class,
+            'permission'  => \App\Core\Auth\Middleware\EnsurePermission::class,
+            'role'        => \App\Http\Middleware\EnsureRole::class,
+            'cors'        => \App\Http\Middleware\CorsMiddleware::class,
+            'require.2fa' => \App\Http\Middleware\RequireTwoFactor::class,
         ]);
 
         // SEO: perform configured 301/302 redirects on public GET requests.

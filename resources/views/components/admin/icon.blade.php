@@ -116,6 +116,12 @@
         @case('server')
             <rect x="3.5" y="4.5" width="17" height="6" rx="1.5"/><rect x="3.5" y="13.5" width="17" height="6" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/>
             @break
+        @case('utensils')
+            <path d="M5 3v7a3 3 0 0 0 6 0V3M8 3v7M8 12v9M18 8c0-2.5-.5-5-1.5-6H15v11a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V8z"/>
+            @break
+        @case('adjustments')
+            <path d="M12 4v4M19 6a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z"/><path d="M5 18a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/><path d="M12 20v-4M5 10V4M19 20v-8"/>
+            @break
         @default
             <circle cx="12" cy="12" r="3.5"/>
     @endswitch

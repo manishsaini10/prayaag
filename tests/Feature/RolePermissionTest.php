@@ -15,21 +15,21 @@ class RolePermissionTest extends TestCase
 
     public function test_user_inherits_permissions_from_its_roles(): void
     {
-        $perm = Permission::create(['name' => 'Create pages', 'slug' => 'pages.create', 'group' => 'pages']);
-        $role = Role::create(['name' => 'Editor', 'slug' => 'editor']);
-        $role->permissions()->attach($perm->id);
+        $perm = Permission::create(['name' => 'pages.create', 'guard_name' => 'web']);
+        $role = Role::create(['name' => 'editor', 'guard_name' => 'web']);
+        $role->givePermissionTo($perm);
 
         $user = User::create(['name' => 'E', 'email' => 'e@a.test', 'password' => Hash::make('x')]);
         $user->assignRole($role);
 
         $this->assertTrue($user->fresh()->hasRole('editor'));
-        $this->assertTrue($user->fresh()->hasPermission('pages.create'));
-        $this->assertFalse($user->fresh()->hasPermission('pages.delete'));
+        $this->assertTrue($user->fresh()->can('pages.create'));
+        $this->assertFalse($user->fresh()->can('pages.delete'));
     }
 
     public function test_super_admin_passes_every_gate(): void
     {
-        $role = Role::create(['name' => 'Super Admin', 'slug' => 'super-admin']);
+        $role = Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
         $user = User::create(['name' => 'S', 'email' => 's@a.test', 'password' => Hash::make('x')]);
         $user->assignRole($role);
 

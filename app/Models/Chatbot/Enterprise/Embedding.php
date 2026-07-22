@@ -2,11 +2,16 @@
 
 namespace App\Models\Chatbot\Enterprise;
 
-use App\Core\Models\BaseModel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 
-class Embedding extends BaseModel
+class Embedding extends Model
 {
+    use HasUlids;
+
     protected $table = 'chatbot_embeddings';
+
+    protected $guarded = ['id'];
 
     protected $casts = [
         'embedding_vector' => 'array',

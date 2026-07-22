@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Core\Chatbot\Repositories\ChatbotRepository;
 use App\Core\Chatbot\Services\ChatbotRAGService;
+use App\Core\Chatbot\Services\CannedResponseService;
 use App\Models\Chatbot\ChatbotKbDocument;
 use App\Models\Chatbot\ChatbotLead;
 use App\Models\Chatbot\ChatbotFlow;
 use App\Models\Chatbot\ChatbotConversation;
+use App\Models\Chatbot\CannedResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -227,5 +229,96 @@ class AdminChatbotController extends Controller
         );
 
         return redirect()->back()->with('success', 'Flow builder configuration saved!');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CANNED RESPONSES
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function cannedResponses(CannedResponseService $service)
+    {
+        $responses  = CannedResponse::orderBy('category')->orderBy('shortcut')->get();
+        $categories = CannedResponse::categories();
+        return view('admin.chatbot.canned', compact('responses', 'categories'));
+    }
+
+    public function storeCanned(Request $request, CannedResponseService $service)
+    {
+        $data = $request->validate([
+            'shortcut' => 'required|string|max:50',
+            'body'     => 'required|string',
+            'category' => 'nullable|string|max:50',
+        ]);
+        $data['created_by'] = Auth::id();
+        $service->create($data);
+        return response()->json(['success' => true, 'message' => 'Canned response created.']);
+    }
+
+    public function updateCanned(Request $request, CannedResponseService $service, string $id)
+    {
+        $cr   = CannedResponse::findOrFail($id);
+        $data = $request->validate([
+            'shortcut' => 'sometimes|string|max:50',
+            'body'     => 'sometimes|string',
+            'category' => 'nullable|string|max:50',
+        ]);
+        $service->update($cr, $data);
+        return response()->json(['success' => true, 'message' => 'Updated successfully.']);
+    }
+
+    public function destroyCanned(CannedResponseService $service, string $id)
+    {
+        $cr = CannedResponse::findOrFail($id);
+        $service->delete($cr);
+        return response()->json(['success' => true, 'message' => 'Deleted successfully.']);
+    }
+
+    /** AJAX: suggest canned responses based on user message */
+    public function suggestCanned(Request $request, CannedResponseService $service)
+    {
+        $query  = $request->input('q', '');
+        $intent = $request->input('intent', 'general');
+
+        if (strlen($query) >= 1 && str_starts_with(trim($query), '/')) {
+            // Slash search: return by shortcut/body match
+            $results = $service->search(ltrim($query, '/'));
+        } else {
+            // AI-style suggestion by user message content
+            $results = $service->suggest($query, $intent);
+        }
+
+        return response()->json($results->map(fn($r) => [
+            'id'       => $r->id,
+            'shortcut' => $r->shortcut,
+            'body'     => $r->body,
+            'category' => $r->category,
+        ])->values());
+    }
+
+    public function assistantConfig()
+    {
+        $settings = $this->repository->getSettings();
+        return view('admin.chatbot.assistant-config', compact('settings'));
+    }
+
+    public function saveAssistantConfig(Request $request)
+    {
+        $settings = $this->repository->getSettings();
+        $settingsData = $settings->settings_data ?? [];
+
+        $assistants = [
+            'enable_admission'   => $request->boolean('settings_data.assistants.enable_admission'),
+            'enable_job'         => $request->boolean('settings_data.assistants.enable_job'),
+            'admission_greeting' => $request->input('settings_data.assistants.admission_greeting'),
+            'job_greeting'       => $request->input('settings_data.assistants.job_greeting'),
+        ];
+
+        $settingsData['assistants'] = $assistants;
+
+        $settings->update([
+            'settings_data' => $settingsData
+        ]);
+
+        return redirect()->back()->with('success', 'Conversational Assistant settings updated successfully.');
     }
 }

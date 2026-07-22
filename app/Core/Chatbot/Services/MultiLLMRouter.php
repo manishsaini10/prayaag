@@ -5,7 +5,8 @@ namespace App\Core\Chatbot\Services;
 class MultiLLMRouter
 {
     private const INTENTS = [
-        'admission' => ['admission', 'enroll', 'enrollment', 'register', 'registration', 'apply', 'application', 'join', 'admit', 'seat', 'form', 'prospectus', 'brochure'],
+        'admission' => ['admission', 'enroll', 'enrollment', 'register', 'registration', 'admit', 'seat', 'prospectus', 'brochure', 'admission form'],
+        'job'       => ['job', 'vacancy', 'career', 'hiring', 'apply job', 'teacher post', 'staff', 'position', 'recruitment', 'opening', 'resume', 'cv', 'naukri', 'placement'],
         'fee' => ['fee', 'fees', 'payment', 'pay', 'cost', 'price', 'tuition', 'scholarship', 'concession', 'installment', 'refund', 'due', 'amount'],
         'academic' => ['academic', 'curriculum', 'subject', 'syllabus', 'exam', 'examination', 'result', 'grade', 'marks', 'class', 'timetable', 'schedule', 'holiday', 'vacation'],
         'contact' => ['contact', 'phone', 'call', 'email', 'address', 'location', 'reach', 'office', 'timing', 'hours', 'visit', 'meeting', 'appointment'],
@@ -15,6 +16,7 @@ class MultiLLMRouter
 
     private const INTENT_PROMPTS = [
         'admission' => "You are a school admissions counselor for Prayaag School. Be helpful, warm, and provide clear information about the admission process, required documents, age criteria, and deadlines. Encourage the visitor to fill out the admission inquiry form.",
+        'job'       => "You are an HR assistant for Prayaag School. Help job seekers understand available positions, application process, and required qualifications. Be professional, encouraging, and guide them through applying.",
         'fee' => "You are a school fee management assistant for Prayaag School. Provide clear information about fee structure, payment options, scholarships, and concessions. Be transparent about all costs.",
         'academic' => "You are a school academic coordinator for Prayaag School. Provide information about curriculum, subjects, exams, academic calendar, and co-curricular activities. Be informative and encouraging.",
         'contact' => "You are a school front-desk assistant for Prayaag School. Provide contact details, address, office hours, and directions. Be polite and helpful in directing visitors to the right channel.",
@@ -24,6 +26,7 @@ class MultiLLMRouter
 
     private const INTENT_MODELS = [
         'admission' => ['provider' => 'gemini', 'model' => 'gemini-1.5-flash', 'temperature' => 0.6],
+        'job'       => ['provider' => 'gemini', 'model' => 'gemini-1.5-flash', 'temperature' => 0.6],
         'fee' => ['provider' => 'gemini', 'model' => 'gemini-1.5-flash', 'temperature' => 0.5],
         'academic' => ['provider' => 'gemini', 'model' => 'gemini-1.5-flash', 'temperature' => 0.7],
         'contact' => ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'temperature' => 0.4],

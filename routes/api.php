@@ -23,3 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::put('pages/{page}/tree', [PageApiController::class, 'syncTree'])
         ->middleware('permission:pages.update');
 });
+
+use App\Http\Controllers\Chatbot\SentimentController;
+
+Route::post('chatbot/sentiment', [SentimentController::class, 'analyse']);

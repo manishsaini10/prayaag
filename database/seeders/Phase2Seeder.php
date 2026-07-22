@@ -9,11 +9,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * Bootstraps the site: the global permission catalog, two roles
- * (super-admin, editor), and an admin user.
- * Run: php artisan db:seed --class=Database\\Seeders\\Phase2Seeder
- */
 class Phase2Seeder extends Seeder
 {
     public function run(): void
@@ -26,31 +21,29 @@ class Phase2Seeder extends Seeder
         ];
 
         $permissions = collect($catalog)->map(function (string $slug) {
-            [$group] = explode('.', $slug);
-
             return Permission::firstOrCreate(
-                ['slug' => $slug],
-                ['name' => Str::headline(str_replace('.', ' ', $slug)), 'group' => $group]
+                ['name' => $slug, 'guard_name' => 'web'],
+                ['name' => $slug, 'guard_name' => 'web']
             );
         });
 
         $superAdmin = Role::firstOrCreate(
-            ['slug' => 'super-admin'],
-            ['name' => 'Super Admin']
+            ['name' => 'super-admin', 'guard_name' => 'web'],
+            ['name' => 'super-admin', 'guard_name' => 'web']
         );
 
         $editor = Role::firstOrCreate(
-            ['slug' => 'editor'],
-            ['name' => 'Editor']
+            ['name' => 'editor', 'guard_name' => 'web'],
+            ['name' => 'editor', 'guard_name' => 'web']
         );
 
-        $superAdmin->permissions()->syncWithoutDetaching($permissions->pluck('id'));
+        $superAdmin->givePermissionTo($permissions);
 
-        $editor->permissions()->syncWithoutDetaching(
+        $editor->givePermissionTo(
             $permissions->filter(
-                fn (Permission $p) => str_starts_with($p->slug, 'pages.')
-                    || str_starts_with($p->slug, 'posts.')
-            )->pluck('id')
+                fn (Permission $p) => str_starts_with($p->name, 'pages.')
+                    || str_starts_with($p->name, 'posts.')
+            )
         );
 
         $admin = User::firstOrCreate(

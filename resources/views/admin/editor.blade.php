@@ -462,5 +462,6 @@
     })();
     </script>
     @endverbatim
+    @include('admin.partials.ai-content-assistant')
 </body>
 </html>

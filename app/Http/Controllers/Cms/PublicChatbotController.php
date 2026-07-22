@@ -9,6 +9,9 @@ use App\Core\Chatbot\Events\MessageRead;
 use App\Core\Chatbot\Repositories\ChatbotRepository;
 use App\Core\Chatbot\Services\ChatbotAIService;
 use App\Core\Chatbot\Services\ChatbotRAGService;
+use App\Core\Chatbot\Services\MultiLLMRouter;
+use App\Core\Chatbot\AdmissionAssistant\AdmissionAssistantService;
+use App\Core\Chatbot\JobAssistant\JobAssistantService;
 use App\Models\Chatbot\ChatbotFormField;
 use App\Models\Chatbot\ChatbotLead;
 use App\Models\Chatbot\ChatbotConversation;
@@ -181,6 +184,69 @@ class PublicChatbotController extends Controller
                 ]);
             }
         }
+
+        // ── Conversational Assistants (Admission / Job) ──────────────────────
+        // Load session data from conversation meta column (JSON)
+        $sessionData = $conversation->meta ?? [];
+        if (!is_array($sessionData)) {
+            $sessionData = json_decode($sessionData ?: '{}', true) ?? [];
+        }
+
+        $router = app(MultiLLMRouter::class);
+        $intent = $router->detectIntent($userInput);
+        $assistantsConfig = $settings->settings_data['assistants'] ?? [];
+        $enableAdmission  = (bool)($assistantsConfig['enable_admission'] ?? true);
+        $enableJob        = (bool)($assistantsConfig['enable_job'] ?? true);
+
+        // --- ADMISSION ASSISTANT ---
+        $admissionAssistant = app(AdmissionAssistantService::class);
+        $isAdmissionActive  = $admissionAssistant->isActive($sessionData);
+
+        if ($enableAdmission && !$isAdmissionActive && $intent === 'admission') {
+            // First time admission intent detected → greet + start session
+            $greeting = !empty($assistantsConfig['admission_greeting']) ? $assistantsConfig['admission_greeting'] : $admissionAssistant->greeting();
+            $firstQ   = $admissionAssistant->handle($convoId, '', $sessionData);
+            $conversation->update(['meta' => $sessionData, 'intent' => 'admission']);
+            $botReply = $greeting . "\n\n" . $firstQ;
+
+            $botMessage = $this->repository->createMessage($convoId, 'chatbot', null, $botReply);
+            MessageSent::dispatch($botMessage);
+            return response()->json(['visitor_message' => $visitorMessage, 'bot_message' => $botMessage]);
+        }
+
+        if ($isAdmissionActive) {
+            $botReply = $admissionAssistant->handle($convoId, $userInput, $sessionData);
+            $conversation->update(['meta' => $sessionData]);
+
+            $botMessage = $this->repository->createMessage($convoId, 'chatbot', null, $botReply);
+            MessageSent::dispatch($botMessage);
+            return response()->json(['visitor_message' => $visitorMessage, 'bot_message' => $botMessage]);
+        }
+
+        // --- JOB ASSISTANT ---
+        $jobAssistant   = app(JobAssistantService::class);
+        $isJobActive    = $jobAssistant->isActive($sessionData);
+
+        if ($enableJob && !$isJobActive && $intent === 'job') {
+            $greeting = !empty($assistantsConfig['job_greeting']) ? $assistantsConfig['job_greeting'] : $jobAssistant->greeting();
+            $firstQ   = $jobAssistant->handle($convoId, '', $sessionData);
+            $conversation->update(['meta' => $sessionData, 'intent' => 'job']);
+            $botReply = $greeting . "\n\n" . $firstQ;
+
+            $botMessage = $this->repository->createMessage($convoId, 'chatbot', null, $botReply);
+            MessageSent::dispatch($botMessage);
+            return response()->json(['visitor_message' => $visitorMessage, 'bot_message' => $botMessage]);
+        }
+
+        if ($isJobActive) {
+            $botReply = $jobAssistant->handle($convoId, $userInput, $sessionData);
+            $conversation->update(['meta' => $sessionData]);
+
+            $botMessage = $this->repository->createMessage($convoId, 'chatbot', null, $botReply);
+            MessageSent::dispatch($botMessage);
+            return response()->json(['visitor_message' => $visitorMessage, 'bot_message' => $botMessage]);
+        }
+        // ── End Conversational Assistants ─────────────────────────────────────
 
         $kbContext = '';
         if ($settings->enable_kb) {

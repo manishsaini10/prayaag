@@ -40,4 +40,8 @@ return [
         ],
     ],
 
+    'bunnycdn' => [
+        'api_key' => env('BUNNYCDN_API_KEY'),
+    ],
+
 ];

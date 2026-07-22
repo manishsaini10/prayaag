@@ -46,7 +46,12 @@ class PageController extends Controller
         // First-party analytics. Wrapped so it can never break rendering.
         rescue(fn () => app(PageViewRecorder::class)->record(request(), $page), null, false);
 
-        $content = $renderer->renderCached($page);
+        // Render page content safely – if rendering fails, fall back to a placeholder
+        $content = rescue(fn () => $renderer->renderCached($page), '', false);
+        if (empty($content)) {
+            \Log::warning('PageRenderer returned empty content for slug: ' . $slug);
+            $content = view('themes.school.partials.empty-page')->render();
+        }
         $isHome = $slug === 'home';
         $seoData = app(SeoManager::class)->forPage($page, $content, $isHome);
         $seo = $seoData->toArray();

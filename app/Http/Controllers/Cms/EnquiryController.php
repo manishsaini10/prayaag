@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Models\Enquiry;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Services\RecaptchaService;
 
 /**
  * Receives public contact/enquiry submissions. Honeypot + route-level

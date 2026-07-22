@@ -43,8 +43,9 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- Admin (authenticated) ---
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/ai-assist', [\App\Http\Controllers\Admin\AiContentAssistController::class, 'generate'])->name('admin.ai-assist');
 
     // Page editor
     Route::get('/admin/pages', [EditorController::class, 'index'])->name('admin.pages.index');
@@ -162,6 +163,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/m/{resource}/{id}', [ResourceController::class, 'update'])->name('admin.resource.update');
     Route::delete('/admin/m/{resource}/{id}', [ResourceController::class, 'destroy'])->name('admin.resource.destroy');
 
+    // Role/User permission management
+    Route::get('/admin/role-permissions', [\App\Http\Controllers\Admin\RolePermissionController::class, 'index'])->name('admin.role-permissions.index');
+    Route::get('/admin/role-permissions/{role}/edit', [\App\Http\Controllers\Admin\RolePermissionController::class, 'edit'])->name('admin.role-permissions.edit');
+    Route::put('/admin/role-permissions/{role}', [\App\Http\Controllers\Admin\RolePermissionController::class, 'update'])->name('admin.role-permissions.update');
+    Route::get('/admin/user-roles', [\App\Http\Controllers\Admin\UserRoleController::class, 'index'])->name('admin.user-roles.index');
+    Route::get('/admin/user-roles/{user}/edit', [\App\Http\Controllers\Admin\UserRoleController::class, 'edit'])->name('admin.user-roles.edit');
+    Route::put('/admin/user-roles/{user}', [\App\Http\Controllers\Admin\UserRoleController::class, 'update'])->name('admin.user-roles.update');
+
     // --- Academic Calendar Admin CRUD ---
     Route::middleware('role:admin|principal')->prefix('admin')->name('admin.')->group(function () {
         Route::get('academic-calendar-entries/import', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'show'])->name('academic-calendar-entries.import');
@@ -174,6 +183,18 @@ Route::middleware('auth')->group(function () {
         Route::post('academic-sessions/{academic_session}/toggle', [\App\Http\Controllers\Admin\AcademicSessionController::class, 'toggle'])->name('academic-sessions.toggle');
         Route::resource('academic-sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
         Route::resource('academic-terms', \App\Http\Controllers\Admin\AcademicTermController::class);
+
+        // Mess Menu CRUD
+        Route::get('mess-menus', [\App\Http\Controllers\Admin\MessMenuController::class, 'index'])->name('mess-menus.index');
+        Route::get('mess-menus/create', [\App\Http\Controllers\Admin\MessMenuController::class, 'create'])->name('mess-menus.create');
+        Route::post('mess-menus', [\App\Http\Controllers\Admin\MessMenuController::class, 'store'])->name('mess-menus.store');
+        Route::get('mess-menus/{id}/edit', [\App\Http\Controllers\Admin\MessMenuController::class, 'edit'])->name('mess-menus.edit');
+        Route::put('mess-menus/{id}', [\App\Http\Controllers\Admin\MessMenuController::class, 'update'])->name('mess-menus.update');
+        Route::delete('mess-menus/{id}', [\App\Http\Controllers\Admin\MessMenuController::class, 'destroy'])->name('mess-menus.destroy');
+        Route::post('mess-menus/{id}/toggle', [\App\Http\Controllers\Admin\MessMenuController::class, 'toggleActive'])->name('mess-menus.toggle');
+        Route::post('mess-menus/{id}/duplicate', [\App\Http\Controllers\Admin\MessMenuController::class, 'duplicate'])->name('mess-menus.duplicate');
+        Route::post('mess-menus/{id}/special', [\App\Http\Controllers\Admin\MessMenuController::class, 'storeSpecial'])->name('mess-menus.special.store');
+        Route::delete('mess-menus/{id}/special/{specialId}', [\App\Http\Controllers\Admin\MessMenuController::class, 'destroySpecial'])->name('mess-menus.special.destroy');
     });
 
     // AI Chatbot Admin Console
@@ -203,6 +224,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/form-fields/reorder', [AdminPreChatFormController::class, 'reorderFields'])->name('form-fields.reorder');
         Route::get('/form-fields/submissions', [AdminPreChatFormController::class, 'submissions'])->name('form-fields.submissions');
 
+        // Canned Responses
+        Route::get('/canned',            [AdminChatbotController::class, 'cannedResponses'])->name('canned');
+        Route::post('/canned',           [AdminChatbotController::class, 'storeCanned'])->name('canned.store');
+        Route::put('/canned/{id}',       [AdminChatbotController::class, 'updateCanned'])->name('canned.update');
+        Route::delete('/canned/{id}',    [AdminChatbotController::class, 'destroyCanned'])->name('canned.destroy');
+        Route::get('/canned/suggest',    [AdminChatbotController::class, 'suggestCanned'])->name('canned.suggest');
+
+        // Conversational Assistants
+        Route::get('/assistant', [AdminChatbotController::class, 'assistantConfig'])->name('assistant');
+        Route::post('/assistant', [AdminChatbotController::class, 'saveAssistantConfig'])->name('assistant.save');
+
         // Campaigns
         Route::resource('campaigns', \App\Http\Controllers\Admin\CampaignController::class)->except(['show']);
         Route::post('/campaigns/{id}/send', [\App\Http\Controllers\Admin\CampaignController::class, 'send'])->name('campaigns.send');
@@ -224,7 +256,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // 2FA
-    Route::prefix('2fa')->name('2fa.')->group(function () {
+    Route::prefix('2fa')->middleware('auth')->name('2fa.')->group(function () {
         Route::get('/setup', [\App\Http\Controllers\Auth\TwoFactorController::class, 'showSetup'])->name('setup');
         Route::post('/enable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'enable'])->name('enable');
         Route::post('/disable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'disable'])->name('disable');
@@ -260,6 +292,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/duplicate/{id}', [AdminTestimonialController::class, 'duplicate'])->name('duplicate');
         Route::delete('/delete/{id}', [AdminTestimonialController::class, 'destroy'])->name('destroy');
     });
+
+    // GDPR & Data Privacy (Admin)
+    Route::prefix('/admin/privacy')->name('admin.privacy.')->group(function () {
+        Route::get('/', [\App\Core\Privacy\Http\Controllers\Admin\PrivacyDashboardController::class, 'index'])->name('index');
+        Route::post('/{id}/approve', [\App\Core\Privacy\Http\Controllers\Admin\PrivacyDashboardController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [\App\Core\Privacy\Http\Controllers\Admin\PrivacyDashboardController::class, 'reject'])->name('reject');
+        Route::get('/{id}/download', [\App\Core\Privacy\Http\Controllers\Admin\PrivacyDashboardController::class, 'download'])->name('download');
+    });
+
+    // Security Audit Trail (Admin)
+    Route::prefix('/admin/audit')->name('admin.audit.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AuditTrailController::class, 'index'])->name('index');
+        Route::get('/export', [\App\Http\Controllers\Admin\AuditTrailController::class, 'exportCsv'])->name('export');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\AuditTrailController::class, 'show'])->name('show');
+    });
 });
 
 // Embeddable chatbot JS (cross-site, served with CORS)
@@ -292,6 +339,9 @@ Route::prefix('/chatbot/track')->middleware('cors')->name('chatbot.track.')->gro
 Route::get('/academic-calendar', [\App\Http\Controllers\AcademicCalendarController::class, 'index'])->name('academic-calendar.index');
 Route::get('/academic-calendar/feed', [\App\Http\Controllers\AcademicCalendarController::class, 'feed'])->name('academic-calendar.feed');
 Route::get('/academic-calendar/export-pdf', [\App\Http\Controllers\AcademicCalendarController::class, 'exportPdf'])->name('academic-calendar.pdf');
+
+// --- Mess Menu PDF Download ---
+Route::get('/mess-menu/pdf', [\App\Http\Controllers\MessMenuController::class, 'downloadPdf'])->name('mess-menu.pdf');
 
 // --- Instagram Feed (public API for load-more) ---
 Route::get('/__ig/feed', [\App\Http\Controllers\Cms\InstagramFeedController::class, 'feed']);
@@ -336,7 +386,12 @@ Route::get('/testimonials', [PublicTestimonialController::class, 'index'])->name
 Route::get('/api/testimonials', [PublicTestimonialController::class, 'apiList'])->name('testimonials.api.list');
 Route::get('/api/featured-testimonials', [PublicTestimonialController::class, 'apiFeatured'])->name('testimonials.api.featured');
 
+// --- GDPR / Data Privacy Public Requests ---
+Route::get('/privacy/request-my-data', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'showForm'])->name('privacy.form');
+Route::post('/privacy/request-my-data', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'submit'])->name('privacy.submit');
+Route::get('/privacy/verify/{token}', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'verify'])->name('privacy.verify');
+
 // --- Public CMS (kept last; catch-all excludes reserved paths) ---
 Route::get('/cms-home', [PageController::class, 'home'])->name('cms.home'); // alias of /
 Route::get('/{slug}', [PageController::class, 'show'])
-    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|legacy-home$|cms-home$|testimonials$|api$)[A-Za-z0-9\-_/]+');
+    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|legacy-home$|cms-home$|testimonials$|api$|privacy$|privacy/)[A-Za-z0-9\-_/]+');

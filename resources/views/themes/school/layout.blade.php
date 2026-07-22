@@ -25,7 +25,7 @@
     <x-popup-builder-assets />
     <link rel="stylesheet" href="{{ asset('css/chatbot/chatbot-runtime.css') }}">
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script src="{{ asset('js/chatbot/chatbot-runtime.js') }}" defer></script>
+    <script src="{{ asset('js/chatbot/chatbot-runtime.js') }}?v={{ @filemtime(public_path('js/chatbot/chatbot-runtime.js')) ?: '1' }}" defer></script>
 </head>
 <body>
     {!! $header !!}
@@ -36,6 +36,7 @@
 
     <x-popup-render />
     <script src="{{ asset('site.js') }}?v={{ @filemtime(public_path('site.js')) ?: '1' }}" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     @stack('scripts')
 </body>
 </html>

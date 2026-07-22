@@ -14,7 +14,6 @@
             </svg>
         </div>
         <h2 class="text-xl font-bold mb-2" style="color:var(--text)">Two-Factor Authentication</h2>
-        <p class="text-sm mb-6" style="color:var(--text-muted)">Enter the authentication code from your authenticator app.</p>
 
         @if($errors->any())
             <div class="mb-4 px-4 py-3 rounded-xl text-sm" style="background:#fee2e2;color:#991b1b">
@@ -22,13 +21,27 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('2fa.verify') }}" class="space-y-4">
-            @csrf
-            <div>
-                <input type="text" name="code" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" class="w-full text-center text-3xl tracking-[0.5em]" style="max-width:280px;margin:0 auto;font-weight:700">
+        <div x-data="{ useRecovery: false }">
+            <p class="text-sm mb-6" style="color:var(--text-muted)" x-text="useRecovery ? 'Enter an emergency recovery code to log in.' : 'Enter the authentication code from your authenticator app.'"></p>
+
+            <form method="POST" action="{{ route('2fa.verify') }}" class="space-y-4">
+                @csrf
+                <div>
+                    {{-- TOTP Input --}}
+                    <input x-show="!useRecovery" type="text" name="code_totp" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" class="w-full text-center text-3xl tracking-[0.5em] focus:outline-none" style="max-width:280px;margin:0 auto;font-weight:700" :disabled="useRecovery">
+
+                    {{-- Recovery Code Input --}}
+                    <input x-show="useRecovery" type="text" name="code_recovery" placeholder="xxxx-xxxx" maxlength="12" class="w-full text-center text-lg tracking-wider focus:outline-none border p-3 rounded-lg" style="max-width:280px;margin:0 auto;border-color:var(--border);background:var(--surface-2);color:var(--text)" :disabled="!useRecovery">
+
+                    <input type="hidden" name="code" :value="useRecovery ? $el.form.code_recovery.value : $el.form.code_totp.value">
+                </div>
+                <button type="submit" class="btn-primary w-full" @click="$el.form.code.value = useRecovery ? $el.form.code_recovery.value : $el.form.code_totp.value">Verify</button>
+            </form>
+
+            <div class="mt-4">
+                <button type="button" class="text-xs font-semibold hover:underline" style="color:var(--primary)" @click="useRecovery = !useRecovery" x-text="useRecovery ? 'Use authenticator application' : 'Use emergency recovery code'"></button>
             </div>
-            <button type="submit" class="btn-primary w-full">Verify</button>
-        </form>
+        </div>
 
         <form method="POST" action="{{ route('logout') }}" class="mt-4">
             @csrf

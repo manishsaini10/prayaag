@@ -260,27 +260,24 @@ class ResourceRegistry
 
             'roles' => [
                 'model' => Role::class, 'label' => 'Roles', 'singular' => 'Role', 'icon' => 'shield', 'permission' => 'users.view',
-                'order' => ['name', 'asc'], 'search' => ['name', 'slug'],
+                'order' => ['name', 'asc'], 'search' => ['name'],
                 'columns' => [
                     ['key' => 'name', 'label' => 'Name'],
-                    ['key' => 'slug', 'label' => 'Slug'],
-                    ['key' => 'description', 'label' => 'Description'],
+                    ['key' => 'guard_name', 'label' => 'Guard'],
                 ],
                 'fields' => [
                     ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|string|max:255'],
-                    ['key' => 'slug', 'label' => 'Slug', 'type' => 'slug', 'rules' => 'required|string|max:255', 'unique' => 'roles,slug'],
-                    ['key' => 'description', 'label' => 'Description', 'type' => 'text', 'rules' => 'nullable|string|max:255'],
+                    ['key' => 'guard_name', 'label' => 'Guard', 'type' => 'text', 'rules' => 'required|string|max:255'],
                 ],
             ],
 
             'permissions' => [
                 'model' => Permission::class, 'label' => 'Permissions', 'singular' => 'Permission', 'icon' => 'shield', 'permission' => 'users.view',
-                'order' => ['group', 'asc'], 'search' => ['name', 'slug', 'group'],
+                'order' => ['name', 'asc'], 'search' => ['name'],
                 'actions' => ['index'],
                 'columns' => [
                     ['key' => 'name', 'label' => 'Name'],
-                    ['key' => 'slug', 'label' => 'Slug'],
-                    ['key' => 'group', 'label' => 'Group', 'type' => 'badge'],
+                    ['key' => 'guard_name', 'label' => 'Guard'],
                 ],
                 'fields' => [],
             ],
