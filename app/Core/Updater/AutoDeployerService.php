@@ -496,6 +496,38 @@ class AutoDeployerService
     }
 
     /**
+     * Legacy helper: Add directory recursively to ZipArchive
+     */
+    public function addDirToZip(ZipArchive $zip, string $dir, string $prefix): void
+    {
+        if (!is_dir($dir)) return;
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = $prefix . '/' . substr($filePath, strlen(realpath($dir)) + 1);
+                $zip->addFile($filePath, str_replace('\\', '/', $relativePath));
+            }
+        }
+    }
+
+    /**
+     * Legacy pre-update backup helper
+     */
+    public function createPreUpdateBackup(string $version = 'pre-deploy'): string
+    {
+        $deploymentId = 'DEPLOY-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        $sha = $this->getCurrentGitSha();
+        return $this->createVerifiedRestorePoint($deploymentId, $version, $sha);
+    }
+
+
+    /**
      * Export complete database SQL via PDO
      */
     protected function exportDatabaseSql(): string
