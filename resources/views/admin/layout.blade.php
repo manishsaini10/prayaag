@@ -63,11 +63,16 @@
 
         {{-- Nav --}}
         <nav class="flex-1 overflow-y-auto py-2">
-            @php($is = fn ($p) => request()->is($p) ? 'active' : '')
+            @php
+                $is = function ($p) {
+                    return request()->is($p) ? 'active' : '';
+                };
+            @endphp
 
             <a href="{{ url('/admin') }}" class="nav-link {{ request()->is('admin') ? 'active' : '' }}">
                 <x-admin.icon name="dashboard"/><span x-show="!collapsed">Dashboard</span>
             </a>
+
 
             <div x-show="!collapsed" class="nav-section">Content</div>
             <a href="{{ url('/admin/pages') }}" class="nav-link {{ $is('admin/pages*') }}"><x-admin.icon name="document"/><span x-show="!collapsed">Pages</span></a>
