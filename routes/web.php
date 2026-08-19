@@ -260,10 +260,6 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::post('/conversations/{id}/messages', [AdminChatbotController::class, 'sendMessage'])->name('conversations.send');
         Route::post('/conversations/{id}/status', [AdminChatbotController::class, 'updateConversationStatus'])->name('conversations.status');
         Route::post('/conversations/{id}/assign', [AdminChatbotController::class, 'assignConversation'])->name('conversations.assign');
-        Route::get('/kb', [AdminChatbotController::class, 'kb'])->name('kb');
-        Route::post('/kb/index-cms', [AdminChatbotController::class, 'indexCms'])->name('kb.index-cms');
-        Route::post('/kb/upload', [AdminChatbotController::class, 'uploadDoc'])->name('kb.upload');
-        Route::delete('/kb/{id}', [AdminChatbotController::class, 'deleteDoc'])->name('kb.delete');
         Route::get('/leads', [AdminChatbotController::class, 'leads'])->name('leads');
         Route::get('/flows', [AdminChatbotController::class, 'flows'])->name('flows');
         Route::post('/flows', [AdminChatbotController::class, 'saveFlow'])->name('flows.save');
@@ -277,35 +273,13 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::post('/form-fields/reorder', [AdminPreChatFormController::class, 'reorderFields'])->name('form-fields.reorder');
         Route::get('/form-fields/submissions', [AdminPreChatFormController::class, 'submissions'])->name('form-fields.submissions');
 
-        // Canned Responses
-        Route::get('/canned',            [AdminChatbotController::class, 'cannedResponses'])->name('canned');
-        Route::post('/canned',           [AdminChatbotController::class, 'storeCanned'])->name('canned.store');
-        Route::put('/canned/{id}',       [AdminChatbotController::class, 'updateCanned'])->name('canned.update');
-        Route::delete('/canned/{id}',    [AdminChatbotController::class, 'destroyCanned'])->name('canned.destroy');
-        Route::get('/canned/suggest',    [AdminChatbotController::class, 'suggestCanned'])->name('canned.suggest');
-
         // Conversational Assistants
         Route::get('/assistant', [AdminChatbotController::class, 'assistantConfig'])->name('assistant');
         Route::post('/assistant', [AdminChatbotController::class, 'saveAssistantConfig'])->name('assistant.save');
 
-        // Campaigns
-        Route::resource('campaigns', \App\Http\Controllers\Admin\CampaignController::class)->except(['show']);
-        Route::post('/campaigns/{id}/send', [\App\Http\Controllers\Admin\CampaignController::class, 'send'])->name('campaigns.send');
-        Route::post('/campaigns/{id}/duplicate', [\App\Http\Controllers\Admin\CampaignController::class, 'duplicate'])->name('campaigns.duplicate');
-
-        // Webhooks
-        Route::resource('webhooks', \App\Http\Controllers\Admin\WebhookController::class);
-        Route::post('/webhooks/{id}/test', [\App\Http\Controllers\Admin\WebhookController::class, 'test'])->name('webhooks.test');
-
         // Webhook Logs
         Route::get('/webhook-logs', [\App\Http\Controllers\Admin\WebhookController::class, 'logs'])->name('webhook-logs');
         Route::get('/webhook-logs/{id}', [\App\Http\Controllers\Admin\WebhookController::class, 'showLog'])->name('webhook-logs.show');
-
-        // Analytics (already defined via enterprise module but add explicit route)
-        Route::get('/analytics', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
-        Route::get('/analytics/reports', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'reports'])->name('analytics.reports');
-        Route::post('/analytics/generate-report', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'generateReport'])->name('analytics.generate-report');
-        Route::get('/analytics/realtime', [\App\Core\Chatbot\Http\Controllers\AnalyticsController::class, 'realtime'])->name('analytics.realtime');
     });
 
     // 2FA
