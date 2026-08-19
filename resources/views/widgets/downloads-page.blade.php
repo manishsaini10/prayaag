@@ -68,8 +68,8 @@
 .dwn-hero__content {
     position: relative;
     z-index: 2;
-    padding: 100px var(--gutter, 20px) 70px;
-    max-width: var(--container, 1200px);
+    padding: 100px 4vw 70px;
+    max-width: 100%;
     margin: 0 auto;
     width: 100%;
 }
@@ -92,7 +92,7 @@
 
 .dwn-hero__title {
     font-family: var(--font-head, 'Playfair Display', serif);
-    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
     font-weight: 700;
     color: #ffffff;
     line-height: 1.2;
@@ -104,9 +104,9 @@
 }
 
 .dwn-hero__sub {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: rgba(255,255,255,0.85);
-    max-width: 640px;
+    max-width: 780px;
     line-height: 1.7;
     margin: 0 0 32px;
 }
@@ -144,21 +144,22 @@
     box-shadow: 0 4px 20px -4px rgba(0,0,0,0.06);
     position: relative;
     z-index: 10;
+    width: 100%;
 }
 
 .dwn-stats-grid {
-    max-width: var(--container, 1200px);
+    max-width: 100%;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    padding: 0 var(--gutter, 20px);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding: 0 4vw;
 }
 
 .dwn-stat-item {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 22px 18px;
+    padding: 24px 20px;
     border-right: 1px solid #f1f5f9;
 }
 
@@ -195,20 +196,21 @@
 
 /* ── Main Catalog Section ────────────────────────────────────────── */
 .dwn-section {
-    padding: 70px var(--gutter, 20px);
-    max-width: var(--container, 1200px);
+    padding: 60px 4vw 80px;
+    max-width: 100%;
     margin: 0 auto;
+    width: 100%;
 }
 
 .dwn-header-center {
     text-align: center;
-    max-width: 680px;
+    max-width: 780px;
     margin: 0 auto 40px;
 }
 
 .dwn-header-center h2 {
     font-family: var(--font-head, 'Playfair Display', serif);
-    font-size: 2.3rem;
+    font-size: clamp(2rem, 3.5vw, 2.7rem);
     color: #0f172a;
     margin: 0 0 12px;
 }
