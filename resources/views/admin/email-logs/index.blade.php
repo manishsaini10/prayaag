@@ -26,7 +26,7 @@
                     <p class="text-xs text-amber-700 dark:text-amber-400 m-0">These emails were waiting in the queue buffer. Click to deliver them now.</p>
                 </div>
             </div>
-            <form method="POST" action="{{ route('admin.email-logs.flush-queue') }}" onsubmit="return confirm('Send all {{ $queuedCount }} queued emails immediately?')">
+            <form method="POST" action="{{ url('/admin/email-logs/flush-queue') }}" onsubmit="return confirm('Send all {{ $queuedCount }} queued emails immediately?')">
                 @csrf
                 <button type="submit" class="btn primary text-xs py-2 px-4 font-bold" style="background:#f59e0b;border:none">
                     ⚡ Send All {{ $queuedCount }} Queued Emails Now
