@@ -248,7 +248,7 @@
                                     {{ $item->duration ? $item->duration . 's' : '—' }}
                                 </td>
                                 <td class="py-3">{{ $item->applied_by ?? 'System' }}</td>
-                                <td class="py-3 font-mono text-muted">{{ $item->created_at ? $item->created_at->format('d M Y, H:i') : '—' }}</td>
+                                <td class="py-3 font-mono text-muted">{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') : '—' }}</td>
                                 <td class="py-3 text-right">
                                     @if($item->backup_path && file_exists($item->backup_path))
                                         <form method="POST" action="{{ route('admin.updates.rollback', $item->id) }}" onsubmit="return confirm('Are you sure you want to rollback to this restore point? Database and files will be restored.')">
