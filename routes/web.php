@@ -305,8 +305,10 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::post('/apply',         [\App\Http\Controllers\Admin\UpdateController::class, 'apply'])->name('apply');
         Route::post('/backup',        [\App\Http\Controllers\Admin\UpdateController::class, 'backup'])->name('backup');
         Route::post('/git-pull',      [\App\Http\Controllers\Admin\UpdateController::class, 'gitPull'])->name('git-pull');
+        Route::get('/health-check',   [\App\Http\Controllers\Admin\UpdateController::class, 'healthCheck'])->name('health-check');
         Route::post('/{id}/rollback', [\App\Http\Controllers\Admin\UpdateController::class, 'rollback'])->name('rollback');
     });
+
 
 
 

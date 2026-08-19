@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Core\Updater\AutoDeployerService;
+use App\Core\Updater\DeploymentHealthChecker;
+use App\Core\Updater\RollbackManager;
 use App\Core\Updater\UpdateManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UpdateController extends Controller
@@ -30,7 +33,7 @@ class UpdateController extends Controller
     }
 
     /* ─────────────────────────────────────────────────────────────
-     |  POST /admin/updates/git-pull  — 1-Click Git Auto-Sync (with Auto-Backup)
+     |  POST /admin/updates/git-pull  — 1-Click Transactional Deploy
      * ─────────────────────────────────────────────────────────── */
     public function gitPull(Request $request)
     {
@@ -41,16 +44,55 @@ class UpdateController extends Controller
         if ($result['success']) {
             $msg = "✅ Update Applied Successfully! " . $result['message'];
             if (!empty($result['backup_path'])) {
-                $msg .= " (Pre-update backup saved: " . basename($result['backup_path']) . ")";
+                $msg .= " (Restore Point: " . basename($result['backup_path']) . ")";
             }
             return back()->with('success', $msg)
-                         ->with('deploy_logs', $result['logs']);
+                         ->with('deploy_logs', $result['logs'])
+                         ->with('health_result', $result['health'] ?? null);
         }
 
-        return back()->with('error', "❌ Git Auto-Sync Failed: " . $result['message'])
+        // Failure with automatic rollback handling
+        if (($result['status'] ?? '') === 'rollback_verified') {
+            $warnMsg = "⚠ Update Failed: " . $result['message'] . "\n↩ AUTOMATIC ROLLBACK SUCCESSFUL: Previous version restored and verified healthy.";
+            return back()->with('error', $warnMsg)
+                         ->with('deploy_logs', $result['logs'])
+                         ->with('rollback_info', $result['rollback'] ?? null);
+        }
+
+        $critMsg = "🚨 CRITICAL DEPLOYMENT FAILURE: Update Failed and Rollback Failed! " . $result['message'];
+        return back()->with('error', $critMsg)
                      ->with('deploy_logs', $result['logs']);
     }
 
+    /* ─────────────────────────────────────────────────────────────
+     |  GET /admin/updates/health-check  — Run Live Health Suite
+     * ─────────────────────────────────────────────────────────── */
+    public function healthCheck(DeploymentHealthChecker $checker)
+    {
+        $result = $checker->runFullHealthCheck(maxRetries: 1, timeoutSeconds: 6);
+        return response()->json($result, $result['status'] === 'healthy' ? 200 : 503);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     |  POST /admin/updates/{id}/rollback  — Rollback a specific update
+     * ─────────────────────────────────────────────────────────── */
+    public function rollback(int|string $id, RollbackManager $rollbackManager)
+    {
+        $record = DB::table('cms_updates')->where('id', $id)->orWhere('deployment_id', $id)->first();
+        if (!$record || !$record->backup_path || !file_exists($record->backup_path)) {
+            return back()->with('error', 'Restore point not found on disk for this update.');
+        }
+
+        $result = $rollbackManager->executeRollback($record->backup_path, (string)$record->id, true);
+
+        if ($result['success']) {
+            return back()->with('success', "✅ {$result['message']}")
+                         ->with('deploy_logs', $result['logs']);
+        }
+
+        return back()->with('error', "❌ {$result['error']}")
+                     ->with('deploy_logs', $result['logs']);
+    }
 
     /* ─────────────────────────────────────────────────────────────
      |  POST /admin/updates/upload  — Upload & validate package
@@ -74,9 +116,7 @@ class UpdateController extends Controller
             return back()->with('error', $result['error']);
         }
 
-        // Store path in session for confirmation step
         session(['pending_update_path' => $tmpPath, 'pending_update_manifest' => $result['manifest']]);
-
         return redirect()->route('admin.updates.confirm');
     }
 
@@ -107,12 +147,9 @@ class UpdateController extends Controller
             return redirect()->route('admin.updates.index')->with('error', 'Session expired. Please upload the package again.');
         }
 
-        // Clear session immediately so double-submit is prevented
         session()->forget(['pending_update_path', 'pending_update_manifest']);
-
         $appliedBy = auth()->user()?->name ?? 'Admin';
 
-        // Step 1 — Backup
         try {
             $backupPath = $this->updater->createBackup($manifest['version']);
         } catch (\Throwable $e) {
@@ -121,7 +158,6 @@ class UpdateController extends Controller
                 ->with('error', 'Backup failed: ' . $e->getMessage() . '. Update aborted for safety.');
         }
 
-        // Step 2 — Apply
         $result = $this->updater->applyUpdate($zipPath, $manifest, $backupPath, $appliedBy);
 
         if ($result['success']) {
@@ -131,20 +167,6 @@ class UpdateController extends Controller
 
         return redirect()->route('admin.updates.index')
             ->with('error', 'Update failed: ' . $result['error'] . ' — You can rollback from the history table below.');
-    }
-
-    /* ─────────────────────────────────────────────────────────────
-     |  POST /admin/updates/{id}/rollback  — Rollback a specific update
-     * ─────────────────────────────────────────────────────────── */
-    public function rollback(int $id)
-    {
-        $result = $this->updater->rollback($id);
-
-        if ($result['success']) {
-            return back()->with('success', 'Rollback completed successfully.');
-        }
-
-        return back()->with('error', 'Rollback failed: ' . $result['error']);
     }
 
     /* ─────────────────────────────────────────────────────────────

@@ -49,9 +49,25 @@ Route::match(['GET', 'POST'], 'deploy/webhook', function (\Illuminate\Http\Reque
     }
 
     $branch = $request->input('branch', 'main');
-    $result = $deployer->deploy($branch);
+    $result = $deployer->backupAndDeploy($branch);
 
     return response()->json($result, $result['success'] ? 200 : 500);
 });
+
+// ── Deployment Health Check API ──────────────────────────────────────────────
+Route::get('deploy/health', function (\App\Core\Updater\DeploymentHealthChecker $checker) {
+    $result = $checker->runFullHealthCheck(maxRetries: 1, timeoutSeconds: 6);
+    return response()->json([
+        'status'      => $result['status'] === 'healthy' ? 'ok' : 'unhealthy',
+        'application' => $result['checks']['backend'] ?? 'unknown',
+        'database'    => $result['checks']['database'] ?? 'unknown',
+        'cache'       => $result['checks']['cache'] ?? 'unknown',
+        'storage'     => $result['checks']['storage'] ?? 'unknown',
+        'assets'      => $result['checks']['assets'] ?? 'unknown',
+        'frontend'    => $result['checks']['frontend'] ?? 'unknown',
+        'checked_at'  => $result['checked_at'] ?? now()->toIso8601String(),
+    ], $result['status'] === 'healthy' ? 200 : 503);
+});
+
 
 

@@ -445,15 +445,36 @@ ${PHP_BIN} "${ARTISAN}" view:cache
 log_success "Blade views compiled and cached."
 
 # ==============================================================================
-# STEP 24: Final Application Verification
+# STEP 24: Comprehensive Multi-Tier Health Verification
 # ==============================================================================
-step_header "24/25" "Final application health verification"
+step_header "24/25" "Executing multi-tier health verification suite"
 
-${PHP_BIN} "${ARTISAN}" about --only=environment 2>/dev/null || ${PHP_BIN} "${ARTISAN}" about || true
+${PHP_BIN} "${ARTISAN}" about --only=environment 2>/dev/null || true
+
+log_info "Running DeploymentHealthChecker (Backend, Database, Vite Assets, Storage, Cache, Frontend HTTP)..."
+HEALTH_CHECK_OUT=$(${PHP_BIN} -r "
+    require '${PROJECT_ROOT}/vendor/autoload.php';
+    \$app = require '${PROJECT_ROOT}/bootstrap/app.php';
+    \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
+    \$kernel->bootstrap();
+    \$checker = new \App\Core\Updater\DeploymentHealthChecker('${PROJECT_ROOT}', '${WEB_ROOT}');
+    \$res = \$checker->runFullHealthCheck(3, 10);
+    if (\$res['status'] !== 'healthy') {
+        echo 'HEALTH_FAIL: ' . json_encode(\$res['errors']);
+        exit(1);
+    }
+    echo 'HEALTH_OK';
+" 2>&1)
+
+if [ "${HEALTH_CHECK_OUT}" != "HEALTH_OK" ] && [ -n "${HEALTH_CHECK_OUT}" ]; then
+    log_error "Post-deployment health check failed: ${HEALTH_CHECK_OUT}"
+    exit 1
+fi
 
 test -d "${BOOTSTRAP_CACHE}" && test -w "${BOOTSTRAP_CACHE}"
 test -d "${STORAGE_DIR}" && test -w "${STORAGE_DIR}"
-log_success "Application health checks verified."
+log_success "All multi-tier health checks verified: Backend, Database, Assets, Storage, Cache, and Frontend PASSED."
+
 
 # ==============================================================================
 # STEP 25: Write Deployment Log & Display Summary
