@@ -5,8 +5,34 @@
 
 <style>
 /* ================================================================
-   BOOK LIST PAGE — SCOPED ULTRA-PREMIUM CSS
+   BOOK LIST PAGE — SCOPED ULTRA-PREMIUM FULL-WIDTH CSS
    ================================================================ */
+
+.bkl-wrapper {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow-x: hidden;
+    background: #f8fafc;
+}
+
+.pb-section:has(.bkl-wrapper),
+.pb-section--full-width {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.pb-section:has(.bkl-wrapper) .pb-row,
+.pb-section:has(.bkl-wrapper) .pb-col {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
 
 .bkl-hero {
     position: relative;
