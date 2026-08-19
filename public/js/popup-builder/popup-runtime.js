@@ -259,10 +259,15 @@
             // Mark frequency on show (catches navigations away before close)
             this.markFrequency(popup);
 
-            // Reveal lazy-loaded images
-            popup.element.querySelectorAll('.popup-image[loading="lazy"]').forEach(function (img) {
-                if (img.complete) { img.classList.add('loaded'); }
-                else { img.addEventListener('load', function () { img.classList.add('loaded'); }); }
+            // Reveal lazy-loaded images with smooth ultra-premium fade-in
+            popup.element.querySelectorAll('.popup-image').forEach(function (img) {
+                if (img.complete && img.naturalWidth > 0) {
+                    img.classList.add('is-loaded', 'loaded');
+                } else {
+                    img.addEventListener('load', function () {
+                        img.classList.add('is-loaded', 'loaded');
+                    });
+                }
             });
 
             // Focus trap: move focus to popup and save previous

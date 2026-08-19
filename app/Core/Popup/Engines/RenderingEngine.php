@@ -173,13 +173,13 @@ class RenderingEngine
         $wrapperStyleStr = implode(';', $wrapperStyles);
         
         $linkUrl = isset($settings['link_url']) ? $this->safeUrl($settings['link_url']) : '';
-        $imgHtml = "<img src=\"{$src}\"{$srcsetAttr} alt=\"{$alt}\" class=\"popup-widget popup-image\" style=\"{$imgStyleStr}\" loading=\"lazy\">";
+        $imgHtml = "<img src=\"{$src}\"{$srcsetAttr} alt=\"{$alt}\" class=\"popup-widget popup-image popup-image-ultra\" style=\"{$imgStyleStr}\" loading=\"lazy\" decoding=\"async\" onload=\"this.classList.add('is-loaded')\">";
         
         if ($linkUrl) {
             $imgHtml = "<a href=\"{$linkUrl}\" target=\"_blank\" style=\"display:inline-block;max-width:100%;text-align:inherit;\">{$imgHtml}</a>";
         }
         
-        return "<div class=\"popup-image-wrapper\" style=\"{$wrapperStyleStr}\">"
+        return "<div class=\"popup-image-wrapper popup-image-container\" style=\"{$wrapperStyleStr}\">"
             . $imgHtml
             . "</div>";
     }
@@ -443,13 +443,13 @@ class RenderingEngine
         $wrapperStyleStr = implode(';', $wrapperStyles);
         
         $linkUrl = isset($block['link_url']) ? $this->safeUrl($block['link_url']) : '';
-        $imgHtml = "<img src=\"{$src}\"{$srcsetAttr} alt=\"{$alt}\" style=\"{$imgStyleStr}\" loading=\"lazy\">";
+        $imgHtml = "<img src=\"{$src}\"{$srcsetAttr} alt=\"{$alt}\" class=\"popup-widget popup-image popup-image-ultra\" style=\"{$imgStyleStr}\" loading=\"lazy\" decoding=\"async\" onload=\"this.classList.add('is-loaded')\">";
         
         if ($linkUrl) {
             $imgHtml = "<a href=\"{$linkUrl}\" target=\"_blank\" style=\"display:inline-block;max-width:100%;text-align:inherit;\">{$imgHtml}</a>";
         }
         
-        return "<div class=\"popup-image-wrapper\" style=\"{$wrapperStyleStr}\">"
+        return "<div class=\"popup-image-wrapper popup-image-container\" style=\"{$wrapperStyleStr}\">"
             . $imgHtml
             . "</div>";
     }

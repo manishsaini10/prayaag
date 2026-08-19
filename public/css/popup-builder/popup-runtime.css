@@ -84,6 +84,58 @@
     height: auto !important;
 }
 
+/* ==========================================================================
+   ULTRA PREMIUM POPUP IMAGE & LAZY LOAD SYSTEM
+   ========================================================================== */
+.popup-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: inherit;
+    background: linear-gradient(110deg, rgba(241,245,249,0.4) 8%, rgba(226,232,240,0.7) 18%, rgba(241,245,249,0.4) 33%);
+    background-size: 200% 100%;
+    animation: popup-image-shimmer 1.8s infinite linear;
+}
+
+@keyframes popup-image-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.popup-image-ultra {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.985);
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+    box-shadow: 
+        0 10px 25px -5px rgba(15, 23, 42, 0.18),
+        0 20px 48px -10px rgba(15, 23, 42, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 0 20px rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.popup-image-ultra.is-loaded {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    background: transparent;
+}
+
+.popup-image-ultra:hover {
+    transform: scale(1.012) translateY(-2px);
+    box-shadow: 
+        0 16px 36px -6px rgba(15, 23, 42, 0.28),
+        0 28px 60px -12px rgba(15, 23, 42, 0.32),
+        0 0 0 1.5px rgba(255, 255, 255, 0.5) inset,
+        0 0 30px rgba(99, 102, 241, 0.28);
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* Image-only Popup Ultra Glow Card */
 .popup--image-only {
     width: auto !important;
     max-width: calc(100vw - 32px) !important;
@@ -93,17 +145,27 @@
     display: inline-block;
     width: auto !important;
     max-width: calc(100vw - 32px) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
 }
 
 .popup--image-only .popup-body {
     padding: 0 !important;
     line-height: 0;
+    overflow: visible !important;
 }
 
 .popup--image-only .popup-image-wrapper {
     display: block !important;
     width: auto !important;
     margin: 0 !important;
+    border-radius: 18px !important;
+    box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.5),
+        0 12px 28px -6px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+        0 0 35px rgba(99, 102, 241, 0.22);
 }
 
 .popup--image-only .popup-image-wrapper a {
@@ -117,11 +179,22 @@
     max-width: min(92vw, var(--popup-runtime-width, 700px)) !important;
     max-height: min(82vh, calc(100dvh - 48px)) !important;
     object-fit: contain !important;
+    border-radius: 18px !important;
 }
 
 .popup--image-only .popup-close {
-    top: 8px !important;
-    right: 8px !important;
+    top: -12px !important;
+    right: -12px !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 0 2px #ffffff !important;
+    opacity: 0.95;
+}
+
+.popup--image-only .popup-close:hover {
+    background: #e11d48 !important;
+    color: #ffffff !important;
+    transform: rotate(90deg) scale(1.1) !important;
 }
 
 .popup-newsletter-form,
