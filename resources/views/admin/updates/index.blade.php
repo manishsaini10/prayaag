@@ -7,8 +7,8 @@
     <div class="flex items-center gap-2">
         <form method="POST" action="{{ route('admin.updates.backup') }}" onsubmit="return confirm('Create a full pre-update backup now?')">
             @csrf
-            <button type="submit" class="btn-secondary inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <button type="submit" class="btn secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Create Backup
             </button>
         </form>
@@ -20,51 +20,51 @@
 
     {{-- Flash Messages --}}
     @if(session('success'))
-        <div class="px-4 py-3 rounded-xl text-sm font-medium" style="background:#dcfce7;color:#166534;border:1px solid #bbf7d0">
+        <div class="card" style="border-color:#86efac;background:#f0fdf4;color:#166534;padding:14px 18px;font-size:13.5px;font-weight:500;border-radius:12px">
             {{ session('success') }}
         </div>
     @endif
     @if(session('error'))
-        <div class="px-4 py-3 rounded-xl text-sm font-medium" style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca">
+        <div class="card" style="border-color:#fca5a5;background:#fef2f2;color:#991b1b;padding:14px 18px;font-size:13.5px;font-weight:500;border-radius:12px">
             {{ session('error') }}
         </div>
     @endif
 
-    {{-- Deploy Execution Logs (if just run) --}}
+    {{-- Execution Logs Modal / Accordion --}}
     @if(session('deploy_logs'))
-        <div class="card p-5" style="background:#0f172a;color:#f8fafc;border:1px solid #334155">
+        <div class="card" style="background:#0f172a;color:#f8fafc;border:1px solid #334155;padding:18px;border-radius:14px">
             <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-bold text-emerald-400 font-mono">📟 Auto-Deployment Execution Output:</h4>
-                <span class="text-xs text-slate-400 font-mono">{{ count(session('deploy_logs')) }} lines</span>
+                <span class="font-bold font-mono text-sm" style="color:#4ade80">📟 Deployment Log Output:</span>
+                <span class="text-xs font-mono" style="color:#94a3b8">{{ count(session('deploy_logs')) }} steps executed</span>
             </div>
-            <pre class="text-xs font-mono overflow-auto max-h-60 space-y-1 p-2 rounded" style="background:#1e293b;line-height:1.6">@foreach(session('deploy_logs') as $line){{ $line }}
+            <pre class="font-mono text-xs overflow-auto max-h-64 p-3 rounded-lg" style="background:#1e293b;color:#e2e8f0;line-height:1.7">@foreach(session('deploy_logs') as $line){{ $line }}
 @endforeach</pre>
         </div>
     @endif
 
-    {{-- NEW UPDATE AVAILABLE ALERT BANNER (If new commit on GitHub) --}}
+    {{-- 🌟 NEW UPDATE AVAILABLE BANNER (If new commit on GitHub) --}}
     @if(!empty($systemInfo['update_available']))
-        <div class="card p-6" style="background:linear-gradient(135deg,#fff1f2,#fef2f2);border:2px solid #f43f5e;box-shadow:0 8px 24px rgba(244,63,94,.15)">
+        <div class="card" style="background:linear-gradient(135deg,#fff1f2,var(--surface));border:2px solid #f43f5e;padding:22px;border-radius:16px;box-shadow:0 8px 24px rgba(244,63,94,0.12)">
             <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div class="flex items-start gap-3.5">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0" style="background:#e11d48;box-shadow:0 0 16px rgba(225,29,72,.5)">
+                <div class="flex items-start gap-4">
+                    <div style="width:48px;height:48px;border-radius:14px;background:#e11d48;display:grid;place-items:center;color:#fff;box-shadow:0 4px 14px rgba(225,29,72,0.4);flex-shrink:0">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-base font-bold text-rose-900">🆕 New GitHub Release Available!</h3>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-rose-200 text-rose-800">
+                            <h3 style="font-size:16px;font-weight:700;color:#9f1239;margin:0">🆕 New GitHub Release Available!</h3>
+                            <span style="font-size:11px;font-weight:700;font-family:monospace;background:#ffe4e6;color:#be123c;padding:2px 8px;border-radius:6px">
                                 Commit: {{ $systemInfo['remote_commit']['sha'] ?? 'Latest' }}
                             </span>
                         </div>
                         @if(!empty($systemInfo['remote_commit']['message']))
-                            <p class="text-sm font-medium text-rose-900 mt-1 font-mono bg-white/80 px-3 py-1.5 rounded-lg border border-rose-200">
+                            <div style="margin-top:6px;font-size:13px;font-family:monospace;background:rgba(255,255,255,0.85);color:#881337;padding:8px 12px;border-radius:8px;border:1px solid #fecdd3">
                                 💬 {{ $systemInfo['remote_commit']['message'] }}
-                            </p>
+                            </div>
                         @endif
-                        <p class="text-xs text-rose-700 mt-1.5">
+                        <p style="font-size:12px;color:#be123c;margin-top:6px">
                             Pushed {{ $systemInfo['remote_commit']['date'] ?? 'recently' }} by {{ $systemInfo['remote_commit']['author'] ?? 'Developer' }}.
-                            Clicking the button will <strong>take a full backup first</strong> and then install the update automatically.
+                            The system will <strong>take a full backup first</strong> and then apply the update automatically.
                         </p>
                     </div>
                 </div>
@@ -73,9 +73,7 @@
                       @submit="deploying = true; if(!confirm('Create a full backup and apply latest update from GitHub now?')) { deploying = false; return false; }">
                     @csrf
                     <input type="hidden" name="branch" value="main">
-                    <button type="submit" class="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-white transition transform hover:scale-105"
-                            x-bind:disabled="deploying"
-                            style="background:linear-gradient(135deg,#e11d48,#be123c);box-shadow:0 4px 14px rgba(225,29,72,.4)">
+                    <button type="submit" class="btn" style="background:#e11d48;color:#fff;border:none;padding:12px 22px;font-size:13.5px;font-weight:700;border-radius:10px;box-shadow:0 4px 14px rgba(225,29,72,0.35);cursor:pointer" x-bind:disabled="deploying">
                         <span x-show="!deploying">⚡ Backup &amp; Apply Update Now</span>
                         <span x-show="deploying" x-cloak>⏳ Creating Backup &amp; Updating…</span>
                     </button>
@@ -84,110 +82,113 @@
         </div>
     @endif
 
-
-    {{-- System Auto-Detection & Git Status Banner --}}
+    {{-- System Status Overview Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="card p-5 md:col-span-2">
+        <div class="card md:col-span-2" style="padding:20px;border-radius:14px">
             <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:linear-gradient(135deg,var(--primary),var(--primary-strong))">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:22px;height:22px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary-strong));display:grid;place-items:center;color:#fff;flex-shrink:0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-muted)">CMS Release &amp; Git Version</div>
-                    <div class="text-2xl font-bold" style="color:var(--text)">v{{ $currentVersion }}</div>
-                    <div class="text-xs font-mono truncate mt-1" style="color:var(--primary-strong)" title="{{ $systemInfo['current_git_rev'] }}">
-                        🔖 Commit: {{ $systemInfo['current_git_rev'] }}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Installed Release &amp; Build</div>
+                    <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px">v{{ $currentVersion }}</div>
+                    <div style="font-size:12px;font-family:monospace;color:var(--primary);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ $systemInfo['current_git_rev'] }}">
+                        🔖 {{ $systemInfo['current_git_rev'] }}
                     </div>
                 </div>
-                <span class="badge" style="background:#dcfce7;color:#166534;font-size:12px;padding:4px 10px">✅ Auto-Detected</span>
+                <span class="badge" style="background:#dcfce7;color:#166534;font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px">
+                    ● Active Release
+                </span>
             </div>
         </div>
 
-        <div class="card p-5">
-            <div class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Public Root Structure</div>
-            <div class="text-sm font-bold" style="color:var(--text)">
+        <div class="card" style="padding:20px;border-radius:14px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Public Root Structure</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-top:6px">
                 @if($systemInfo['is_split_public'])
-                    <span class="text-amber-600">⚡ Split (public_html detected)</span>
+                    <span style="color:#d97706">⚡ Split (public_html detected)</span>
                 @else
-                    <span class="text-emerald-600">🔗 Standard (Unified public)</span>
+                    <span style="color:#059669">🔗 Unified Public Root</span>
                 @endif
             </div>
-            <div class="text-xs mt-1" style="color:var(--text-muted)">{{ count($backups) }} saved restore points</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
+                <strong>{{ count($backups) }}</strong> restore points stored in backup
+            </div>
         </div>
     </div>
 
     {{-- SECTION 1: 1-Click Git Auto-Sync (Automated Deployment) --}}
-    <div class="card p-6" style="border: 2px solid var(--primary);box-shadow: 0 4px 12px rgba(var(--primary-rgb, 14, 116, 144), 0.08)">
+    <div class="card" style="border:2px solid var(--primary);padding:24px;border-radius:16px;background:var(--surface)">
         <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
             <div>
-                <h3 class="text-lg font-bold flex items-center gap-2" style="color:var(--text)">
+                <h3 style="font-size:17px;font-weight:700;color:var(--text);margin:0;display:flex;align-items:center;gap:8px">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--primary)"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
                     1-Click Git Auto-Deployer
                 </h3>
-                <p class="text-sm mt-0.5" style="color:var(--text-muted)">
-                    Pulls latest code from GitHub, auto-syncs assets to <code>public_html</code>, runs migrations, and flushes caches.
+                <p style="font-size:13.5px;color:var(--text-muted);margin:4px 0 0 0">
+                    Takes a full backup, pulls latest code from GitHub, auto-syncs assets to <code>public_html</code>, runs migrations, and clears caches.
                 </p>
             </div>
             <form method="POST" action="{{ route('admin.updates.git-pull') }}"
                   x-data="{ running: false }"
-                  @submit="running = true; if(!confirm('Start automated Git pull and asset sync now?')) { running = false; return false; }">
+                  @submit="running = true; if(!confirm('Create full backup and sync latest update from Git now?')) { running = false; return false; }">
                 @csrf
                 <div class="flex items-center gap-2">
                     <input type="hidden" name="branch" value="main">
-                    <button type="submit" class="btn-primary flex items-center gap-2" x-bind:disabled="running" style="padding:10px 20px;font-size:14px">
+                    <button type="submit" class="btn primary" x-bind:disabled="running" style="padding:10px 22px;font-size:13.5px;font-weight:700;border-radius:10px">
                         <span x-show="!running">⚡ Sync with Git Now</span>
-                        <span x-show="running" x-cloak>⏳ Deploying… Please wait…</span>
+                        <span x-show="running" x-cloak>⏳ Backup &amp; Deploying…</span>
                     </button>
                 </div>
             </form>
         </div>
 
         {{-- Auto-Detected Environment Specs --}}
-        <div class="rounded-xl p-4 mt-4" style="background:var(--surface-2);border:1px solid var(--border)">
-            <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">🧠 Auto-Detected Environment Paths:</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
-                <div class="truncate">
-                    <span class="font-bold text-slate-500">Core Directory:</span>
-                    <span class="text-slate-800 dark:text-slate-200" title="{{ $systemInfo['laravel_root'] }}">{{ $systemInfo['laravel_root'] }}</span>
+        <div style="background:var(--surface-2);border:1px solid var(--border);padding:14px;border-radius:12px;margin-top:16px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:8px">🧠 Auto-Detected Environment Paths:</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 font-mono" style="font-size:11.5px">
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    <span style="font-weight:700;color:var(--text-muted)">Core Directory:</span>
+                    <span style="color:var(--text)" title="{{ $systemInfo['laravel_root'] }}">{{ $systemInfo['laravel_root'] }}</span>
                 </div>
-                <div class="truncate">
-                    <span class="font-bold text-slate-500">Web Root (Public):</span>
-                    <span class="text-slate-800 dark:text-slate-200" title="{{ $systemInfo['web_root'] }}">{{ $systemInfo['web_root'] }}</span>
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    <span style="font-weight:700;color:var(--text-muted)">Web Root:</span>
+                    <span style="color:var(--text)" title="{{ $systemInfo['web_root'] }}">{{ $systemInfo['web_root'] }}</span>
                 </div>
-                <div class="truncate">
-                    <span class="font-bold text-slate-500">PHP Binary:</span>
-                    <span class="text-slate-800 dark:text-slate-200">{{ $systemInfo['php_binary'] }}</span>
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    <span style="font-weight:700;color:var(--text-muted)">PHP Binary:</span>
+                    <span style="color:var(--text)">{{ $systemInfo['php_binary'] }}</span>
                 </div>
-                <div class="truncate">
-                    <span class="font-bold text-slate-500">Git Binary:</span>
-                    <span class="text-slate-800 dark:text-slate-200">{{ $systemInfo['git_binary'] }}</span>
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    <span style="font-weight:700;color:var(--text-muted)">Git Binary:</span>
+                    <span style="color:var(--text)">{{ $systemInfo['git_binary'] }}</span>
                 </div>
             </div>
         </div>
 
         {{-- Automated GitHub Webhook URL Box --}}
-        <div class="mt-4 pt-4" style="border-top:1px dashed var(--border)" x-data="{ copied: false }">
-            <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold" style="color:var(--text)">🔗 Automated GitHub Webhook URL (Optional for Zero-Touch Deployment):</span>
-                <span x-show="copied" x-cloak class="text-xs text-emerald-600 font-bold">✓ Copied to clipboard!</span>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border)" x-data="{ copied: false }">
+            <div class="flex items-center justify-between mb-1.5">
+                <span style="font-size:12px;font-weight:700;color:var(--text)">🔗 Automated GitHub Webhook URL (Optional for Zero-Touch Deployment):</span>
+                <span x-show="copied" x-cloak style="font-size:12px;color:var(--success);font-weight:700">✓ Copied to clipboard!</span>
             </div>
             <div class="flex items-center gap-2">
-                <input type="text" readonly value="{{ $webhookUrl }}" class="flex-1 px-3 py-1.5 text-xs font-mono rounded-lg outline-none" style="background:var(--surface);border:1px solid var(--border);color:var(--text-muted)">
-                <button type="button" class="btn-secondary text-xs px-3 py-1.5"
+                <input type="text" readonly value="{{ $webhookUrl }}" class="flex-1 font-mono outline-none" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px">
+                <button type="button" class="btn secondary" style="padding:8px 14px;font-size:12px"
                         @click="navigator.clipboard.writeText('{{ $webhookUrl }}'); copied = true; setTimeout(() => copied = false, 2500)">
                     Copy Link
                 </button>
             </div>
-            <p class="text-[11px] mt-1" style="color:var(--text-muted)">
+            <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px">
                 Add this URL in <strong>GitHub Repo ➔ Settings ➔ Webhooks</strong> so every <code>git push</code> updates your live school website automatically!
             </p>
         </div>
     </div>
 
     {{-- SECTION 2: Manual ZIP Package Upload (Fallback / Offline) --}}
-    <div class="card p-6">
-        <h3 class="text-base font-bold mb-1" style="color:var(--text)">Manual ZIP Update Package (Offline Fallback)</h3>
-        <p class="text-sm mb-5" style="color:var(--text-muted)">
+    <div class="card" style="padding:22px;border-radius:16px">
+        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0 0 4px 0">Manual ZIP Update Package (Offline Fallback)</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px 0">
             Agar internet nahi hai, toh offline banayi hui <code>.zip</code> package yahan upload kar sakte hain.
         </p>
 
@@ -227,12 +228,12 @@
                        @change="file=$event.target.files[0]">
             </label>
 
-            @error('package')
-                <p class="text-sm mt-2" style="color:var(--danger)">{{ $message }}</p>
-            @enderror
+            @if(!empty($errors) && $errors->has('package'))
+                <p class="text-sm mt-2" style="color:var(--danger)">{{ $errors->first('package') }}</p>
+            @endif
 
             <div class="mt-4 flex items-center gap-3">
-                <button type="submit" class="btn-primary" x-bind:disabled="!file">
+                <button type="submit" class="btn primary" x-bind:disabled="!file">
                     Validate &amp; Continue →
                 </button>
                 <span class="text-xs" style="color:var(--text-muted)">A full backup is taken automatically before applying.</span>
@@ -241,14 +242,14 @@
     </div>
 
     {{-- Update History Table --}}
-    <div class="card p-0 overflow-hidden">
+    <div class="card p-0 overflow-hidden" style="border-radius:16px">
         <div class="px-6 py-4" style="border-bottom:1px solid var(--border)">
-            <h3 class="text-base font-bold" style="color:var(--text)">Update &amp; Deploy History</h3>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0">Update &amp; Deploy History</h3>
         </div>
 
         @if($history->isEmpty())
             <div class="text-center py-12 text-sm" style="color:var(--text-muted)">
-                No manual ZIP updates recorded. Active version is v{{ $currentVersion }}.
+                No previous update logs recorded. Active version is v{{ $currentVersion }}.
             </div>
         @else
             <div class="overflow-x-auto">
@@ -266,8 +267,8 @@
                     <tbody>
                         @foreach($history as $update)
                             <tr style="border-bottom:1px solid var(--border)">
-                                <td class="px-6 py-3">
-                                    <span class="font-bold" style="color:var(--text)">v{{ $update->version }}</span>
+                                <td class="px-6 py-3 font-bold" style="color:var(--text)">
+                                    v{{ $update->version }}
                                 </td>
                                 <td class="px-4 py-3" style="color:var(--text-muted)">
                                     v{{ $update->previous_version ?? '—' }}
@@ -283,7 +284,7 @@
                                         ];
                                         $b = $badges[$update->status] ?? $badges['pending'];
                                     @endphp
-                                    <span class="badge text-xs" style="background:{{ $b['bg'] }};color:{{ $b['color'] }}">
+                                    <span class="badge text-xs" style="background:{{ $b['bg'] }};color:{{ $b['color'] }};padding:3px 8px;border-radius:6px">
                                         {{ $b['label'] }}
                                     </span>
                                 </td>
@@ -297,15 +298,15 @@
                                     <div class="flex items-center gap-2">
                                         @if($update->status === 'success' && $update->backup_path && file_exists($update->backup_path))
                                             <form method="POST" action="{{ route('admin.updates.rollback', $update->id) }}"
-                                                  onsubmit="return confirm('Rollback to v{{ $update->previous_version }}? Current changes will be reverted.')">
+                                                  onsubmit="return confirm('Rollback to this backup? Current changes will be reverted.')">
                                                 @csrf
-                                                <button type="submit" class="text-xs font-medium hover:underline" style="color:var(--danger);background:none;border:none;cursor:pointer">
-                                                    Rollback
+                                                <button type="submit" class="text-xs font-bold hover:underline" style="color:var(--danger);background:none;border:none;cursor:pointer">
+                                                    ↩ Rollback
                                                 </button>
                                             </form>
                                         @endif
                                         @if($update->error_message)
-                                            <span class="text-xs" style="color:var(--danger)" title="{{ $update->error_message }}">⚠ Error</span>
+                                            <span class="text-xs" style="color:var(--danger)" title="{{ $update->error_message }}">⚠ Error Details</span>
                                         @endif
                                     </div>
                                 </td>
@@ -319,19 +320,19 @@
 
     {{-- Saved Backups Section --}}
     @if(count($backups) > 0)
-    <div class="card p-0 overflow-hidden">
+    <div class="card p-0 overflow-hidden" style="border-radius:16px">
         <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
-            <h3 class="text-base font-bold" style="color:var(--text)">Saved Backups</h3>
-            <span class="text-xs" style="color:var(--text-muted)">Stored in storage/backups/updates/</span>
+            <h3 style="font-size:15px;font-weight:700;color:var(--text);margin:0">Saved Backups</h3>
+            <span class="text-xs font-mono" style="color:var(--text-muted)">storage/backups/updates/</span>
         </div>
         <div class="divide-y" style="border-color:var(--border)">
             @foreach($backups as $backup)
                 <div class="px-6 py-3 flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium" style="color:var(--text)">{{ $backup['name'] }}</p>
+                        <p class="text-sm font-bold font-mono" style="color:var(--text)">📦 {{ $backup['name'] }}</p>
                         <p class="text-xs" style="color:var(--text-muted)">{{ $backup['size'] }} · {{ $backup['modified'] }}</p>
                     </div>
-                    <span class="badge text-xs" style="background:#dcfce7;color:#166534">Available</span>
+                    <span class="badge text-xs" style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:6px">Verified</span>
                 </div>
             @endforeach
         </div>
