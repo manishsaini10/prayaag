@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# Git Post-Merge Hook for Prayaag CMS
+# Automatically executes deploy.sh whenever 'git pull' is run.
+# Fully portable: dynamically determines repository root.
+# ==============================================================================
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+if [ -f "${REPO_ROOT}/deploy.sh" ]; then
+    echo "⚡ Git post-merge hook: executing automated deployment..."
+    chmod +x "${REPO_ROOT}/deploy.sh"
+    bash "${REPO_ROOT}/deploy.sh"
+fi

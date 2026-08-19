@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Prayaag School CMS — Production-Safe Deployment Script (Hostinger Linux)
-# Target Environment: Hostinger Shared Hosting (PHP 8.3 / Laravel 12)
-# Project Root:       /home/u919095325/prayaag
-# Web Root:           /home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html
+# Prayaag School CMS — Fully Portable Production Deployment Script
+# Supports dynamic project root detection and configurable web root.
 # ==============================================================================
 
 set -eo pipefail
@@ -40,98 +38,139 @@ error_handler() {
     exit ${exit_code}
 }
 
-# Configuration Defaults (Auto-detected or Hostinger defaults)
-APP_DIR="$(pwd)"
-PUBLIC_WEB_ROOT="/home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html"
+# ==============================================================================
+# Dynamic Path Detection (Zero Hard-Coded Project Root)
+# ==============================================================================
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "${PROJECT_ROOT}"
 
-# [1/10] Checking environment
-step_header "[1/10] Checking environment"
+ARTISAN="${PROJECT_ROOT}/artisan"
+PUBLIC_DIR="${PROJECT_ROOT}/public"
+BUILD_DIR="${PUBLIC_DIR}/build"
+STORAGE_DIR="${PROJECT_ROOT}/storage"
+BOOTSTRAP_CACHE="${PROJECT_ROOT}/bootstrap/cache"
+ENV_FILE="${PROJECT_ROOT}/.env"
 
-if [ ! -f "${APP_DIR}/artisan" ] || [ ! -f "${APP_DIR}/composer.json" ]; then
-    log_error "Must run from Laravel project root! Current directory: ${APP_DIR}"
+# Load Configurable Web Root from .deploy-config if present
+DEPLOY_CONFIG="${PROJECT_ROOT}/.deploy-config"
+WEB_ROOT=""
+if [ -f "${DEPLOY_CONFIG}" ]; then
+    # shellcheck source=/dev/null
+    source "${DEPLOY_CONFIG}"
+fi
+
+# [1/10] Checking environment & Path Validation
+step_header "[1/10] Checking environment & Path Validation"
+
+# 1. Validate Project Root & Artisan
+if [ ! -f "${ARTISAN}" ]; then
+    log_error "artisan not found at: ${ARTISAN}"
+    log_error "Please run deploy.sh from within the Laravel Git repository."
     exit 1
 fi
 
-if [ ! -f "${APP_DIR}/.env" ]; then
-    log_error ".env file is missing in ${APP_DIR}!"
-    log_warn "Copy .env.example to .env and configure your production credentials."
+if [ ! -f "${PROJECT_ROOT}/composer.json" ]; then
+    log_error "composer.json not found in project root: ${PROJECT_ROOT}"
     exit 1
 fi
 
+if [ ! -f "${ENV_FILE}" ]; then
+    log_error ".env file is missing in ${PROJECT_ROOT}!"
+    log_warn "Copy .env.example to .env and configure production credentials."
+    exit 1
+fi
+
+# 2. Detect Tooling Binaries
 PHP_BIN=$(which php || echo "php")
 COMPOSER_BIN=$(which composer || echo "composer")
 GIT_BIN=$(which git || echo "git")
 
-log_info "Laravel Project Root: ${APP_DIR}"
-log_info "PHP Binary:           ${PHP_BIN} ($(${PHP_BIN} -r 'echo PHP_VERSION;'))"
-log_info "Composer:             $(${COMPOSER_BIN} --version 2>/dev/null | head -n 1 || echo 'Detected')"
-log_info "Git Version:          $(${GIT_BIN} --version 2>/dev/null || echo 'Detected')"
+log_info "Detected Project Root: ${PROJECT_ROOT}"
+log_info "PHP Binary:            ${PHP_BIN} ($(${PHP_BIN} -r 'echo PHP_VERSION;'))"
+log_info "Composer:              $(${COMPOSER_BIN} --version 2>/dev/null | head -n 1 || echo 'Detected')"
+log_info "Git:                   $(${GIT_BIN} --version 2>/dev/null || echo 'Detected')"
 
-if [ -d "${PUBLIC_WEB_ROOT}" ]; then
-    log_info "Target Web Root:      ${PUBLIC_WEB_ROOT} (Split public_html)"
+# 3. Validate Configurable Web Root (WEB_ROOT)
+if [ -n "${WEB_ROOT}" ]; then
+    log_info "Configured Web Root:   ${WEB_ROOT} (.deploy-config)"
+    
+    if [ ! -d "${WEB_ROOT}" ]; then
+        log_error "WEB_ROOT directory does NOT exist: ${WEB_ROOT}"
+        log_error "Please verify or update the path in: ${DEPLOY_CONFIG}"
+        exit 1
+    fi
+
+    if [ ! -w "${WEB_ROOT}" ]; then
+        log_error "WEB_ROOT directory is NOT writable: ${WEB_ROOT}"
+        log_error "Check web server user permissions on the public web root."
+        exit 1
+    fi
+    log_success "Target Web Root validated and writable."
 else
-    PUBLIC_WEB_ROOT="${APP_DIR}/public"
-    log_info "Target Web Root:      ${PUBLIC_WEB_ROOT} (Unified public)"
+    WEB_ROOT="${PUBLIC_DIR}"
+    log_info "Target Web Root:       ${WEB_ROOT} (Default unified public directory)"
 fi
-log_success "Environment verification passed."
 
-# [2/10] Pulling Git changes & Pre-Deploy Backup
+log_success "Environment and path validations passed."
+
+# [2/10] Pulling Git changes & Pre-Deploy Safety Backup
 step_header "[2/10] Pulling Git changes"
 
-# Check for uncommitted changes in production
+# Check for uncommitted production changes
 DIRTY_FILES=$(${GIT_BIN} status --porcelain 2>/dev/null || true)
 if [ -n "${DIRTY_FILES}" ]; then
-    log_warn "Uncommitted local changes detected in production repository:"
+    log_warn "Uncommitted local changes detected in repository:"
     echo "${DIRTY_FILES}"
-    log_warn "To avoid overwriting custom changes, please review or commit them before pulling."
+    log_warn "Review these files to prevent accidental overwrite."
 fi
 
-# Pre-Deploy Safety Backup (Protect .env and critical configs)
-BACKUP_DIR="${APP_DIR}/storage/backups/updates"
+# Pre-Deploy Safety Backup (.env + critical configs)
+BACKUP_DIR="${STORAGE_DIR}/backups/updates"
 mkdir -p "${BACKUP_DIR}"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_FILE="${BACKUP_DIR}/pre-deploy-${TIMESTAMP}.tar.gz"
 
 log_info "Creating pre-deployment safety snapshot: $(basename ${BACKUP_FILE})..."
 tar -czf "${BACKUP_FILE}" \
+    -C "${PROJECT_ROOT}" \
     --exclude='vendor' \
     --exclude='node_modules' \
     --exclude='storage/framework/cache' \
     --exclude='storage/framework/sessions' \
     --exclude='storage/framework/views' \
-    .env config/ routes/ app/ database/ 2>/dev/null || true
-log_success "Safety backup created."
+    .env config routes app database 2>/dev/null || true
+log_success "Safety snapshot saved."
 
-# Fetch and pull latest main branch
-log_info "Fetching and pulling latest changes from origin main..."
+# Pull latest commits
+log_info "Pulling latest code from origin main..."
 ${GIT_BIN} pull origin main
 
 COMMIT_HASH=$(${GIT_BIN} rev-parse --short HEAD 2>/dev/null || echo "Unknown")
 COMMIT_MSG=$(${GIT_BIN} log -1 --pretty=format:"%s (%cr)" 2>/dev/null || echo "Latest commit")
-log_success "Pulled commit: ${COMMIT_HASH} - ${COMMIT_MSG}"
+log_success "Active commit: ${COMMIT_HASH} - ${COMMIT_MSG}"
 
 # [3/10] Preparing Laravel directories & Permissions
 step_header "[3/10] Preparing Laravel directories & Permissions"
 
 log_info "Ensuring bootstrap/cache and storage directories exist..."
-mkdir -p "${APP_DIR}/bootstrap/cache"
-mkdir -p "${APP_DIR}/storage/app/public"
-mkdir -p "${APP_DIR}/storage/framework/cache/data"
-mkdir -p "${APP_DIR}/storage/framework/sessions"
-mkdir -p "${APP_DIR}/storage/framework/views"
-mkdir -p "${APP_DIR}/storage/logs"
-mkdir -p "${APP_DIR}/storage/backups/updates"
+mkdir -p "${BOOTSTRAP_CACHE}"
+mkdir -p "${STORAGE_DIR}/app/public"
+mkdir -p "${STORAGE_DIR}/framework/cache/data"
+mkdir -p "${STORAGE_DIR}/framework/sessions"
+mkdir -p "${STORAGE_DIR}/framework/views"
+mkdir -p "${STORAGE_DIR}/logs"
+mkdir -p "${STORAGE_DIR}/backups/updates"
 
-log_info "Setting safe directory permissions (ug+rwX / 775)..."
-chmod -R ug+rwX "${APP_DIR}/storage" "${APP_DIR}/bootstrap/cache" 2>/dev/null || \
-chmod -R 775 "${APP_DIR}/storage" "${APP_DIR}/bootstrap/cache" 2>/dev/null || true
+log_info "Enforcing safe directory permissions (ug+rwX / 775)..."
+chmod -R ug+rwX "${STORAGE_DIR}" "${BOOTSTRAP_CACHE}" 2>/dev/null || \
+chmod -R 775 "${STORAGE_DIR}" "${BOOTSTRAP_CACHE}" 2>/dev/null || true
 
-# Verify write permission
-if [ ! -w "${APP_DIR}/bootstrap/cache" ] || [ ! -w "${APP_DIR}/storage" ]; then
-    log_error "Write permission check failed on bootstrap/cache or storage!"
+# Validate writability
+if [ ! -w "${BOOTSTRAP_CACHE}" ] || [ ! -w "${STORAGE_DIR}" ]; then
+    log_error "Write permission verification failed on ${BOOTSTRAP_CACHE} or ${STORAGE_DIR}!"
     exit 1
 fi
-log_success "Directories created and permissions verified."
+log_success "Directory structure and permissions verified."
 
 # [4/10] Installing Composer dependencies
 step_header "[4/10] Installing Composer dependencies"
@@ -139,37 +178,37 @@ step_header "[4/10] Installing Composer dependencies"
 log_info "Running composer install (--no-dev --optimize-autoloader)..."
 ${COMPOSER_BIN} install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-log_info "Dumping optimized autoloader..."
+log_info "Generating optimized autoload classmap..."
 ${COMPOSER_BIN} dump-autoload -o --no-interaction
-log_success "Composer dependencies updated and autoloaded."
+log_success "Composer dependencies and autoloader updated."
 
 # [5/10] Running migrations
 step_header "[5/10] Running database migrations"
 
-log_info "Running database migrations (--force)..."
-${PHP_BIN} artisan migrate --force
+log_info "Executing database migrations (--force)..."
+${PHP_BIN} "${ARTISAN}" migrate --force
 log_success "Database migrations up to date."
 
 # [6/10] Clearing caches
 step_header "[6/10] Clearing caches"
 
-log_info "Clearing old compiled caches..."
-${PHP_BIN} artisan optimize:clear
-log_success "All caches cleared."
+log_info "Clearing old bootstrap, view, route, and config caches..."
+${PHP_BIN} "${ARTISAN}" optimize:clear
+log_success "All old caches cleared."
 
 # [7/10] Rebuilding caches
 step_header "[7/10] Rebuilding caches"
 
 log_info "Caching production configuration..."
-${PHP_BIN} artisan config:cache
+${PHP_BIN} "${ARTISAN}" config:cache
 
 log_info "Caching Blade views..."
-${PHP_BIN} artisan view:cache
+${PHP_BIN} "${ARTISAN}" view:cache
 
 log_info "Caching routes..."
-if ! ${PHP_BIN} artisan route:cache; then
+if ! ${PHP_BIN} "${ARTISAN}" route:cache; then
     log_warn "Route caching skipped (closure routes or dynamic registrations detected)."
-    ${PHP_BIN} artisan route:clear || true
+    ${PHP_BIN} "${ARTISAN}" route:clear || true
 else
     log_success "Routes cached successfully."
 fi
@@ -178,62 +217,64 @@ fi
 step_header "[8/10] Checking Vite assets & syncing public_html"
 
 VITE_STATUS="WARNING"
-if [ -f "${APP_DIR}/public/build/manifest.json" ]; then
-    log_success "Vite manifest.json found in public/build."
+MANIFEST_FILE="${BUILD_DIR}/manifest.json"
+
+if [ -f "${MANIFEST_FILE}" ]; then
+    log_success "Vite manifest.json verified: ${MANIFEST_FILE}"
     VITE_STATUS="OK"
 else
-    log_warn "Vite production assets (public/build/manifest.json) not found!"
-    log_warn "Remember to run 'npm run build' locally and commit public/build."
+    log_warn "Vite manifest.json not found in ${BUILD_DIR}!"
+    log_warn "Vite production assets are missing. Run npm run build on the local development machine and deploy/commit the generated public/build directory."
 fi
 
-# If public_html is separated, sync public assets
-if [ "${PUBLIC_WEB_ROOT}" != "${APP_DIR}/public" ] && [ -d "${PUBLIC_WEB_ROOT}" ]; then
-    log_info "Syncing public assets to public_html: ${PUBLIC_WEB_ROOT}..."
+# Sync to external WEB_ROOT if distinct from local public/
+if [ -n "${WEB_ROOT}" ] && [ "${WEB_ROOT}" != "${PUBLIC_DIR}" ] && [ -d "${WEB_ROOT}" ]; then
+    log_info "Syncing compiled public assets to Web Root: ${WEB_ROOT}..."
 
     # Sync build directory
-    if [ -d "${APP_DIR}/public/build" ]; then
-        mkdir -p "${PUBLIC_WEB_ROOT}/build"
-        cp -r "${APP_DIR}/public/build/." "${PUBLIC_WEB_ROOT}/build/"
+    if [ -d "${BUILD_DIR}" ]; then
+        mkdir -p "${WEB_ROOT}/build"
+        cp -r "${BUILD_DIR}/." "${WEB_ROOT}/build/"
     fi
 
-    # Sync css & js directories if they exist
+    # Sync css, js, images, fonts directories if present
     for dir in css js images fonts; do
-        if [ -d "${APP_DIR}/public/${dir}" ]; then
-            mkdir -p "${PUBLIC_WEB_ROOT}/${dir}"
-            cp -r "${APP_DIR}/public/${dir}/." "${PUBLIC_WEB_ROOT}/${dir}/"
+        if [ -d "${PUBLIC_DIR}/${dir}" ]; then
+            mkdir -p "${WEB_ROOT}/${dir}"
+            cp -r "${PUBLIC_DIR}/${dir}/." "${WEB_ROOT}/${dir}/"
         fi
     done
 
-    # Sync standalone root assets
+    # Sync root asset files
     for file in site.css admin.css robots.txt favicon.ico deploy.php; do
-        if [ -f "${APP_DIR}/public/${file}" ]; then
-            cp "${APP_DIR}/public/${file}" "${PUBLIC_WEB_ROOT}/${file}"
+        if [ -f "${PUBLIC_DIR}/${file}" ]; then
+            cp "${PUBLIC_DIR}/${file}" "${WEB_ROOT}/${file}"
         fi
     done
 
-    # Verify storage symlink
-    if [ ! -L "${PUBLIC_WEB_ROOT}/storage" ] && [ ! -d "${PUBLIC_WEB_ROOT}/storage" ]; then
-        log_info "Creating storage symlink in public_html..."
-        ln -s "${APP_DIR}/storage/app/public" "${PUBLIC_WEB_ROOT}/storage" 2>/dev/null || true
+    # Verify storage symlink in WEB_ROOT
+    if [ ! -L "${WEB_ROOT}/storage" ] && [ ! -d "${WEB_ROOT}/storage" ]; then
+        log_info "Creating storage symlink in ${WEB_ROOT}..."
+        ln -s "${STORAGE_DIR}/app/public" "${WEB_ROOT}/storage" 2>/dev/null || true
     fi
 
-    log_success "Public assets synced to public_html."
+    log_success "Assets successfully synced to ${WEB_ROOT}."
 fi
 
-# [9/10] Checking Laravel
+# [9/10] Checking Laravel system health
 step_header "[9/10] Checking Laravel system health"
 
-${PHP_BIN} artisan about --only=environment 2>/dev/null || ${PHP_BIN} artisan about || true
+${PHP_BIN} "${ARTISAN}" about --only=environment 2>/dev/null || ${PHP_BIN} "${ARTISAN}" about || true
 
-# Check write permissions
-test -d "${APP_DIR}/bootstrap/cache" && test -w "${APP_DIR}/bootstrap/cache"
-test -d "${APP_DIR}/storage" && test -w "${APP_DIR}/storage"
+# Final permission assertions
+test -d "${BOOTSTRAP_CACHE}" && test -w "${BOOTSTRAP_CACHE}"
+test -d "${STORAGE_DIR}" && test -w "${STORAGE_DIR}"
 
 # [10/10] Deployment complete
 step_header "[10/10] Deployment complete"
 
 PHP_VER=$(${PHP_BIN} -r 'echo PHP_VERSION;')
-APP_ENV=$(${PHP_BIN} -r "require '${APP_DIR}/vendor/autoload.php'; \$app = require '${APP_DIR}/bootstrap/app.php'; echo config('app.env', 'production');" 2>/dev/null || echo "production")
+APP_ENV=$(${PHP_BIN} -r "require '${PROJECT_ROOT}/vendor/autoload.php'; \$app = require '${PROJECT_ROOT}/bootstrap/app.php'; echo config('app.env', 'production');" 2>/dev/null || echo "production")
 
 echo ""
 echo -e "${BOLD}${GREEN}========================================${NC}"

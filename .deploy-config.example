@@ -1,0 +1,8 @@
+# ==============================================================================
+# Prayaag CMS — Deployment Configuration Template (.deploy-config.example)
+# ==============================================================================
+# Copy this file to .deploy-config and set your server's public_html path:
+# cp .deploy-config.example .deploy-config
+# ==============================================================================
+
+WEB_ROOT="/home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html"

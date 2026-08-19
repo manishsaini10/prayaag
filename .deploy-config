@@ -1,0 +1,9 @@
+# ==============================================================================
+# Prayaag CMS — Production Deployment Configuration (.deploy-config)
+# ==============================================================================
+# This file defines the public web root for deployment.
+# If your server layout or domain changes in the future, modify WEB_ROOT below.
+# All deployment scripts dynamically load this configuration.
+# ==============================================================================
+
+WEB_ROOT="/home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html"
