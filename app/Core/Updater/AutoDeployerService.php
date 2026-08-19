@@ -70,7 +70,17 @@ class AutoDeployerService
     public function checkForRemoteUpdates(string $repo = 'manishsaini10/prayaag', string $branch = 'main'): array
     {
         return Cache::remember('cms_remote_git_update_check', 30, function () use ($repo, $branch) {
-            $localSha = $this->getCurrentGitSha();
+            $localSha   = $this->getCurrentGitSha();
+            $currentVer = config('cms.version', '1.3.2');
+
+            // Calculate next target semantic version (e.g. 1.3.2 -> 1.3.3)
+            $parts = explode('.', $currentVer);
+            if (count($parts) === 3) {
+                $parts[2] = ((int) $parts[2]) + 1;
+                $predictedVer = implode('.', $parts);
+            } else {
+                $predictedVer = $currentVer . '.1';
+            }
 
             try {
                 $response = Http::timeout(4)
@@ -92,8 +102,10 @@ class AutoDeployerService
                         'update_available' => $isUpdateAvailable,
                         'local_sha'        => $localSha,
                         'remote_sha'       => $remoteSha,
+                        'target_version'   => 'v' . $predictedVer,
                         'remote_commit'    => [
                             'sha'     => $remoteSha,
+                            'version' => 'v' . $predictedVer,
                             'message' => $message,
                             'author'  => $author,
                             'date'    => $date ? \Carbon\Carbon::parse($date)->diffForHumans() : '',
@@ -107,6 +119,7 @@ class AutoDeployerService
             return [
                 'update_available' => false,
                 'local_sha'        => $localSha,
+                'target_version'   => 'v' . $currentVer,
                 'remote_commit'    => null,
             ];
         });

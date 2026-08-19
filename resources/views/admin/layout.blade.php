@@ -191,12 +191,12 @@
             @if(!empty($cmsUpdateStatus['update_available']))
                 <a href="{{ url('/admin/updates') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold text-white transition transform hover:scale-105"
                    style="background:linear-gradient(135deg,#e11d48,#f59e0b);box-shadow:0 0 14px rgba(225,29,72,.6);border:1px solid rgba(255,255,255,.3);animation:pulse 2s infinite"
-                   title="New update available on GitHub! Click to backup & install">
+                   title="New update {{ $cmsUpdateStatus['target_version'] ?? '' }} available on GitHub! Click to backup & install">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                     </span>
-                    <span>⚡ New Update Available!</span>
+                    <span>⚡ New Update Available ({{ $cmsUpdateStatus['target_version'] ?? 'v' . ($cmsUpdateStatus['remote_sha'] ?? 'New') }})</span>
                 </a>
             @endif
 

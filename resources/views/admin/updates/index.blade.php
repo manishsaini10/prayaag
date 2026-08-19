@@ -124,7 +124,7 @@
                     @csrf
                     <input type="hidden" name="branch" value="main">
                     <button type="submit" class="btn" style="background:#e11d48;color:#fff;border:none;padding:12px 22px;font-size:13.5px;font-weight:700;border-radius:10px;box-shadow:0 4px 14px rgba(225,29,72,0.35);cursor:pointer" x-bind:disabled="deploying">
-                        <span x-show="!deploying">⚡ Backup &amp; Apply Update Now</span>
+                        <span x-show="!deploying">⚡ Backup &amp; Apply Update Now ({{ $systemInfo['remote_commit']['version'] ?? ($systemInfo['remote_commit']['sha'] ?? 'New') }})</span>
                         <span x-show="deploying" x-cloak>⏳ Creating Backup, Updating &amp; Verifying Health…</span>
                     </button>
                 </form>
@@ -186,7 +186,7 @@
                 @csrf
                 <input type="hidden" name="branch" value="main">
                 <button type="submit" class="btn primary w-full justify-center" style="font-weight:700;border-radius:10px" x-bind:disabled="syncing">
-                    <span x-show="!syncing">⚡ Backup &amp; Apply Update Now</span>
+                    <span x-show="!syncing">⚡ Backup &amp; Apply Update Now @if(!empty($systemInfo['update_available'])) ({{ $systemInfo['remote_commit']['version'] ?? 'New' }}) @endif</span>
                     <span x-show="syncing" x-cloak>⏳ Deploying &amp; Verifying…</span>
                 </button>
             </form>
