@@ -787,7 +787,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -815,7 +815,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -843,7 +843,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-4-8.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-4-8.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -871,7 +871,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-4-8.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-4-8.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -899,7 +899,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-9-12.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-9-12.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -926,7 +926,7 @@
                     </div>
                 </div>
                 <div class="bkl-card__actions">
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-9-12.pdf" target="_blank" class="bkl-download-btn">
+                    <a href="/docs/Booklist-9-12.pdf" target="_blank" class="bkl-download-btn">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF List
                     </a>
@@ -948,7 +948,7 @@
             </div>
 
             <div class="bkl-archive-list">
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2023/09/BOOK_LIST_PrayaagInternationalSchool.com_2023-24.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/BOOK_LIST_PrayaagInternationalSchool.com_2023-24.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>
@@ -959,7 +959,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
 
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/Booklist-Pre-Nur-III-20-21.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>
@@ -970,7 +970,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
 
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-4-8.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/Booklist-4-8.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>
@@ -981,7 +981,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
 
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Booklist-9-12.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/Booklist-9-12.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>
@@ -992,7 +992,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
 
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Book-List-2020-21.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/Book-List-2020-21.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>
@@ -1003,7 +1003,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
 
-                <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/01/Book-List-2019-20.pdf" target="_blank" class="bkl-archive-item">
+                <a href="/docs/Book-List-2019-20.pdf" target="_blank" class="bkl-archive-item">
                     <div class="bkl-archive-info">
                         <div class="pdf-icon">PDF</div>
                         <div>

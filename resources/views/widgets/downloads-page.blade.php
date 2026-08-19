@@ -537,7 +537,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT1-XII-COMMERCE-SYLLABUS-COMPILED.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT1-XII-COMMERCE-SYLLABUS-COMPILED.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -557,7 +557,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT-1-SYLLABUS-XII-SCIENCE.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT-1-SYLLABUS-XII-SCIENCE.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -577,7 +577,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT1-XII-HUMANITIES-SYLLABUS-COMPILED.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT1-XII-HUMANITIES-SYLLABUS-COMPILED.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -597,7 +597,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/10TH-PT-1-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/10TH-PT-1-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -617,7 +617,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/9TH-PT-1-SYLLABUS.docx" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/9TH-PT-1-SYLLABUS.docx" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download DOCX
                     </a>
@@ -637,7 +637,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/grade-8-pt1-syllabus-22-23.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/grade-8-pt1-syllabus-22-23.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -657,7 +657,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/cl7-pt1-syllabus.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/cl7-pt1-syllabus.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -677,7 +677,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/Grade-5-pt-1-syllabus.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-5-pt-1-syllabus.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -697,7 +697,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT-1-Grade-4-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT-1-Grade-4-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -717,7 +717,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT-1-Grade-3-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT-1-Grade-3-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -737,7 +737,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/PT-1-Grade-2-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/PT-1-Grade-2-SYLLABUS.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -757,7 +757,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Official Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/06/Grade-1-PT1-Syllabus-2022-23.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-1-PT1-Syllabus-2022-23.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -778,7 +778,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/GRADE-12-SCIENCE-HHW-COMPILED.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/GRADE-12-SCIENCE-HHW-COMPILED.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -798,7 +798,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/GRADE-12-HUMANITIES-HHW-COMPLIED.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/GRADE-12-HUMANITIES-HHW-COMPLIED.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -818,7 +818,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/GRADE-12-COMMERCE-HHW-COMPILED.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/GRADE-12-COMMERCE-HHW-COMPILED.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -838,7 +838,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Compiled-Holiday-Homework-Grade-10.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Compiled-Holiday-Homework-Grade-10.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -858,7 +858,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Compiled-holiday-homework-IX.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Compiled-holiday-homework-IX.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -878,7 +878,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Grade-8-Holiday-Homework-2022-23.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-8-Holiday-Homework-2022-23.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -898,7 +898,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Grade-7-Holiday-Homework-2022-23.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-7-Holiday-Homework-2022-23.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -918,7 +918,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/6-hhw-1.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/6-hhw-1.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -938,7 +938,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/5-hhw-copy-copy.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/5-hhw-copy-copy.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -958,7 +958,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Grade-4-HOLIDAY-HOMEWORK.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-4-HOLIDAY-HOMEWORK.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -978,7 +978,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Vacation Dossier</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/Grade-3-HOLIDAY-HOMEWORK-Copy.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Grade-3-HOLIDAY-HOMEWORK-Copy.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -999,7 +999,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Dining Chart</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2022/05/FOOD-MENU-FROM-9TH-MAY-TO-22-MAY-2022.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/FOOD-MENU-FROM-9TH-MAY-TO-22-MAY-2022.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1020,7 +1020,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Affiliation Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2026/03/Fee_Structure_2026-27.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Fee_Structure_2026-27.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1040,7 +1040,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Affiliation Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2026/03/Transport_Fee_Structure-2026-27.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Transport_Fee_Structure-2026-27.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1060,7 +1060,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Affiliation Document</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2026/07/Mandatory-Public-Disclosure.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/Mandatory-Public-Disclosure.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1080,7 +1080,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Safety Certificate</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2024/06/BSC.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/BSC.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1100,7 +1100,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Safety Certificate</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2024/06/TSC.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/TSC.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
@@ -1120,7 +1120,7 @@
                 </div>
                 <div class="dwn-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Safety Certificate</span>
-                    <a href="https://prayaaginternationalschool.com/wp-content/uploads/2024/06/FSC.pdf" target="_blank" class="dwn-action-btn">
+                    <a href="/docs/FSC.pdf" target="_blank" class="dwn-action-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Download PDF
                     </a>
