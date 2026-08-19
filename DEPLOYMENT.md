@@ -1,159 +1,132 @@
-# Prayaag CMS — Portable Production Deployment Guide (Hostinger / Linux)
+# Prayaag CMS — Production Deployment & Database Migration Guide
 
-This guide documents the **portable, automated production deployment system** for the Prayaag School CMS.
-
----
-
-## 🧭 1. Dynamic Path Portability & `.deploy-config`
-
-The deployment system is **100% path-portable** and contains **no hard-coded project directory paths**.
-
-### How Dynamic Path Resolution Works:
-1. **Dynamic Project Root Detection:**
-   ```bash
-   PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-   ```
-   All core paths are derived relative to this detected root:
-   * `ARTISAN="$PROJECT_ROOT/artisan"`
-   * `PUBLIC_DIR="$PROJECT_ROOT/public"`
-   * `BUILD_DIR="$PUBLIC_DIR/build"`
-   * `STORAGE_DIR="$PROJECT_ROOT/storage"`
-   * `BOOTSTRAP_CACHE="$PROJECT_ROOT/bootstrap/cache"`
-
-2. **Configurable Web Root via `.deploy-config`:**
-   The public web directory (`public_html`) is configured in a single file at the root:
-   ```ini
-   # .deploy-config
-   WEB_ROOT="/home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html"
-   ```
-   * If your domain or folder structure changes in the future, you **only** need to edit `WEB_ROOT` in `.deploy-config`. No other script or hook needs to be modified.
-
-3. **Strict Path Validation:**
-   Before copying any files or applying updates, `deploy.sh` verifies:
-   * `PROJECT_ROOT/artisan` exists.
-   * `WEB_ROOT` exists and is writable.
-   * `PROJECT_ROOT/public/build/manifest.json` exists.
-   * If `WEB_ROOT` does not exist, the deployment stops safely with an error to prevent copying files to an incorrect location.
+This guide documents the **25-step automated, production-safe deployment system** for the Prayaag School CMS running on Hostinger Shared Hosting (PHP 8.3 / Laravel 12).
 
 ---
 
-## ⚡ 2. Routine Deployment Workflow
+## 🗄️ 1. Database & Automatic Migration Policy
 
-### Option A: Run `deploy.sh` directly
-From anywhere inside your project directory on the server:
+Every deployment automatically executes:
 ```bash
-./deploy.sh
+php artisan migrate --force
 ```
 
-### Option B: Automatic Deployment via Git Post-Merge Hook
-To automatically trigger `deploy.sh` whenever you run `git pull origin main`, install the portable Git hook once on the server:
-```bash
-cp .git-hooks/post-merge .git/hooks/post-merge
-chmod +x .git/hooks/post-merge
-```
-After this 1-time step, simply running `git pull origin main` will automatically execute all deployment tasks!
+### 🛑 Production Database Safety Rules:
+1. **NEVER Run Destructive Commands:**
+   The deployment engine will **never** run:
+   * `php artisan migrate:fresh`
+   * `php artisan migrate:refresh`
+   * `php artisan db:wipe`
+   * `php artisan migrate:reset`
+2. **Idempotent Migration Execution:**
+   Laravel's `migrations` table is used to track applied migrations. If there are 5 new migrations, only the pending 5 will run in exact chronological order. If none are pending, it continues smoothly.
+3. **Migration Failure Safety:**
+   If `php artisan migrate --force` fails:
+   * Deployment halts immediately.
+   * Production cache rebuilding is aborted.
+   * Full error details are recorded in `storage/logs/deployment.log`.
+   * The database state is preserved without destructive rollbacks.
+4. **Pre-Migration Database Snapshot:**
+   Before running any pending migrations, a timestamped SQL snapshot is safely saved to:
+   `storage/backups/database/db-backup-YYYYMMDD_HHMMSS.sql`
+   *(This directory is located outside `public_html` and is strictly excluded by `.gitignore`).*
 
 ---
 
-## 🛠️ 3. First-Time Server Setup (1-Time Setup)
+## 📜 2. Best Practice: Creating Future Migrations
+
+Once a migration is deployed to production:
+> ⚠️ **NEVER modify or edit an existing migration file that has already executed in production.**
+
+To make future database schema changes (e.g. adding a column or modifying a table), always create a **NEW** migration file:
 
 ```bash
-# 1. Clone the repository into any directory of your choice
-cd /home/u919095325
-git clone https://github.com/manishsaini10/prayaag.git prayaag
-cd prayaag
-
-# 2. Configure .env
-cp .env.example .env
-nano .env
-
-# 3. Configure .deploy-config (set your public_html path)
-cp .deploy-config.example .deploy-config
-nano .deploy-config
-
-# 4. Make deploy.sh executable and run initial deployment
-chmod +x deploy.sh
-./deploy.sh
-
-# 5. (Optional) Enable automatic post-merge deployment hook
-cp .git-hooks/post-merge .git/hooks/post-merge
-chmod +x .git/hooks/post-merge
+# Example: Adding a column to popups table
+php artisan make:migration add_target_url_to_popups_table --table=popups
 ```
+
+Then commit and push the new migration file to Git:
+```bash
+git add database/migrations/*_add_target_url_to_popups_table.php
+git commit -m "feat: add target_url to popups"
+git push origin main
+```
+
+When deployed on the server, `deploy.sh` will automatically detect the new migration and run only that specific migration safely!
 
 ---
 
-## 🌐 4. Hostinger `public_html/index.php` Setup
+## 🧭 3. Dynamic Path Portability & `.deploy-config`
 
-Ensure `public_html/index.php` references the Laravel application root (e.g. `/home/u919095325/prayaag`):
+The deployment system is **100% path-portable** with zero hardcoded project root paths.
 
-```php
-<?php
-
-use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
-
-define('LARAVEL_START', microtime(true));
-
-// 1. Maintenance mode check
-if (file_exists($maintenance = '/home/u919095325/prayaag/storage/framework/maintenance.php')) {
-    require $maintenance;
-}
-
-// 2. Composer Autoloader
-require '/home/u919095325/prayaag/vendor/autoload.php';
-
-// 3. Bootstrap Laravel Application
-/** @var Application $app */
-$app = require_once '/home/u919095325/prayaag/bootstrap/app.php';
-
-$app->handleRequest(Request::capture());
+### A. Dynamic Project Root:
+```bash
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ```
+All paths (`artisan`, `public/`, `storage/`, `bootstrap/cache/`) are derived relative to this root.
+
+### B. Configurable Web Root ([`.deploy-config`](file:///f:/prayaag-laravel/prayaag/.deploy-config)):
+```ini
+# .deploy-config
+WEB_ROOT="/home/u919095325/domains/lightgray-buffalo-350334.hostingersite.com/public_html"
+```
+If your public web directory changes in the future, **only update `WEB_ROOT` in `.deploy-config`**.
 
 ---
 
-## 🔍 5. What `deploy.sh` Does (10-Step Execution)
+## ⚡ 4. The Exact 25-Step Deployment Pipeline
 
 | Step | Action | Description |
 |---|---|---|
-| **[1/10]** | **Environment & Path Validation** | Detects `$PROJECT_ROOT`, validates `$ARTISAN`, loads `.deploy-config`, and checks `$WEB_ROOT` existence and writability. |
-| **[2/10]** | **Git Pull & Pre-Backup** | Checks uncommitted changes, saves pre-deploy snapshot in `$STORAGE_DIR/backups/updates/`, and pulls `origin main`. |
-| **[3/10]** | **Directory & Permissions** | Ensures `$BOOTSTRAP_CACHE` and all `$STORAGE_DIR/framework/*` directories exist with `ug+rwX` / `775` permissions. |
-| **[4/10]** | **Composer** | Runs `composer install --no-dev --optimize-autoloader` and `composer dump-autoload -o`. |
-| **[5/10]** | **Database Migrations** | Runs `php artisan migrate --force` safely without data deletion. |
-| **[6/10]** | **Clear Caches** | Flushes old compiled views, configs, and routes (`optimize:clear`). |
-| **[7/10]** | **Rebuild Caches** | Rebuilds `config:cache`, `view:cache`, and `route:cache`. |
-| **[8/10]** | **Vite & Public Sync** | Validates `manifest.json` and syncs compiled assets (`build/`, `css/`, `js/`, `site.css`, `admin.css`) to `$WEB_ROOT`. |
-| **[9/10]** | **Health Check** | Runs `php artisan about` and tests directory writability. |
-| **[10/10]** | **Completion Banner** | Prints structured deployment report with commit hash and status. |
+| **1/25** | **Git Pull** | Pulls latest commits from `origin main`. |
+| **2/25** | **Detect Project Root** | Dynamically resolves repository root via `git rev-parse --show-toplevel`. |
+| **3/25** | **Load Configuration** | Loads `WEB_ROOT` from `.deploy-config`. |
+| **4/25** | **Validate Laravel** | Verifies `artisan`, `composer.json`, and `.env`. |
+| **5/25** | **Validate Environment** | Verifies PHP 8.3 binary, Composer, and `WEB_ROOT` writability. |
+| **6/25** | **Validate Vite Manifest** | Checks `public/build/manifest.json`. |
+| **7/25** | **Create Directories** | Creates `bootstrap/cache`, `storage/framework/*`, `storage/logs`, `storage/backups/database`. |
+| **8/25** | **Fix Safe Permissions** | Enforces `ug+rwX` / `775` permissions on storage and bootstrap/cache. |
+| **9/25** | **Composer Install** | Runs `composer install --no-dev --optimize-autoloader`. |
+| **10/25** | **Composer Autoload** | Runs `composer dump-autoload -o`. |
+| **11/25** | **Verify DB Connection** | Confirms active MySQL PDO connection. |
+| **12/25** | **Pre-Migration Status** | Displays `php artisan migrate:status` before migrating. |
+| **13/25** | **Database Backup** | Creates pre-migration database snapshot in `storage/backups/database/`. |
+| **14/25** | **Run Migrations** | Executes `php artisan migrate --force`. |
+| **15/25** | **Post-Migration Status** | Verifies all migrations are marked as "Ran". |
+| **16/25** | **Sync Public Files** | Copies `css/`, `js/`, `images/`, `site.css`, `admin.css`, `robots.txt` to `WEB_ROOT`. |
+| **17/25** | **Sync Vite Build** | Copies `public/build/` to `WEB_ROOT/build/`. |
+| **18/25** | **Verify Manifest Assets** | Confirms all compiled assets referenced in manifest exist. |
+| **19/25** | **Storage Link** | Executes `php artisan storage:link` and verifies symlink in `WEB_ROOT/storage`. |
+| **20/25** | **Clear Caches** | Clears old bootstrap, route, view, and config caches (`optimize:clear`). |
+| **21/25** | **Cache Config** | Generates production `config:cache`. |
+| **22/25** | **Cache Routes** | Generates production `route:cache`. |
+| **23/25** | **Cache Views** | Precompiles Blade templates (`view:cache`). |
+| **24/25** | **Health Check** | Executes `php artisan about` and validates directory writability. |
+| **25/25** | **Audit Log & Summary** | Writes success record to `storage/logs/deployment.log` and displays summary. |
 
 ---
 
-## 🛡️ 6. Fail-Safe Error Handling & Rollback
+## 🪵 5. Deployment Audit Logs & Error Tracking
 
-* **`set -eo pipefail` + `trap ERR`**: If any command fails (e.g. database error), deployment halts immediately.
-* **Pre-Deploy Snapshot**: Every deployment automatically archives a snapshot to:
-  `storage/backups/updates/pre-deploy-YYYYMMDD_HHMMSS.tar.gz`
-* **To Rollback**:
-  ```bash
-  tar -xzf storage/backups/updates/pre-deploy-YYYYMMDD_HHMMSS.tar.gz
-  php artisan optimize:clear
-  php artisan config:cache
-  php artisan view:cache
-  ```
+All deployment events and any migration errors are logged with timestamps in:
+```bash
+tail -n 50 storage/logs/deployment.log
+```
 
 ---
 
-## 🎨 7. Local Vite Frontend Builds (No Node on Server)
+## 🔁 6. Routine Deployment Commands
 
-Because Node.js/npm is not installed on Hostinger shared hosting:
-1. Build assets locally:
-   ```bash
-   npm run build
-   ```
-2. Commit and push `public/build`:
-   ```bash
-   git add public/build
-   git commit -m "build: compile frontend assets"
-   git push origin main
-   ```
-3. `deploy.sh` automatically verifies `manifest.json` and syncs `public/build/` to `public_html/build/`.
+### Via SSH:
+```bash
+cd /home/u919095325/prayaag
+./deploy.sh
+```
+
+### Automatic Post-Merge Hook (1-Time Setup):
+```bash
+cp .git-hooks/post-merge .git/hooks/post-merge
+chmod +x .git/hooks/post-merge
+```
+*(Now running `git pull origin main` automatically executes the full 25-step deployment!)*

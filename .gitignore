@@ -26,7 +26,12 @@
 /storage/framework/views/*
 /storage/pail
 /vendor
+/storage/backups/*
 *.zip
+*.tar.gz
+*.sql
+*.sql.gz
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
