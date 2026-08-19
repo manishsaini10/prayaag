@@ -165,6 +165,7 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
 
     Route::prefix('/admin/email-logs')->name('admin.email-logs.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('index');
+        Route::post('/flush-queue', [\App\Http\Controllers\Admin\EmailLogController::class, 'flushQueue'])->name('flush-queue');
         Route::post('/{id}/resend', [\App\Http\Controllers\Admin\EmailLogController::class, 'resend'])->name('resend');
     });
 

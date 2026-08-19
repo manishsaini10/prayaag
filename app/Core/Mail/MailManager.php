@@ -23,8 +23,9 @@ class MailManager
 
     /**
      * Public entry point for sending emails across all modules.
+     * By default ($async = false), emails are dispatched and sent immediately in real-time!
      */
-    public function send(string $templateKey, array $data, string|array $to, ?array $overrideOptions = null): ?EmailLog
+    public function send(string $templateKey, array $data, string|array $to, ?array $overrideOptions = null, bool $async = false): ?EmailLog
     {
         $template = EmailTemplate::where('template_key', $templateKey)->first();
 
@@ -63,20 +64,26 @@ class MailManager
 
         $log = EmailLog::create([
             'template_key' => $templateKey,
-            'module' => $template->module,
-            'to_address' => implode(', ', $toAddresses),
-            'subject' => $rendered['subject'],
-            'status' => 'queued',
+            'module'       => $template->module,
+            'to_address'   => implode(', ', $toAddresses),
+            'subject'      => $rendered['subject'],
+            'status'       => 'queued',
         ]);
 
-        SendEmailJob::dispatch($log->id, $message);
+        // If background async is requested AND queue connection is configured
+        if ($async && config('queue.default') !== 'sync') {
+            SendEmailJob::dispatch($log->id, $message);
+        } else {
+            // Immediate real-time execution
+            $this->executeSend($log, $message);
+        }
 
-        return $log;
+        return $log->fresh();
     }
 
     /**
      * Executes the actual email send attempt with failover across configured providers.
-     * Called inside SendEmailJob.
+     * Called synchronously or inside SendEmailJob.
      */
     public function executeSend(EmailLog $log, EmailMessage $message): SendResult
     {
@@ -87,9 +94,9 @@ class MailManager
             $logProvider = new LogProvider();
             $result = $logProvider->send($message);
             $log->update([
-                'status' => 'sent',
+                'status'        => 'sent',
                 'provider_used' => $logProvider->key(),
-                'sent_at' => now(),
+                'sent_at'       => now(),
             ]);
             return $result;
         }
@@ -102,9 +109,10 @@ class MailManager
 
                 if ($result->success) {
                     $log->update([
-                        'status' => 'sent',
+                        'status'        => 'sent',
                         'provider_used' => $config->provider_key,
-                        'sent_at' => now(),
+                        'error_message' => null,
+                        'sent_at'       => now(),
                     ]);
                     return $result;
                 }
@@ -119,7 +127,7 @@ class MailManager
 
         // All providers failed
         $log->update([
-            'status' => 'failed',
+            'status'        => 'failed',
             'error_message' => "All providers failed. Last error: {$lastError}",
         ]);
 

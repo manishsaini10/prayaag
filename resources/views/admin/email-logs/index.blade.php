@@ -9,6 +9,32 @@
             {{ session('success') }}
         </div>
     @endif
+    @if(session('error'))
+        <div class="mb-4 p-4 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 text-sm font-medium">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(($queuedCount ?? 0) > 0)
+        <div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white grid place-items-center font-bold">
+                    ⏳
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-amber-900 dark:text-amber-200 m-0">{{ $queuedCount }} Emails Currently Queued</h4>
+                    <p class="text-xs text-amber-700 dark:text-amber-400 m-0">These emails were waiting in the queue buffer. Click to deliver them now.</p>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('admin.email-logs.flush-queue') }}" onsubmit="return confirm('Send all {{ $queuedCount }} queued emails immediately?')">
+                @csrf
+                <button type="submit" class="btn primary text-xs py-2 px-4 font-bold" style="background:#f59e0b;border:none">
+                    ⚡ Send All {{ $queuedCount }} Queued Emails Now
+                </button>
+            </form>
+        </div>
+    @endif
+
 
     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm mb-6">
         <form method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
