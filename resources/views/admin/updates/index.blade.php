@@ -243,6 +243,11 @@
                                         <span class="badge" style="background:#fee2e2;color:#991b1b;font-weight:700">✖ {{ ucfirst($item->status) }}</span>
                                     @endif
                                     <span style="font-size:10px;color:var(--text-muted);display:block;margin-top:2px">[{{ $item->stage ?? 'finished' }}]</span>
+                                    @if(!empty($item->error_message))
+                                        <div style="font-size:10px;color:#dc2626;margin-top:2px;max-width:240px;word-break:break-word" title="{{ $item->error_message }}">
+                                            ⚠ {{ \Illuminate\Support\Str::limit($item->error_message, 45) }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="py-3 font-mono">
                                     {{ $item->duration ? $item->duration . 's' : '—' }}

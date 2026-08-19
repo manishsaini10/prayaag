@@ -133,28 +133,44 @@ class RollbackManager
             $this->verifyChecksums($dir, $checksumFile);
         }
 
-        // 2. Restore Application Archive
-        $appArchive = $dir . '/application.tar.gz';
-        if (file_exists($appArchive)) {
-            $this->log("  ↳ Extracting application archive...");
-            $cmd = "tar -xzf \"{$appArchive}\" -C \"{$this->projectRoot}\" 2>&1";
+        // 2. Restore Application Archive (.zip or .tar.gz)
+        $appZip = $dir . '/application.zip';
+        $appTar = $dir . '/application.tar.gz';
+        if (file_exists($appZip)) {
+            $this->log("  ↳ Extracting application ZIP archive...");
+            $zip = new ZipArchive();
+            if ($zip->open($appZip) === true) {
+                $zip->extractTo($this->projectRoot);
+                $zip->close();
+            }
+        } elseif (file_exists($appTar)) {
+            $this->log("  ↳ Extracting application tar archive...");
+            $cmd = "tar -xzf \"{$appTar}\" -C \"{$this->projectRoot}\" 2>&1";
             $this->execCommand($cmd);
         }
 
-        // 3. Restore Public Web Assets
-        $publicArchive = $dir . '/public.tar.gz';
-        if (file_exists($publicArchive)) {
-            $this->log("  ↳ Extracting public web assets archive...");
-            $cmd = "tar -xzf \"{$publicArchive}\" -C \"{$this->publicDir}\" 2>&1";
+        // 3. Restore Public Web Assets (.zip or .tar.gz)
+        $pubZip = $dir . '/public.zip';
+        $pubTar = $dir . '/public.tar.gz';
+        if (file_exists($pubZip)) {
+            $this->log("  ↳ Extracting public web assets ZIP archive...");
+            $zip = new ZipArchive();
+            if ($zip->open($pubZip) === true) {
+                $zip->extractTo($this->publicDir);
+                $zip->close();
+            }
+        } elseif (file_exists($pubTar)) {
+            $this->log("  ↳ Extracting public web assets tar archive...");
+            $cmd = "tar -czf \"{$pubTar}\" -C \"{$this->publicDir}\" 2>&1";
             $this->execCommand($cmd);
+        }
 
-            // Sync to WEB_ROOT if distinct
-            if ($this->webRoot && $this->webRoot !== $this->publicDir && is_dir($this->webRoot)) {
-                $this->log("  ↳ Syncing restored assets to WEB_ROOT ({$this->webRoot})...");
-                if (is_dir($this->publicDir . '/build')) {
-                    File::ensureDirectoryExists($this->webRoot . '/build');
-                    File::copyDirectory($this->publicDir . '/build', $this->webRoot . '/build');
-                }
+        // Sync to WEB_ROOT if distinct
+        if ($this->webRoot && $this->webRoot !== $this->publicDir && is_dir($this->webRoot)) {
+            $this->log("  ↳ Syncing restored assets to WEB_ROOT ({$this->webRoot})...");
+            if (is_dir($this->publicDir . '/build')) {
+                File::ensureDirectoryExists($this->webRoot . '/build');
+                File::copyDirectory($this->publicDir . '/build', $this->webRoot . '/build');
             }
         }
 

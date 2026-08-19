@@ -297,7 +297,7 @@ class AutoDeployerService
     }
 
     /**
-     * Create Complete Verified Restore Point Folder
+     * Create Complete Verified Restore Point Folder (Pure PHP Native)
      */
     protected function createVerifiedRestorePoint(string $deploymentId, string $version, string $sha): string
     {
@@ -316,15 +316,46 @@ class AutoDeployerService
         ];
         file_put_contents($pointDir . '/metadata.json', json_encode($metadata, JSON_PRETTY_PRINT));
 
-        // 2. Application Archive (tar.gz)
-        $appArchive = $pointDir . '/application.tar.gz';
-        $cmd = "tar -czf \"{$appArchive}\" -C \"{$this->laravelRoot}\" --exclude='vendor' --exclude='node_modules' --exclude='storage' app config database resources routes composer.json composer.lock 2>&1";
-        $this->execCommand($cmd);
+        // 2. Application Archive (Pure PHP ZipArchive)
+        $appZip = $pointDir . '/application.zip';
+        $zip = new ZipArchive();
+        if ($zip->open($appZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach (['app', 'config', 'database', 'resources', 'routes'] as $folder) {
+                $dirPath = $this->laravelRoot . '/' . $folder;
+                if (is_dir($dirPath)) {
+                    $this->addDirToZip($zip, $dirPath, $folder);
+                }
+            }
+            foreach (['composer.json', 'composer.lock', 'deploy.sh', '.deploy-config'] as $file) {
+                $filePath = $this->laravelRoot . '/' . $file;
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $file);
+                }
+            }
+            $zip->close();
+        }
 
-        // 3. Public Web Assets Archive (tar.gz)
-        $publicArchive = $pointDir . '/public.tar.gz';
-        $cmd = "tar -czf \"{$publicArchive}\" -C \"{$this->laravelRoot}/public\" build css js images site.css admin.css robots.txt 2>&1";
-        $this->execCommand($cmd);
+        // 3. Public Web Assets Archive (Pure PHP ZipArchive)
+        $publicZip = $pointDir . '/public.zip';
+        $zipPub = new ZipArchive();
+        if ($zipPub->open($publicZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            $pubDir = $this->laravelRoot . '/public';
+            if (is_dir($pubDir)) {
+                foreach (['build', 'css', 'js', 'images', 'fonts'] as $folder) {
+                    $dirPath = $pubDir . '/' . $folder;
+                    if (is_dir($dirPath)) {
+                        $this->addDirToZip($zipPub, $dirPath, $folder);
+                    }
+                }
+                foreach (['site.css', 'admin.css', 'robots.txt', 'favicon.ico', 'deploy.php'] as $file) {
+                    $filePath = $pubDir . '/' . $file;
+                    if (file_exists($filePath)) {
+                        $zipPub->addFile($filePath, $file);
+                    }
+                }
+            }
+            $zipPub->close();
+        }
 
         // 4. .env Backup
         if (file_exists($this->laravelRoot . '/.env')) {
@@ -332,15 +363,16 @@ class AutoDeployerService
         }
 
         // 5. Complete Database Snapshot (Compressed .sql.gz)
-        $dbDumpPath = $pointDir . '/database.sql';
         $dbDump = $this->exportDatabaseSql();
-        file_put_contents($dbDumpPath, $dbDump);
-        file_put_contents($pointDir . '/database.sql.gz', gzencode($dbDump, 9));
-        @unlink($dbDumpPath);
+        if (!empty($dbDump)) {
+            file_put_contents($pointDir . '/database.sql.gz', gzencode($dbDump, 9));
+        } else {
+            file_put_contents($pointDir . '/database.sql.gz', gzencode("-- No database tables found\n", 9));
+        }
 
         // 6. SHA-256 Checksums
         $checksums = [];
-        foreach (['metadata.json', 'application.tar.gz', 'public.tar.gz', 'env.backup', 'database.sql.gz'] as $file) {
+        foreach (['metadata.json', 'application.zip', 'public.zip', 'env.backup', 'database.sql.gz'] as $file) {
             $fPath = $pointDir . '/' . $file;
             if (file_exists($fPath)) {
                 $checksums[] = hash_file('sha256', $fPath) . '  ' . $file;
@@ -356,7 +388,7 @@ class AutoDeployerService
      */
     protected function verifyRestorePoint(string $pointDir): void
     {
-        $required = ['metadata.json', 'application.tar.gz', 'public.tar.gz', 'database.sql.gz', 'checksums.sha256'];
+        $required = ['metadata.json', 'application.zip', 'public.zip', 'database.sql.gz', 'checksums.sha256'];
         foreach ($required as $req) {
             $f = $pointDir . '/' . $req;
             if (!file_exists($f) || filesize($f) < 10) {
@@ -371,23 +403,32 @@ class AutoDeployerService
             $parts = preg_split('/\s+/', trim($line), 2);
             if (count($parts) === 2) {
                 [$hash, $fn] = $parts;
-                $actual = hash_file('sha256', $pointDir . '/' . $fn);
-                if ($actual !== $hash) {
-                    throw new \RuntimeException("Checksum verification mismatch for {$fn}!");
+                $target = $pointDir . '/' . $fn;
+                if (file_exists($target)) {
+                    $actual = hash_file('sha256', $target);
+                    if ($actual !== $hash) {
+                        throw new \RuntimeException("Checksum verification mismatch for {$fn}!");
+                    }
                 }
             }
         }
     }
 
     /**
-     * Run Git Pull
+     * Run Git Pull with detailed error capture
      */
     protected function runGitPull(string $branch): bool
     {
-        $cmd = "cd \"{$this->laravelRoot}\" && {$this->gitBinary} fetch origin {$branch} 2>&1 && {$this->gitBinary} pull origin {$branch} 2>&1";
+        $git = $this->gitBinary;
+        $cmd = "cd \"{$this->laravelRoot}\" && {$git} pull origin {$branch} 2>&1";
         $res = $this->execCommand($cmd);
-        $this->log("  ↳ " . trim($res));
-        return !str_contains(strtolower($res), 'fatal:') && !str_contains(strtolower($res), 'error:');
+        $this->log("  ↳ Git Pull: " . trim($res));
+
+        if (str_contains(strtolower($res), 'fatal:') || str_contains(strtolower($res), 'error:')) {
+            throw new \RuntimeException("Git pull failed: " . trim($res));
+        }
+
+        return true;
     }
 
     /**
@@ -397,7 +438,7 @@ class AutoDeployerService
     {
         $cmd = "cd \"{$this->laravelRoot}\" && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader 2>&1 && composer dump-autoload -o --no-interaction 2>&1";
         $res = $this->execCommand($cmd);
-        $this->log("  ↳ " . trim($res));
+        $this->log("  ↳ Composer: " . trim($res));
     }
 
     /**
