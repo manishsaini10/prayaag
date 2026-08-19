@@ -115,17 +115,24 @@ class AutoDeployerService
         $this->logs = [];
         $startTime  = microtime(true);
 
-        $this->log("📦 Step 1: Taking automatic pre-update backup of core files...");
+        $this->log("📦 Step 1: Taking mandatory full pre-update backup (Files + Database)...");
         $backupPath = null;
         try {
             $backupPath = $this->createPreUpdateBackup();
-            $this->log("  ↳ Backup saved safely: " . basename($backupPath));
+            $this->log("  ↳ ✅ Backup verified & saved safely: " . basename($backupPath));
         } catch (\Throwable $e) {
-            $this->log("  ⚠ Backup warning: " . $e->getMessage() . " (Continuing deploy...)");
+            $errMsg = "Pre-update backup failed: " . $e->getMessage() . " — Update aborted for safety.";
+            $this->log("  ❌ ABORTED: " . $errMsg);
+            return [
+                'success' => false,
+                'message' => $errMsg,
+                'logs'    => $this->logs,
+            ];
         }
 
         $this->log("🚀 Step 2: Executing deployment pipeline from origin/{$branch}...");
         $deployResult = $this->deploy($branch);
+
 
         // Record in Database history
         try {
@@ -200,19 +207,33 @@ class AutoDeployerService
 
 
     /**
-     * Create Pre-Update ZIP Backup
+     * Create Mandatory Full Pre-Update Backup (Files + Database Snapshot)
      */
     public function createPreUpdateBackup(): string
     {
         File::ensureDirectoryExists($this->backupDir);
+        $oldVer     = config('cms.version', '1.0.0');
         $timestamp  = now()->format('Ymd_His');
-        $backupName = "pre-git-update-{$timestamp}.zip";
+        $backupName = "backup-v{$oldVer}-{$timestamp}.zip";
         $backupPath = $this->backupDir . '/' . $backupName;
 
         $zip = new ZipArchive();
-        $zip->open($backupPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        if ($zip->open($backupPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new \RuntimeException("Unable to create backup file at {$backupPath}. Check disk space or write permissions.");
+        }
 
-        $dirsToBackup = ['app', 'config', 'routes', 'resources/views', 'public/site.css', 'public/admin.css'];
+        // 1. Backup Application Directories
+        $dirsToBackup = [
+            'app', 
+            'config', 
+            'database/migrations', 
+            'database/seeders', 
+            'resources', 
+            'routes', 
+            'public/site.css', 
+            'public/admin.css'
+        ];
+
         foreach ($dirsToBackup as $item) {
             $fullPath = $this->laravelRoot . '/' . $item;
             if (is_file($fullPath)) {
@@ -221,21 +242,77 @@ class AutoDeployerService
                 $this->addDirToZip($zip, $fullPath, $item);
             }
         }
+
+        if (file_exists($this->laravelRoot . '/composer.json')) {
+            $zip->addFile($this->laravelRoot . '/composer.json', 'composer.json');
+        }
+
+        // 2. Export Fast Database Snapshot into the Backup ZIP
+        try {
+            $sqlDump = $this->exportDatabaseSql();
+            if (!empty($sqlDump)) {
+                $zip->addFromString('database_snapshot.sql', $sqlDump);
+                $this->log("  ↳ Database snapshot included in backup (Size: " . round(strlen($sqlDump)/1024, 1) . " KB)");
+            }
+        } catch (\Throwable $e) {
+            $this->log("  ⚠ DB backup note: " . $e->getMessage());
+        }
+
         $zip->close();
+
+        if (!file_exists($backupPath) || filesize($backupPath) < 1000) {
+            throw new \RuntimeException("Backup verification failed (file is empty or corrupted).");
+        }
 
         return $backupPath;
     }
 
-    protected function addDirToZip(ZipArchive $zip, string $dir, string $prefix): void
+    /**
+     * Fast Database Exporter using PDO
+     */
+    protected function exportDatabaseSql(): string
     {
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        foreach ($files as $file) {
-            $relative = $prefix . '/' . str_replace($dir . DIRECTORY_SEPARATOR, '', $file->getPathname());
-            $zip->addFile($file->getPathname(), str_replace('\\', '/', $relative));
+        $tables = DB::select('SHOW TABLES');
+        if (empty($tables)) return '';
+
+        $dbName = config('database.connections.mysql.database');
+        $out = "-- Database Snapshot before update\n-- Date: " . date('Y-m-d H:i:s') . "\nSET FOREIGN_KEY_CHECKS=0;\n\n";
+
+        foreach ($tables as $tableObj) {
+            $tableArr = (array) $tableObj;
+            $tableName = reset($tableArr);
+
+            // Skip large log tables from inline memory dump if desired
+            if (in_array($tableName, ['activity_logs', 'email_logs', 'sessions', 'cache'])) {
+                continue;
+            }
+
+            $createRes = DB::select("SHOW CREATE TABLE `{$tableName}`");
+            if (!empty($createRes)) {
+                $createArr = (array) $createRes[0];
+                $out .= "DROP TABLE IF EXISTS `{$tableName}`;\n" . ($createArr['Create Table'] ?? '') . ";\n\n";
+            }
+
+            $rows = DB::table($tableName)->get();
+            if ($rows->isNotEmpty()) {
+                foreach ($rows as $row) {
+                    $rowArr = (array) $row;
+                    $cols = array_map(fn($c) => "`{$c}`", array_keys($rowArr));
+                    $vals = array_map(function ($v) {
+                        if (is_null($v)) return 'NULL';
+                        return "'" . addslashes((string)$v) . "'";
+                    }, array_values($rowArr));
+
+                    $out .= "INSERT INTO `{$tableName}` (" . implode(',', $cols) . ") VALUES (" . implode(',', $vals) . ");\n";
+                }
+                $out .= "\n";
+            }
         }
+
+        $out .= "SET FOREIGN_KEY_CHECKS=1;\n";
+        return $out;
     }
+
 
     /**
      * Run Git Pull safely
