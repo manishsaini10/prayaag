@@ -41,8 +41,11 @@ use App\Core\Builder\Widgets\TextWidget;
 use App\Core\Builder\Widgets\UpcomingEventsWidget;
 use App\Core\Builder\Widgets\VideosWidget;
 use App\Core\Builder\WidgetRegistry;
+use App\Core\Builder\Widgets\AdmissionsPageWidget;
 use App\Core\Builder\Widgets\DynamicWidget;
 use App\Core\Builder\Widgets\MessMenuWidget;
+use App\Core\Builder\Widgets\VideoTestimonialWidget;
+use App\Core\Video\VideoManager;
 use App\Models\WidgetDefinition;
 use App\Core\Media\MediaManager;
 use App\Core\Menu\MenuManager;
@@ -52,6 +55,57 @@ use App\Core\Theme\ThemeRenderer;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+
+use App\Core\Builder\Widgets\PricingTableWidget;
+use App\Core\Builder\Widgets\FaqAccordionWidget;
+use App\Core\Builder\Widgets\CountdownTimerWidget;
+use App\Core\Builder\Widgets\TeamMemberWidget;
+use App\Core\Builder\Widgets\FlipBoxWidget;
+use App\Core\Builder\Widgets\TimelineWidget;
+use App\Core\Builder\Widgets\ProgressBarWidget;
+use App\Core\Builder\Widgets\ImageComparisonWidget;
+use App\Core\Builder\Widgets\TabsWidget;
+use App\Core\Builder\Widgets\DualButtonWidget;
+use App\Core\Builder\Widgets\AudioPlayerWidget;
+use App\Core\Builder\Widgets\ChartWidget;
+use App\Core\Builder\Widgets\CircleMenuWidget;
+use App\Core\Builder\Widgets\DataTableWidget;
+use App\Core\Builder\Widgets\EventCalendarWidget;
+use App\Core\Builder\Widgets\WhatsAppChatWidget;
+use App\Core\Builder\Widgets\ZoomMeetingWidget;
+use App\Core\Builder\Widgets\AdvancedSliderWidget;
+use App\Core\Builder\Widgets\AdvancedToggleWidget;
+use App\Core\Builder\Widgets\ProtectedContentWidget;
+use App\Core\Builder\Widgets\CreativeButtonWidget;
+use App\Core\Builder\Widgets\FancyTextWidget;
+use App\Core\Builder\Widgets\ImageHotspotWidget;
+use App\Core\Builder\Widgets\ImageMorphingWidget;
+use App\Core\Builder\Widgets\MotionTextWidget;
+use App\Core\Builder\Widgets\StackedCardsWidget;
+use App\Core\Builder\Widgets\UnfoldContentWidget;
+use App\Core\Builder\Widgets\GlassMorphismWidget;
+use App\Core\Builder\Widgets\ContentTickerWidget;
+use App\Core\Builder\Widgets\CouponCodeWidget;
+use App\Core\Builder\Widgets\PriceMenuWidget;
+use App\Core\Builder\Widgets\ReviewsRatingsWidget;
+use App\Core\Builder\Widgets\BackToTopWidget;
+use App\Core\Builder\Widgets\BusinessHoursWidget;
+use App\Core\Builder\Widgets\IconBoxWidget;
+use App\Core\Builder\Widgets\ImageAccordionWidget;
+use App\Core\Builder\Widgets\ImageBoxWidget;
+use App\Core\Builder\Widgets\PageListWidget;
+use App\Core\Builder\Widgets\SocialIconsWidget;
+use App\Core\Builder\Widgets\DropCapsWidget;
+use App\Core\Builder\Widgets\FunFactWidget;
+use App\Core\Builder\Widgets\LottieAnimationWidget;
+use App\Core\Builder\Widgets\MegaMenuWidget;
+use App\Core\Builder\Widgets\HeaderInfoWidget;
+use App\Core\Builder\Widgets\HeaderOffcanvasWidget;
+use App\Core\Builder\Widgets\ClientLogoWidget;
+use App\Core\Builder\Widgets\SocialShareWidget;
+use App\Core\Builder\Widgets\CategoryListWidget;
+use App\Core\Builder\Widgets\PostListWidget;
+use App\Core\Builder\Widgets\AlumniPageWidget;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -102,6 +156,60 @@ class CoreServiceProvider extends ServiceProvider
         FloatingActionWidget::class,
         InstagramWidget::class,
         MessMenuWidget::class,
+        AdmissionsPageWidget::class,
+        AlumniPageWidget::class,
+        // Media & Social Proof
+        VideoTestimonialWidget::class,
+        // PRO Suite
+        PricingTableWidget::class,
+        FaqAccordionWidget::class,
+        CountdownTimerWidget::class,
+        TeamMemberWidget::class,
+        FlipBoxWidget::class,
+        TimelineWidget::class,
+        ProgressBarWidget::class,
+        ImageComparisonWidget::class,
+        TabsWidget::class,
+        DualButtonWidget::class,
+        AudioPlayerWidget::class,
+        ChartWidget::class,
+        CircleMenuWidget::class,
+        DataTableWidget::class,
+        EventCalendarWidget::class,
+        WhatsAppChatWidget::class,
+        ZoomMeetingWidget::class,
+        AdvancedSliderWidget::class,
+        AdvancedToggleWidget::class,
+        ProtectedContentWidget::class,
+        CreativeButtonWidget::class,
+        FancyTextWidget::class,
+        ImageHotspotWidget::class,
+        ImageMorphingWidget::class,
+        MotionTextWidget::class,
+        StackedCardsWidget::class,
+        UnfoldContentWidget::class,
+        GlassMorphismWidget::class,
+        ContentTickerWidget::class,
+        CouponCodeWidget::class,
+        PriceMenuWidget::class,
+        ReviewsRatingsWidget::class,
+        BackToTopWidget::class,
+        BusinessHoursWidget::class,
+        IconBoxWidget::class,
+        ImageAccordionWidget::class,
+        ImageBoxWidget::class,
+        PageListWidget::class,
+        SocialIconsWidget::class,
+        DropCapsWidget::class,
+        FunFactWidget::class,
+        LottieAnimationWidget::class,
+        MegaMenuWidget::class,
+        HeaderInfoWidget::class,
+        HeaderOffcanvasWidget::class,
+        ClientLogoWidget::class,
+        SocialShareWidget::class,
+        CategoryListWidget::class,
+        PostListWidget::class,
     ];
 
     public function register(): void
@@ -113,6 +221,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->singleton(PageRenderer::class);
         $this->app->singleton(MenuManager::class);
         $this->app->singleton(ThemeRenderer::class);
+        $this->app->singleton(VideoManager::class);
     }
 
     public function boot(): void

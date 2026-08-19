@@ -769,6 +769,7 @@ return new class extends Migration
             $table->timestamp('last_active_at')->nullable();
             $table->timestamp('logged_in_at')->nullable();
             $table->timestamp('logged_out_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 

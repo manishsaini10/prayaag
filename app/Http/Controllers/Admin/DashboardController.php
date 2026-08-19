@@ -40,12 +40,13 @@ class DashboardController extends Controller
     protected function buildMetrics(): array
     {
         return [
-            'kpis'     => $this->kpis(),
-            'charts'   => $this->charts(),
-            'activity' => $this->activity(),
-            'builder'  => $this->builderOverview(),
-            'media'    => $this->mediaOverview(),
-            'seo'      => $this->seoOverview(),
+            'kpis'       => $this->kpis(),
+            'charts'     => $this->charts(),
+            'activity'   => $this->activity(),
+            'builder'    => $this->builderOverview(),
+            'media'      => $this->mediaOverview(),
+            'seo'        => $this->seoOverview(),
+            'emailStats' => $this->emailOverview(),
         ];
     }
 
@@ -191,6 +192,19 @@ class DashboardController extends Controller
             'published'   => $published->count(),
             'missingDesc' => $missing,
             'covered'     => $published->count() - $missing,
+        ];
+    }
+
+    protected function emailOverview(): array
+    {
+        $activeConfig = \App\Models\EmailProviderConfig::active()->first();
+
+        return [
+            'sentToday' => \App\Models\EmailLog::where('status', 'sent')->whereDate('sent_at', today())->count(),
+            'sentWeek' => \App\Models\EmailLog::where('status', 'sent')->where('sent_at', '>=', now()->subWeek())->count(),
+            'failedWeek' => \App\Models\EmailLog::where('status', 'failed')->where('created_at', '>=', now()->subWeek())->count(),
+            'activeProvider' => $activeConfig ? $activeConfig->label : 'Log Provider (Dev)',
+            'subscribers' => \App\Models\NewsletterSubscriber::subscribed()->count(),
         ];
     }
 

@@ -25,5 +25,33 @@ Route::middleware('auth')->group(function () {
 });
 
 use App\Http\Controllers\Chatbot\SentimentController;
+use App\Http\Controllers\Api\V1\PublicApiController;
 
 Route::post('chatbot/sentiment', [SentimentController::class, 'analyse']);
+
+// ── Versioned REST API v1 (Headless & Mobile) ──────────────────────────────
+Route::prefix('v1')->middleware(['cors', 'http.cache:300'])->name('api.v1.')->group(function () {
+    Route::get('pages/{slug}', [PublicApiController::class, 'page'])->name('page');
+    Route::get('mess-menu', [PublicApiController::class, 'messMenu'])->name('mess-menu');
+    Route::get('academic-calendar', [PublicApiController::class, 'academicCalendar'])->name('academic-calendar');
+    Route::get('testimonials', [PublicApiController::class, 'testimonials'])->name('testimonials');
+    Route::get('video-testimonials', [PublicApiController::class, 'videoTestimonials'])->name('video-testimonials');
+    Route::get('jobs', [PublicApiController::class, 'jobListings'])->name('jobs');
+});
+
+// ── Automated Git Deployment Webhook ─────────────────────────────────────────
+Route::match(['GET', 'POST'], 'deploy/webhook', function (\Illuminate\Http\Request $request, \App\Core\Updater\AutoDeployerService $deployer) {
+    $expectedToken = substr(hash('sha256', config('app.key') . 'deploy_secret'), 0, 32);
+    $providedToken = $request->input('token') ?? $request->header('X-Deploy-Token');
+
+    if (!$providedToken || !hash_equals($expectedToken, $providedToken)) {
+        return response()->json(['error' => 'Unauthorized: Invalid token'], 403);
+    }
+
+    $branch = $request->input('branch', 'main');
+    $result = $deployer->deploy($branch);
+
+    return response()->json($result, $result['success'] ? 200 : 500);
+});
+
+

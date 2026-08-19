@@ -8,20 +8,22 @@
     $shortDay  = ['monday'=>'Mon','tuesday'=>'Tue','wednesday'=>'Wed',
                   'thursday'=>'Thu','friday'=>'Fri','saturday'=>'Sat','sunday'=>'Sun'];
 
-    function messMenuEmoji(string $n): string {
-        $d = strtolower($n);
-        if (str_contains($d,'paneer'))  return '🧀';
-        if (str_contains($d,'dal'))     return '🫘';
-        if (str_contains($d,'rice')||str_contains($d,'pulao')) return '🍚';
-        if (str_contains($d,'roti')||str_contains($d,'chapati')||str_contains($d,'poori')||str_contains($d,'naan')) return '🫓';
-        if (str_contains($d,'salad'))   return '🥗';
-        if (str_contains($d,'custard')||str_contains($d,'halwa')||str_contains($d,'kheer')||str_contains($d,'seviya')) return '🍮';
-        if (str_contains($d,'noodle')||str_contains($d,'chowmein')||str_contains($d,'manchurian')) return '🍜';
-        if (str_contains($d,'aloo')||str_contains($d,'potato')) return '🥔';
-        if (str_contains($d,'rajma'))   return '🫘';
-        if (str_contains($d,'raita')||str_contains($d,'kadhi')) return '🥣';
-        if (str_contains($d,'veg')||str_contains($d,'gobhi')||str_contains($d,'bhindi')) return '🥦';
-        return '🍛';
+    if (!function_exists('messMenuEmoji')) {
+        function messMenuEmoji(string $n): string {
+            $d = strtolower($n);
+            if (str_contains($d,'paneer'))  return '🧀';
+            if (str_contains($d,'dal'))     return '🫘';
+            if (str_contains($d,'rice')||str_contains($d,'pulao')) return '🍚';
+            if (str_contains($d,'roti')||str_contains($d,'chapati')||str_contains($d,'poori')||str_contains($d,'naan')) return '🫓';
+            if (str_contains($d,'salad'))   return '🥗';
+            if (str_contains($d,'custard')||str_contains($d,'halwa')||str_contains($d,'kheer')||str_contains($d,'seviya')) return '🍮';
+            if (str_contains($d,'noodle')||str_contains($d,'chowmein')||str_contains($d,'manchurian')) return '🍜';
+            if (str_contains($d,'aloo')||str_contains($d,'potato')) return '🥔';
+            if (str_contains($d,'rajma'))   return '🫘';
+            if (str_contains($d,'raita')||str_contains($d,'kadhi')) return '🥣';
+            if (str_contains($d,'veg')||str_contains($d,'gobhi')||str_contains($d,'bhindi')) return '🥦';
+            return '🍛';
+        }
     }
 @endphp
 
@@ -131,27 +133,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($days as $idx => $day)
+                        @php
+                            $scheduleList = $schedule ?? [];
+                            if (empty($scheduleList)) {
+                                foreach($days as $idx => $day) {
+                                    $dateObj = $menu->effective_from->copy()->addDays($idx);
+                                    $mealData = ($day === $todayDay && isset($specialOverrides['lunch']))
+                                        ? $specialOverrides['lunch']
+                                        : ($grouped[$day]['lunch'] ?? ['items' => [], 'notes' => '']);
+                                    $scheduleList[] = [
+                                        'date' => $dateObj,
+                                        'date_str' => $dateObj->format('Y-m-d'),
+                                        'day_key' => $day,
+                                        'day_name' => $dayLabels[$day] ?? ucfirst($day),
+                                        'dishes' => $mealData['items'] ?? [],
+                                        'notes' => $mealData['notes'] ?? '',
+                                        'has_lunch' => !empty($mealData['items']),
+                                    ];
+                                }
+                            }
+                            $todayDateStr = \Illuminate\Support\Carbon::now()->format('Y-m-d');
+                        @endphp
+                        @foreach($scheduleList as $row)
                             @php
-                                $isToday  = ($day === $todayDay);
-                                $dateObj  = $menu->effective_from->copy()->addDays($idx);
-                                $mealData = ($isToday && isset($specialOverrides['lunch']))
-                                    ? $specialOverrides['lunch']
-                                    : ($grouped[$day]['lunch'] ?? ['items' => [], 'notes' => '']);
-                                $dishes   = $mealData['items'] ?? [];
-                                $note     = $mealData['notes'] ?? '';
-                                $hasLunch = !empty($dishes);
+                                $isToday  = ($row['date_str'] === $todayDateStr);
+                                $dishes   = $row['dishes'];
+                                $note     = $row['notes'];
+                                $hasLunch = $row['has_lunch'];
                                 $rowText  = strtolower(implode(' ', $dishes) . ' ' . $note);
                             @endphp
-                            <tr x-show="rowVisible('{{ $day }}', {{ json_encode($rowText) }})"
+                            <tr x-show="rowVisible('{{ $row['day_key'] }}', {{ json_encode($rowText) }})"
                                 class="mm-row {{ $isToday ? 'mm-row-today' : '' }}">
                                 <td class="mm-cell mm-cell-day">
                                     @if($isToday)
                                         <span class="mm-today-badge">Today</span>
                                     @endif
-                                    {{ $dayLabels[$day] }}
+                                    {{ $row['day_name'] }}
                                 </td>
-                                <td class="mm-cell mm-cell-date">{{ $dateObj->format('d M Y') }}</td>
+                                <td class="mm-cell mm-cell-date">{{ $row['date']->format('d M Y') }}</td>
                                 <td class="mm-cell mm-cell-dishes">
                                     @if($hasLunch)
                                         <div class="mm-dishes">
@@ -170,7 +189,7 @@
                                     @endif
                                 </td>
                                 <td class="mm-cell mm-cell-status">
-                                    @if($isToday)
+                                    @if($isToday && $hasLunch)
                                         <span class="mm-status mm-status-serving">
                                             <span class="mm-status-pulse"></span>
                                             Serving Now
@@ -182,7 +201,7 @@
                                     @endif
                                 </td>
                                 <td class="mm-cell mm-cell-view">
-                                    <button x-on:click="openModal({{ json_encode($dayLabels[$day]) }}, '{{ $dateObj->format('d M Y') }}', {{ json_encode($dishes) }}, {{ json_encode($note) }})"
+                                    <button x-on:click="openModal({{ json_encode($row['day_name']) }}, '{{ $row['date']->format('d M Y') }}', {{ json_encode($dishes) }}, {{ json_encode($note) }})"
                                             class="mm-view-btn" title="Quick View">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -199,16 +218,14 @@
 
         {{-- ── TODAY HIGHLIGHT BANNER ── --}}
         @php
-            $todayBanner = ($menu && isset($specialOverrides['lunch']))
-                ? $specialOverrides['lunch']
-                : ($grouped[$todayDay]['lunch'] ?? ['items' => [], 'notes' => '']);
-            $todayItems = $todayBanner['items'] ?? [];
+            $todayEntry = collect($scheduleList)->firstWhere('date_str', $todayDateStr);
+            $todayItems = $todayEntry ? $todayEntry['dishes'] : ($grouped[$todayDay]['lunch']['items'] ?? []);
         @endphp
         @if(!empty($todayItems))
             <div class="mm-banner">
                 <div class="mm-banner-icon">🍽️</div>
                 <div class="mm-banner-content">
-                    <p class="mm-banner-label">Today's Lunch · {{ $dayLabels[$todayDay] }}, {{ now()->format('d M Y') }}</p>
+                    <p class="mm-banner-label">Today's Lunch · {{ $dayLabels[$todayDay] ?? ucfirst($todayDay) }}, {{ now()->format('d M Y') }}</p>
                     <div class="mm-banner-dishes">
                         @foreach($todayItems as $ti)
                             <span class="mm-banner-dish">{{ messMenuEmoji($ti) }} {{ $ti }}</span>

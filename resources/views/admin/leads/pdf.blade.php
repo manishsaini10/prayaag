@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Leads Report — Prayaag International School</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg-soft: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            background: #fff;
+            padding: 30px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .brand h1 {
+            font-size: 22px;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .report-meta {
+            text-align: right;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .report-meta strong {
+            color: var(--text);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: var(--bg-soft);
+            color: var(--muted);
+            font-weight: 600;
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) td {
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .badge.new { background: #dbeafe; color: #1e40af; }
+        .badge.read { background: #dcfce7; color: #166534; }
+        .badge.archived { background: #f1f5f9; color: #475569; }
+
+        @media print {
+            .actions-bar { display: none !important; }
+            body { padding: 0; background: #fff; }
+            .stat-card { border-color: #cbd5e1; }
+            th { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="actions-bar">
+        <button class="btn primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        <button class="btn" onclick="window.close()">Close</button>
+    </div>
+
+    <div class="header">
+        <div class="brand">
+            <h1>Prayaag International School</h1>
+            <p>Official Admission Leads & Enquiries Audit Report</p>
+        </div>
+        <div class="report-meta">
+            <div>Generated: <strong>{{ now()->format('F d, Y · h:i A') }}</strong></div>
+            <div>Generated By: <strong>{{ auth()->user()?->name ?? 'Admin' }}</strong></div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Total Leads</div>
+            <div class="val">{{ $stats['total'] }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">New Leads</div>
+            <div class="val">{{ $stats['new'] }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Contacted</div>
+            <div class="val">{{ $stats['read'] }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Archived</div>
+            <div class="val">{{ $stats['archived'] }}</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Received</th>
+                <th>Parent Name</th>
+                <th>Contact Details</th>
+                <th>Student Details</th>
+                <th>Class Applying</th>
+                <th>Location / Address</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($leads as $index => $lead)
+                @php $meta = $lead->meta ?? []; @endphp
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td style="white-space:nowrap">{{ $lead->created_at?->format('d M Y') }}</td>
+                    <td>
+                        <strong>{{ $lead->name }}</strong>
+                        @if (!empty($meta['father_name']))<div style="font-size:11px;color:var(--muted)">Father: {{ $meta['father_name'] }}</div>@endif
+                        @if (!empty($meta['mother_name']))<div style="font-size:11px;color:var(--muted)">Mother: {{ $meta['mother_name'] }}</div>@endif
+                    </td>
+                    <td>
+                        <div>{{ $lead->email }}</div>
+                        @if ($lead->phone)<div style="color:var(--muted);font-size:11px">{{ $lead->phone }}</div>@endif
+                    </td>
+                    <td>
+                        <strong>{{ $meta['student_name'] ?? '—' }}</strong>
+                        @if (!empty($meta['dob']))<div style="font-size:11px;color:var(--text);font-weight:600">DOB: {{ \Carbon\Carbon::parse($meta['dob'])->format('d M Y') }}</div>@endif
+                        @if (!empty($meta['gender']))<div style="color:var(--muted);font-size:11px;text-transform:capitalize">Gender: {{ $meta['gender'] }}</div>@endif
+                    </td>
+                    <td><strong style="color:var(--primary)">{{ $meta['class_applying'] ?? '—' }}</strong></td>
+                    <td>{{ $meta['address'] ?? ($meta['previous_school'] ?? '—') }}</td>
+                    <td><span class="badge {{ $lead->status }}">{{ $lead->status }}</span></td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No admission leads recorded.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+</body>
+</html>

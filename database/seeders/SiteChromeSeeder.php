@@ -60,7 +60,7 @@ class SiteChromeSeeder extends Seeder
 
         // Admission CTA (header button)
         $s->set('admission_cta_label', 'Apply Now', 'string', 'header');
-        $s->set('admission_cta_url', 'https://pisp.accevate.com/registration/', 'string', 'header');
+        $s->set('admission_cta_url', '/registration', 'string', 'header');
 
         // Header utility bar (top strip) — matches the original site
         $s->set('top_note_1', 'CBSE Affiliation No. : 531592', 'string', 'header');

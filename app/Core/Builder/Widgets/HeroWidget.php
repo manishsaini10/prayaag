@@ -32,7 +32,7 @@ class HeroWidget extends AbstractWidget
             'heading'         => 'Prayaag International School, Panipat',
             'tagline'         => 'Life begins here…',
             'primary_label'   => 'Online Registration →',
-            'primary_url'     => 'https://pisp.accevate.com/registration/',
+            'primary_url'     => '/registration',
             'secondary_label' => 'Discover the School',
             'secondary_url'   => '/about-us/',
             'image'           => 'https://prayaaginternationalschool.com/wp-content/uploads/2022/01/About-Prayaag-International-School.webp',

@@ -22,6 +22,18 @@ class PipelineController extends Controller
         return view('chatbot.admin.pipelines.index', compact('pipelines'));
     }
 
+    public function create()
+    {
+        Gate::authorize('chatbot.contacts.create');
+        return view('chatbot.admin.pipelines.index', ['pipelines' => Pipeline::with(['stages' => fn($q) => $q->orderBy('sort_order')])->withCount('deals')->orderBy('sort_order')->get(), 'showCreateModal' => true]);
+    }
+
+    public function edit(Pipeline $pipeline)
+    {
+        Gate::authorize('chatbot.contacts.update');
+        return view('chatbot.admin.pipelines.show', compact('pipeline'));
+    }
+
     public function store(Request $request)
     {
         Gate::authorize('chatbot.contacts.create');

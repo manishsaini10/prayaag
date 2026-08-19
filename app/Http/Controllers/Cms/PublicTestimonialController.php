@@ -142,12 +142,12 @@ class PublicTestimonialController extends Controller
             }
         }
 
-        // Send Email Alert to Admin
+        // Send Queued Email Alert to Admin
         try {
-            Mail::html("<p>A new parent testimonial has been submitted by <b>{$testimonial->name}</b>.</p><p><b>Snippet:</b><br>\"" . substr($testimonial->testimonial, 0, 150) . "...\"</p><p>Please review and approve this testimonial in the admin panel.</p><p>Best regards,<br>Prayaag CMS</p>", function ($message) {
-                $message->to(config('mail.from.address', 'admin@prayaag.in'))
-                        ->subject('New Testimonial Received');
-            });
+            $adminEmail = config('mail.from.address', 'admin@prayaag.in');
+            $subject = 'New Testimonial Received';
+            $body = "A new parent testimonial has been submitted by {$testimonial->name}.\n\nSnippet:\n\"" . substr($testimonial->testimonial, 0, 150) . "...\"\n\nPlease review and approve this testimonial in the admin panel.";
+            Mail::to($adminEmail)->queue(new \App\Notifications\MailNotification($subject, $body, url('/admin/testimonials-console?status=pending'), 'Review Testimonial'));
         } catch (\Throwable $e) {
             Log::error("Failed to send admin submission notification email: " . $e->getMessage());
         }
@@ -254,11 +254,13 @@ class PublicTestimonialController extends Controller
 
     public function apiFeatured()
     {
-        $testimonials = Testimonial::published()
-            ->featured()
-            ->forLocation('home')
-            ->orderBy('sort_order', 'asc')
-            ->get();
+        $testimonials = \Illuminate\Support\Facades\Cache::remember('testimonials.featured', 3600, function () {
+            return Testimonial::published()
+                ->featured()
+                ->forLocation('home')
+                ->orderBy('sort_order', 'asc')
+                ->get();
+        });
 
         return response()->json($testimonials);
     }

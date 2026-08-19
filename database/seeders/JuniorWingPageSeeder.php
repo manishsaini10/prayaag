@@ -144,7 +144,7 @@ class JuniorWingPageSeeder extends Seeder
                                 'heading'      => 'Enroll Your Child in Junior Wing',
                                 'text'         => 'Give your child the best start in life. Nursery, Kindergarten and Primary education at Prayaag International School.',
                                 'button_label' => 'Apply Now →',
-                                'button_url'   => 'https://pisp.accevate.com/registration/',
+                                'button_url'   => '/registration',
                             ],
                         ]],
                     ]],

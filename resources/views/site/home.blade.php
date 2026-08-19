@@ -351,7 +351,7 @@
         <h1>Prayaag International School, Panipat</h1>
         <p class="tag">Life begins here…</p>
         <div class="cta">
-            <a class="btn" href="https://pisp.accevate.com/registration/">Online Registration →</a>
+            <a class="btn" href="/registration">Online Registration →</a>
             <a class="btn btn-ghost" href="/about-us/">Discover the School</a>
         </div>
     </div>
@@ -558,7 +558,7 @@
     <div class="container">
         <h2>Admission Open 2026-27</h2>
         <p>Give your child the Prayaag advantage. Register online today.</p>
-        <a class="btn" href="https://pisp.accevate.com/registration/">Online Registration →</a>
+        <a class="btn" href="/registration">Online Registration →</a>
     </div>
 </section>
 

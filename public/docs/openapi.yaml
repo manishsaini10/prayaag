@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Prayaag International School CMS/LMS API
+  description: Public REST API v1 for Prayaag International School CMS, powering mobile apps, headless widgets, and external integrations.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8000/api/v1
+    description: Local Development Server
+  - url: https://prayaaginternationalschool.com/api/v1
+    description: Production Server
+
+paths:
+  /pages/{slug}:
+    get:
+      summary: Fetch a published CMS page by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          example: home
+      responses:
+        '200':
+          description: Page object returned successfully
+        '404':
+          description: Page not found or unpublished
+
+  /mess-menu:
+    get:
+      summary: Fetch the active weekly mess menu
+      responses:
+        '200':
+          description: Weekly mess menu grouped by day and meal type
+
+  /academic-calendar:
+    get:
+      summary: Fetch academic calendar entries
+      responses:
+        '200':
+          description: List of academic calendar events and holidays
+
+  /testimonials:
+    get:
+      summary: Fetch published parent testimonials (paginated)
+      responses:
+        '200':
+          description: List of parent testimonials
+
+  /video-testimonials:
+    get:
+      summary: Fetch approved video testimonials
+      responses:
+        '200':
+          description: List of video testimonials with embed URLs
+
+  /jobs:
+    get:
+      summary: Fetch open job listings
+      responses:
+        '200':
+          description: List of active career opportunities

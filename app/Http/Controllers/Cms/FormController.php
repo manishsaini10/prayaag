@@ -35,12 +35,15 @@ class FormController extends Controller
         $rules = [];
         $labels = [];
         foreach ($form->fields ?? [] as $field) {
-            $key = $field['key'];
-            $rule = $field['required'] ?? false ? ['required'] : ['nullable'];
-            $rule[] = $field['type'] === 'email' ? 'email' : 'string';
+            $key = $field['key'] ?? $field['name'] ?? null;
+            if (!$key) continue;
+            
+            $fieldType = $field['type'] ?? 'text';
+            $rule = ($field['required'] ?? false) ? ['required'] : ['nullable'];
+            $rule[] = $fieldType === 'email' ? 'email' : 'string';
             $rule[] = 'max:5000';
             $rules[$key] = implode('|', $rule);
-            $labels[$key] = $field['label'];
+            $labels[$key] = $field['label'] ?? ucfirst(str_replace('_', ' ', $key));
         }
 
         $validated = $request->validate($rules, [], $labels);

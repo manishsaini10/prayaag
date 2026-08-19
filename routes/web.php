@@ -28,6 +28,9 @@ use App\Http\Controllers\Admin\AdminChatbotController;
 use App\Http\Controllers\Admin\AdminPreChatFormController;
 use App\Http\Controllers\Cms\PublicChatbotController;
 use App\Http\Controllers\Admin\AdminTestimonialController;
+use App\Http\Controllers\Admin\VideoTestimonialController;
+use App\Http\Controllers\Admin\VideoTestimonialAnalyticsController;
+use App\Http\Controllers\VideoTestimonialSubmissionController;
 use App\Http\Controllers\Cms\PublicTestimonialController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,8 +45,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/2fa/verify', [\App\Http\Controllers\Auth\TwoFactorController::class, 'verify'])->name('2fa.verify');
 });
 
-// --- Admin (authenticated) ---
-Route::middleware(['auth'])->group(function () {
+// --- Admin (authenticated + 2FA-enforced) ---
+// require.2fa: redirects admin/super-admin to 2FA setup if not yet configured,
+//              and to 2FA challenge if session has not been verified this session.
+Route::middleware(['auth', 'require.2fa'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/ai-assist', [\App\Http\Controllers\Admin\AiContentAssistController::class, 'generate'])->name('admin.ai-assist');
 
@@ -59,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/widgets', [WidgetBuilderController::class, 'index'])->name('admin.widgets.index');
     Route::get('/admin/widgets/create', [WidgetBuilderController::class, 'create'])->name('admin.widgets.create');
     Route::post('/admin/widgets', [WidgetBuilderController::class, 'store'])->name('admin.widgets.store');
+    Route::get('/admin/widgets/preview/{type}', [WidgetBuilderController::class, 'preview'])->name('admin.widgets.preview');
+    Route::post('/admin/widgets/seed/{type}', [WidgetBuilderController::class, 'seed'])->name('admin.widgets.seed');
     Route::get('/admin/widgets/{id}/edit', [WidgetBuilderController::class, 'edit'])->name('admin.widgets.edit');
     Route::put('/admin/widgets/{id}', [WidgetBuilderController::class, 'update'])->name('admin.widgets.update');
     Route::delete('/admin/widgets/{id}', [WidgetBuilderController::class, 'destroy'])->name('admin.widgets.destroy');
@@ -75,6 +82,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Admission leads (admission-type enquiries)
     Route::get('/admin/leads', [LeadController::class, 'index'])->name('admin.leads');
+    Route::get('/admin/leads/export/csv', [LeadController::class, 'exportCsv'])->name('admin.leads.export.csv');
+    Route::get('/admin/leads/export/pdf', [LeadController::class, 'exportPdf'])->name('admin.leads.export.pdf');
 
     // Admission Forms (builder + submissions)
     Route::get('/admin/forms', [FormController::class, 'index'])->name('admin.forms.index');
@@ -88,6 +97,8 @@ Route::middleware(['auth'])->group(function () {
     // Upload Center
     Route::get('/admin/upload', [UploadController::class, 'index'])->name('admin.upload');
     Route::post('/admin/upload', [UploadController::class, 'store'])->name('admin.upload.store');
+    Route::delete('/admin/upload/{id}', [UploadController::class, 'destroy'])->name('admin.upload.destroy');
+
 
     // Enquiries
     Route::get('/admin/enquiries', [InboxController::class, 'enquiries'])->name('admin.enquiries');
@@ -130,6 +141,48 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
     Route::post('/admin/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('admin.notifications.read-all');
     Route::post('/admin/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('admin.notifications.read');
+
+    // --- Phase 7 Dynamic Email System & Newsletter ---
+    Route::prefix('/admin/settings/email-providers')->name('admin.email-providers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EmailProviderController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\EmailProviderController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\EmailProviderController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\EmailProviderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\EmailProviderController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\EmailProviderController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/test', [\App\Http\Controllers\Admin\EmailProviderController::class, 'testConnection'])->name('test');
+        Route::post('/{id}/set-active', [\App\Http\Controllers\Admin\EmailProviderController::class, 'setActive'])->name('set-active');
+    });
+
+    Route::prefix('/admin/settings/email-templates')->name('admin.email-templates.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('update');
+        Route::post('/{id}/test-send', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'testSend'])->name('test-send');
+        Route::post('/{id}/revert/{revisionId}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'revert'])->name('revert');
+        Route::post('/{id}/toggle', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'toggle'])->name('toggle');
+    });
+
+    Route::prefix('/admin/email-logs')->name('admin.email-logs.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('index');
+        Route::post('/{id}/resend', [\App\Http\Controllers\Admin\EmailLogController::class, 'resend'])->name('resend');
+    });
+
+    Route::prefix('/admin/newsletter/campaigns')->name('admin.newsletter.campaigns.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\NewsletterController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\NewsletterController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\NewsletterController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\NewsletterController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/send-now', [\App\Http\Controllers\Admin\NewsletterController::class, 'sendNow'])->name('send-now');
+    });
+
+    Route::prefix('/admin/newsletter/subscribers')->name('admin.newsletter.subscribers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'index'])->name('index');
+        Route::post('/{id}/unsubscribe', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+        Route::get('/export', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'export'])->name('export');
+    });
 
     // Instagram Feed (Facebook OAuth + Meta Graph API enterprise module)
     Route::prefix('/admin/instagram')->name('admin.instagram.')->group(function () {
@@ -270,6 +323,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/revoke', [\App\Http\Controllers\Admin\ApiTokenController::class, 'revoke'])->name('revoke');
     });
 
+    // CMS Update System
+    Route::prefix('/admin/updates')->name('admin.updates.')->group(function () {
+        Route::get('/',               [\App\Http\Controllers\Admin\UpdateController::class, 'index'])->name('index');
+        Route::post('/upload',        [\App\Http\Controllers\Admin\UpdateController::class, 'upload'])->name('upload');
+        Route::get('/confirm',        [\App\Http\Controllers\Admin\UpdateController::class, 'confirm'])->name('confirm');
+        Route::post('/apply',         [\App\Http\Controllers\Admin\UpdateController::class, 'apply'])->name('apply');
+        Route::post('/backup',        [\App\Http\Controllers\Admin\UpdateController::class, 'backup'])->name('backup');
+        Route::post('/git-pull',      [\App\Http\Controllers\Admin\UpdateController::class, 'gitPull'])->name('git-pull');
+        Route::post('/{id}/rollback', [\App\Http\Controllers\Admin\UpdateController::class, 'rollback'])->name('rollback');
+    });
+
+
+
     // Funnel Analytics
     Route::get('/admin/funnel', [\App\Http\Controllers\Admin\FunnelController::class, 'index'])->name('admin.funnel');
     Route::get('/admin/funnel/data', [\App\Http\Controllers\Admin\FunnelController::class, 'data'])->name('admin.funnel.data');
@@ -291,6 +357,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update/{id}', [AdminTestimonialController::class, 'update'])->name('update');
         Route::post('/duplicate/{id}', [AdminTestimonialController::class, 'duplicate'])->name('duplicate');
         Route::delete('/delete/{id}', [AdminTestimonialController::class, 'destroy'])->name('destroy');
+    });
+
+    // Video Testimonials Admin Console
+    Route::prefix('/admin/video-testimonials')->name('admin.video-testimonials.')->group(function () {
+        Route::get('/', [VideoTestimonialController::class, 'index'])->name('index');
+        Route::get('/create', [VideoTestimonialController::class, 'create'])->name('create');
+        Route::post('/', [VideoTestimonialController::class, 'store'])->name('store');
+        Route::get('/settings', [\App\Http\Controllers\Admin\VideoTestimonialSettingsController::class, 'index'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\VideoTestimonialSettingsController::class, 'update'])->name('settings.update');
+        Route::post('/settings/sync-instagram', [\App\Http\Controllers\Admin\VideoTestimonialSettingsController::class, 'syncInstagram'])->name('settings.sync-instagram');
+        Route::get('/analytics', [VideoTestimonialAnalyticsController::class, 'index'])->name('analytics');
+        Route::get('/{id}/edit', [VideoTestimonialController::class, 'edit'])->name('edit');
+        Route::patch('/{id}', [VideoTestimonialController::class, 'update'])->name('update');
+        Route::post('/{id}/approve', [VideoTestimonialController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [VideoTestimonialController::class, 'reject'])->name('reject');
+        Route::delete('/{id}', [VideoTestimonialController::class, 'destroy'])->name('destroy');
     });
 
     // GDPR & Data Privacy (Admin)
@@ -336,15 +418,26 @@ Route::prefix('/chatbot/track')->middleware('cors')->name('chatbot.track.')->gro
 });
 
 // --- Academic Calendar Public Routes ---
-Route::get('/academic-calendar', [\App\Http\Controllers\AcademicCalendarController::class, 'index'])->name('academic-calendar.index');
-Route::get('/academic-calendar/feed', [\App\Http\Controllers\AcademicCalendarController::class, 'feed'])->name('academic-calendar.feed');
-Route::get('/academic-calendar/export-pdf', [\App\Http\Controllers\AcademicCalendarController::class, 'exportPdf'])->name('academic-calendar.pdf');
+Route::get('/academic-calendar', [\App\Http\Controllers\AcademicCalendarController::class, 'index'])
+    ->middleware('http.cache:300')
+    ->name('academic-calendar.index');
+Route::get('/academic-calendar/feed', [\App\Http\Controllers\AcademicCalendarController::class, 'feed'])
+    ->middleware('http.cache:300')
+    ->name('academic-calendar.feed');
+Route::get('/academic-calendar/export-pdf', [\App\Http\Controllers\AcademicCalendarController::class, 'exportPdf'])
+    ->middleware('http.cache:600')
+    ->name('academic-calendar.pdf');
 
-// --- Mess Menu PDF Download ---
-Route::get('/mess-menu/pdf', [\App\Http\Controllers\MessMenuController::class, 'downloadPdf'])->name('mess-menu.pdf');
+// --- Mess Menu (public page + PDF) ---
+Route::get('/mess-menu', [\App\Http\Controllers\MessMenuController::class, 'index'])
+    ->middleware('http.cache:300')
+    ->name('mess-menu.index');
+Route::get('/mess-menu/pdf', [\App\Http\Controllers\MessMenuController::class, 'downloadPdf'])
+    ->middleware(['throttle:10,1', 'http.cache:600'])
+    ->name('mess-menu.pdf');
 
 // --- Instagram Feed (public API for load-more) ---
-Route::get('/__ig/feed', [\App\Http\Controllers\Cms\InstagramFeedController::class, 'feed']);
+Route::get('/__ig/feed', [\App\Http\Controllers\Cms\InstagramFeedController::class, 'feed'])->middleware('http.cache:300');
 
 // --- Public form submissions (rate-limited, honeypot-guarded) ---
 Route::post('/enquiries', [EnquiryController::class, 'store'])
@@ -352,46 +445,69 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
     ->name('enquiries.store');
 
 Route::post('/jobs/apply', [JobApplicationController::class, 'store'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:5,1')
     ->name('jobs.apply');
 
 Route::post('/subscribe', [SubscriberController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('subscribe.store');
 
+// --- Standalone Online Registration Form ---
+Route::get('/registration', [\App\Http\Controllers\Cms\RegistrationController::class, 'show'])->name('admissions.register');
+Route::get('/admissions/register', [\App\Http\Controllers\Cms\RegistrationController::class, 'show']);
+Route::post('/admissions/store', [\App\Http\Controllers\Cms\RegistrationController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('admissions.store');
+
 // --- Public custom forms (admission enquiry forms, etc.) ---
-Route::get('/forms/{slug}', [PublicFormController::class, 'show'])->name('public.form');
+Route::get('/forms/{slug}', [PublicFormController::class, 'show'])->middleware('http.cache:300')->name('public.form');
 Route::post('/forms/{slug}', [PublicFormController::class, 'submit'])
     ->middleware('throttle:10,1')
     ->name('public.form.submit');
 
 // --- SEO (generated live from published pages) ---
-Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
-Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
-Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
-Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
+Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->middleware('http.cache:600')->name('sitemap');
+Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->middleware('http.cache:600')->name('sitemap.pages');
+Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->middleware('http.cache:600')->name('sitemap.images');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->middleware('http.cache:86400')->name('robots');
 // IndexNow ownership key file (only matches lowercase-hex .txt filenames).
 Route::get('/{key}.txt', [SitemapController::class, 'indexNowKey'])->where('key', '[a-f0-9]{8,128}')->name('indexnow.key');
 
 // --- Public marketing site ---
 // The home page is now fully builder-driven (CMS). The original static design
 // is preserved at /legacy-home for reference/rollback.
-Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/', [PageController::class, 'home'])->middleware('http.cache:300')->name('home');
 Route::get('/legacy-home', [SiteController::class, 'home'])->name('legacy.home');
 Route::get('/search', [SiteSearchController::class, 'index'])->name('search');
 
 // --- Public custom testimonials ---
 Route::post('/testimonials', [PublicTestimonialController::class, 'store'])->middleware('throttle:10,1')->name('testimonials.store');
-Route::get('/testimonials', [PublicTestimonialController::class, 'index'])->name('testimonials.index');
-Route::get('/api/testimonials', [PublicTestimonialController::class, 'apiList'])->name('testimonials.api.list');
-Route::get('/api/featured-testimonials', [PublicTestimonialController::class, 'apiFeatured'])->name('testimonials.api.featured');
+Route::get('/testimonials', [PublicTestimonialController::class, 'index'])->middleware('http.cache:300')->name('testimonials.index');
+Route::get('/api/testimonials', [PublicTestimonialController::class, 'apiList'])->middleware('http.cache:300')->name('testimonials.api.list');
+Route::get('/api/featured-testimonials', [PublicTestimonialController::class, 'apiFeatured'])->middleware('http.cache:300')->name('testimonials.api.featured');
+
+// --- Video Testimonials (public submission) ---
+Route::get('/video-testimonials/submit', [VideoTestimonialSubmissionController::class, 'show'])
+    ->middleware('http.cache:300')
+    ->name('video-testimonials.submit');
+Route::post('/video-testimonials/submit', [VideoTestimonialSubmissionController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('video-testimonials.submit.store');
+Route::post('/video-testimonials/track', [VideoTestimonialAnalyticsController::class, 'track'])
+    ->middleware('throttle:60,1')
+    ->name('video-testimonials.track');
 
 // --- GDPR / Data Privacy Public Requests ---
 Route::get('/privacy/request-my-data', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'showForm'])->name('privacy.form');
 Route::post('/privacy/request-my-data', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'submit'])->name('privacy.submit');
 Route::get('/privacy/verify/{token}', [\App\Core\Privacy\Http\Controllers\PrivacyRequestController::class, 'verify'])->name('privacy.verify');
 
+// --- Public Newsletter Double Opt-in & Unsubscribe ---
+Route::get('/newsletter/confirm/{token}', [\App\Http\Controllers\Cms\NewsletterController::class, 'confirm'])->name('newsletter.confirm');
+Route::get('/newsletter/unsubscribe/{id}', [\App\Http\Controllers\Cms\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
 // --- Public CMS (kept last; catch-all excludes reserved paths) ---
 Route::get('/cms-home', [PageController::class, 'home'])->name('cms.home'); // alias of /
 Route::get('/{slug}', [PageController::class, 'show'])
-    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|legacy-home$|cms-home$|testimonials$|api$|privacy$|privacy/)[A-Za-z0-9\-_/]+');
+    ->middleware('http.cache:300')
+    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|registration$|admissions/store$|legacy-home$|cms-home$|testimonials$|video-testimonials$|api$|privacy$|privacy/)[A-Za-z0-9\-_/]+');

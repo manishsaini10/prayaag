@@ -49,6 +49,16 @@ class InboxController extends Controller
         $data = $request->validate(['status' => 'required|in:new,reviewing,rejected,hired']);
         $application->update(['status' => $data['status']]);
 
+        try {
+            app(\App\Core\Mail\MailManager::class)->send('job_application_status_changed', [
+                'candidate_name' => $application->name,
+                'job_title' => $application->jobListing->title ?? 'Position',
+                'status' => ucfirst($data['status']),
+            ], $application->email);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to send job application status change email: " . $e->getMessage());
+        }
+
         return back();
     }
 

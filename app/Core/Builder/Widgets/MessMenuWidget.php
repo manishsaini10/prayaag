@@ -53,6 +53,8 @@ class MessMenuWidget extends AbstractWidget
         $menu = $data['menu'] ?? null;
         $grouped = $data['grouped'] ?? [];
 
+        $schedule = $data['schedule'] ?? [];
+
         // Check for today's special day override
         $specialOverrides = [];
         if ($this->setting($settings, 'show_special_days', true)) {
@@ -63,6 +65,7 @@ class MessMenuWidget extends AbstractWidget
         return view('widgets.mess-menu', [
             'menu' => $menu,
             'grouped' => $grouped,
+            'schedule' => $schedule,
             'specialOverrides' => $specialOverrides,
             'settings' => $settings,
             'title' => $this->setting($settings, 'title', 'Weekly Mess Menu'),

@@ -57,6 +57,19 @@ class DealController extends Controller
         return view('chatbot.admin.deals.kanban', compact('pipelines'));
     }
 
+    public function create()
+    {
+        Gate::authorize('chatbot.contacts.create');
+        return view('chatbot.admin.deals.index', ['deals' => Deal::with(['contact', 'pipeline', 'stage', 'company'])->orderBy('created_at', 'desc')->paginate(20), 'pipelines' => Pipeline::where('is_active', true)->get(), 'showCreateModal' => true]);
+    }
+
+    public function edit(Deal $deal)
+    {
+        Gate::authorize('chatbot.contacts.update');
+        $deal->load(['contact', 'pipeline', 'stage', 'company']);
+        return view('chatbot.admin.deals.show', compact('deal'));
+    }
+
     public function store(Request $request)
     {
         Gate::authorize('chatbot.contacts.create');

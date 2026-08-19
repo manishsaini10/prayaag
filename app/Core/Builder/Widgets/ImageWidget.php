@@ -23,7 +23,7 @@ class ImageWidget extends AbstractWidget
 
     public function defaultSettings(): array
     {
-        return ['src' => '', 'alt' => ''];
+        return ['src' => 'https://prayaaginternationalschool.com/wp-content/uploads/2022/01/About-Prayaag-International-School.webp', 'alt' => 'Prayaag International School'];
     }
 
     public function render(array $settings, array $context = []): string

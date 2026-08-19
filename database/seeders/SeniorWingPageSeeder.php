@@ -144,7 +144,7 @@ class SeniorWingPageSeeder extends Seeder
                                 'heading'      => 'Enroll in Senior Wing',
                                 'text'         => 'Give your child the best secondary education at Prayaag International School. CBSE curriculum with holistic development.',
                                 'button_label' => 'Apply Now →',
-                                'button_url'   => 'https://pisp.accevate.com/registration/',
+                                'button_url'   => '/registration',
                             ],
                         ]],
                     ]],

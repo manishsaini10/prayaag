@@ -27,7 +27,7 @@ class AnnouncementBarWidget extends AbstractWidget
         return [
             'text'       => 'Admissions Open for 2026-27 — limited seats available.',
             'link_label' => 'Apply Now',
-            'link_url'   => 'https://pisp.accevate.com/registration/',
+            'link_url'   => '/registration',
         ];
     }
 

@@ -16,7 +16,7 @@ class RequireTwoFactor
             $route = $request->route();
             $routeName = $route ? $route->getName() : '';
 
-            // 1. Skip checks for 2FA actions or logging out to avoid redirect loops
+            // Skip checks for 2FA actions or logging out to avoid redirect loops
             $excluded = [
                 '2fa.challenge',
                 '2fa.verify',
@@ -30,17 +30,15 @@ class RequireTwoFactor
                 return $next($request);
             }
 
-            // 2. Enforce challenge validation if 2FA is enabled
+            // If the user has 2FA enabled and has NOT passed the session challenge,
+            // redirect them to the challenge page to enter their TOTP code.
             if ($user->two_factor_enabled && !session('2fa_passed')) {
                 return redirect()->route('2fa.challenge');
             }
 
-            // 3. Enforce mandatory 2FA setup for Admin/Super-Admin roles
-            $hasAdminRole = $user->roles->contains(fn ($role) => in_array($role->name, ['admin', 'super-admin']));
-            if ($hasAdminRole && !$user->two_factor_enabled) {
-                return redirect()->route('2fa.setup')
-                    ->with('warning', 'Two-Factor Authentication is mandatory for your administrative role. Please set up 2FA to proceed.');
-            }
+            // NOTE: Mandatory 2FA setup enforcement has been removed.
+            // Admin users who have NOT enabled 2FA can continue using the panel normally.
+            // They can optionally set it up via their profile settings.
         }
 
         return $next($request);

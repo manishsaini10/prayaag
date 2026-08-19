@@ -30,11 +30,13 @@
     .mtile .meta{padding:8px 10px}
     .mtile .meta .n{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .mtile .meta .s{font-size:11px;color:var(--text-muted)}
-    .mtile .copy-link{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border:none;color:#fff;cursor:pointer;display:grid;place-items:center;opacity:0;transition:opacity .18s;z-index:2}
-    .mtile:hover .copy-link{opacity:1}
-    .mtile .copy-link svg{width:14px;height:14px}
-    .mtile .copy-link:hover{background:rgba(0,0,0,.8)}
-    .mtile .copy-link.copied{background:var(--success)}
+    .mtile .actions-overlay{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .18s;z-index:2}
+    .mtile:hover .actions-overlay{opacity:1}
+    .mtile .action-btn{width:28px;height:28px;border-radius:7px;background:rgba(15,23,42,.75);backdrop-filter:blur(6px);border:none;color:#fff;cursor:pointer;display:grid;place-items:center;transition:background .15s,transform .15s}
+    .mtile .action-btn:hover{background:rgba(15,23,42,.95);transform:scale(1.06)}
+    .mtile .action-btn svg{width:13px;height:13px}
+    .mtile .action-btn.del:hover{background:#ef4444}
+    .mtile .action-btn.copied{background:var(--success)}
     .toast-copy{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 22px;border-radius:10px;font-size:13.5px;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;transition:opacity .25s;pointer-events:none}
     .toast-copy.show{opacity:1}
 </style>
@@ -65,7 +67,7 @@
 
 <div class="flex items-center justify-between mb-2">
     <span class="font-semibold" style="color:var(--text)">Recent uploads</span>
-    <a class="link text-[13px]" href="{{ url('/admin/m/media') }}">View all →</a>
+    <a class="link text-[13px]" href="{{ url('/admin/m/media') }}">View all in Media Library →</a>
 </div>
 
 <div class="toast-copy" id="toastCopy">Link copied</div>
@@ -74,9 +76,18 @@
     @forelse ($recent as $m)
         @php $url = \Illuminate\Support\Facades\Storage::disk($m->disk ?? 'public')->url($m->path); $rel = '/storage/' . ltrim($m->path, '/'); @endphp
         <div class="mtile" data-url="{{ $rel }}">
-            <button class="copy-link" onclick="copyMediaLink(this)" title="Copy link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+            <div class="actions-overlay">
+                <button class="action-btn" onclick="copyMediaLink(this)" title="Copy link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+                <form method="POST" action="{{ route('admin.upload.destroy', $m->id) }}" onsubmit="return confirm('Are you sure you want to permanently delete this file: {{ addslashes($m->original_name) }}?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="action-btn del" title="Delete file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                </form>
+            </div>
             <div class="thumb">
                 @if (str_starts_with((string) $m->mime_type, 'image/'))
                     <img src="{{ $rel }}" alt="{{ $m->original_name }}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'ext\'>{{ $m->extension ?: 'img' }}</span>'">
@@ -94,6 +105,7 @@
         <div class="empty" style="grid-column:1/-1">No uploads yet.</div>
     @endforelse
 </div>
+
 
 <script>
     (function () {

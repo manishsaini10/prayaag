@@ -6,7 +6,7 @@ use App\Core\Builder\AbstractWidget;
 use App\Models\JobListing;
 
 /**
- * Dynamic widget: lists currently open job listings.
+ * Dynamic widget: Ultra-Premium Careers Page & Job Application Portal.
  */
 class JobListingsWidget extends AbstractWidget
 {
@@ -17,7 +17,7 @@ class JobListingsWidget extends AbstractWidget
 
     public function label(): string
     {
-        return 'Job Listings';
+        return 'Job Listings & Application Portal';
     }
 
     public function category(): string
@@ -27,7 +27,11 @@ class JobListingsWidget extends AbstractWidget
 
     public function defaultSettings(): array
     {
-        return ['limit' => 10];
+        return [
+            'limit'   => 12,
+            'heading' => 'Careers at Prayaag International',
+            'eyebrow' => 'Shape The Future With Us',
+        ];
     }
 
     public function isDynamic(): bool
@@ -37,21 +41,20 @@ class JobListingsWidget extends AbstractWidget
 
     public function render(array $settings, array $context = []): string
     {
-        $limit = max(1, (int) $this->setting($settings, 'limit', 10));
+        $limit = max(1, (int) $this->setting($settings, 'limit', 12));
 
         $jobs = JobListing::open()->latest()->limit($limit)->get();
 
-        if ($jobs->isEmpty()) {
-            return '<div class="pb-jobs pb-empty"></div>';
-        }
+        $categories = JobListing::open()
+            ->distinct()
+            ->pluck('department')
+            ->filter()
+            ->values();
 
-        $items = '';
-        foreach ($jobs as $job) {
-            $meta = array_filter([$job->department, $job->location]);
-            $sub = $meta ? ' <span class="pb-job__meta">' . $this->e(implode(' · ', $meta)) . '</span>' : '';
-            $items .= '<li class="pb-job">' . $this->e($job->title) . $sub . '</li>';
-        }
-
-        return '<div class="pb-jobs"><ul>' . $items . '</ul></div>';
+        return view('widgets.careers-page', [
+            'jobs'       => $jobs,
+            'categories' => $categories,
+            'settings'   => $settings,
+        ])->render();
     }
 }

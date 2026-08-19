@@ -178,27 +178,42 @@
 
     {{-- Today's Quick Highlight --}}
     @php
-        $todayDay   = strtolower(\Illuminate\Support\Carbon::now()->format('l'));
-        $todayLabel = ucfirst($todayDay);
-        $todayData  = $grouped[$todayDay]['lunch'] ?? ['items' => [], 'notes' => ''];
-        $todayItems = $todayData['items'] ?? [];
+        $todayDateStr = \Illuminate\Support\Carbon::now()->format('Y-m-d');
+        $todayDay     = strtolower(\Illuminate\Support\Carbon::now()->format('l'));
+        $scheduleList = $schedule ?? [];
+        if (empty($scheduleList)) {
+            $days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            $dayLabels = [
+                'monday'=>'Monday','tuesday'=>'Tuesday','wednesday'=>'Wednesday',
+                'thursday'=>'Thursday','friday'=>'Friday','saturday'=>'Saturday','sunday'=>'Sunday',
+            ];
+            foreach($days as $idx => $day) {
+                $dateObj = $menu->effective_from->copy()->addDays($idx);
+                $mealData = ($day === $todayDay && isset($specialOverrides['lunch']))
+                    ? $specialOverrides['lunch']
+                    : ($grouped[$day]['lunch'] ?? ['items' => [], 'notes' => '']);
+                $scheduleList[] = [
+                    'date' => $dateObj,
+                    'date_str' => $dateObj->format('Y-m-d'),
+                    'day_key' => $day,
+                    'day_name' => $dayLabels[$day] ?? ucfirst($day),
+                    'dishes' => $mealData['items'] ?? [],
+                    'notes' => $mealData['notes'] ?? '',
+                    'has_lunch' => !empty($mealData['items']),
+                ];
+            }
+        }
+        $todayEntry = collect($scheduleList)->firstWhere('date_str', $todayDateStr);
+        $todayItems = $todayEntry ? $todayEntry['dishes'] : ($grouped[$todayDay]['lunch']['items'] ?? []);
     @endphp
     @if(!empty($todayItems))
         <div class="today-box">
-            <div class="label">🍽 Today's Lunch · {{ $todayLabel }}, {{ now()->format('d M Y') }}</div>
+            <div class="label">🍽 Today's Lunch · {{ ucfirst(strtolower(now()->format('l'))) }}, {{ now()->format('d M Y') }}</div>
             <div class="dishes">{{ implode(' · ', $todayItems) }}</div>
         </div>
     @endif
 
     {{-- Menu Table --}}
-    @php
-        $days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-        $dayLabels = [
-            'monday'=>'Monday','tuesday'=>'Tuesday','wednesday'=>'Wednesday',
-            'thursday'=>'Thursday','friday'=>'Friday','saturday'=>'Saturday','sunday'=>'Sunday',
-        ];
-    @endphp
-
     <table>
         <thead>
             <tr>
@@ -209,23 +224,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($days as $idx => $day)
+            @foreach($scheduleList as $row)
                 @php
-                    $isToday  = ($day === $todayDay);
-                    $dateObj  = $menu->effective_from->copy()->addDays($idx);
-                    $mealData = ($isToday && isset($specialOverrides['lunch']))
-                        ? $specialOverrides['lunch']
-                        : ($grouped[$day]['lunch'] ?? ['items' => [], 'notes' => '']);
-                    $dishes   = $mealData['items'] ?? [];
-                    $note     = $mealData['notes'] ?? '';
-                    $hasLunch = !empty($dishes);
+                    $isToday  = ($row['date_str'] === $todayDateStr);
+                    $dishes   = $row['dishes'];
+                    $note     = $row['notes'];
+                    $hasLunch = $row['has_lunch'];
                 @endphp
                 <tr class="{{ $isToday ? 'today-row' : '' }}">
                     <td class="day-cell">
                         @if($isToday)<span class="today-badge">Today</span>@endif
-                        {{ $dayLabels[$day] }}
+                        {{ $row['day_name'] }}
                     </td>
-                    <td class="date-cell">{{ $dateObj->format('d M Y') }}</td>
+                    <td class="date-cell">{{ $row['date']->format('d M Y') }}</td>
                     <td>
                         @if($hasLunch)
                             @foreach($dishes as $dish)
@@ -239,7 +250,7 @@
                         @endif
                     </td>
                     <td>
-                        @if($isToday)
+                        @if($isToday && $hasLunch)
                             <span class="status-badge status-serving">Serving Now</span>
                         @elseif(!$hasLunch)
                             <span class="status-badge status-closed">Closed</span>

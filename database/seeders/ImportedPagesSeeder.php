@@ -829,7 +829,7 @@ PISPHTML,
 <h3 class="uppercase"><strong>Best CBSE School in Panipat <br />Admissions Open 2026-27 </strong></h3>
 <p class="uppercase"><strong>Give Your Child The Best Future at Prayaag International School Panipat.<br />
 Limited Seats Available – Apply Now. </strong></p>
-<a class="imp-btn" href="https://pisp.accevate.com/registration/">Online Registration</a>
+<a class="imp-btn" href="/registration">Online Registration</a>
 
 </div></div>
 
@@ -849,7 +849,7 @@ Limited Seats Available – Apply Now. </strong></p>
 
 <p><span style="color: #000000;">Welcome to Prayaag International School, Panipat. Our admission process is meticulously designed to ensure a seamless and transparent journey for both parents and students. Here's a step-by-step guide to navigate through the process:</span></p>
 
-<a class="imp-btn" href="https://pisp.accevate.com/registration/">Apply For Admission</a>
+<a class="imp-btn" href="/registration">Apply For Admission</a>
 
 <h2>Creating Intellectual Environment for Students</h2>
 
@@ -933,7 +933,7 @@ PISPHTML,
 <div class="imp-hero" style="background-image:url('https://prayaaginternationalschool.com/wp-content/uploads/2023/08/Prayaag-International-School-Fee-Structure.jpg');background-size:cover;background-position:center"><div class="imp-hero-in">
 
 <h3 class="uppercase"><strong>Fee Structure</strong></h3>
-<a class="imp-btn" href="https://pisp.accevate.com/registration/">Online Registration</a>
+<a class="imp-btn" href="/registration">Online Registration</a>
 
 </div></div>
 

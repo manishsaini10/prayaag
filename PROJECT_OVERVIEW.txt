@@ -1,0 +1,83 @@
+================================================================================
+                    PRAYAAG INTERNATIONAL SCHOOL — CMS & LMS
+                            PROJECT COMPLETE LOG & OVERVIEW
+================================================================================
+Created Date : 05-August-2026
+Framework    : Laravel 12.x (PHP 8.2.12)
+Database     : MySQL (school_website)
+Frontend     : Blade, Livewire 3, Alpine.js, Custom CSS (site.css), FullCalendar 6
+Server Host  : http://127.0.0.1:8000
+================================================================================
+
+1. PROJECT SUMMARY (YEH PROJECT KYA HAI?)
+--------------------------------------------------------------------------------
+Yeh Prayaag International School ka ek complete Enterprise School Management System
+(SMS/LMS) aur Dynamic Content Management System (CMS) hai. Is project mein school ki
+website, online admissions, academic calendar, hostel mess menu, custom page builder,
+aur admin management system ek jagah integrated hain.
+
+2. CORE MODULES & FEATURES (ISME KYA KYA HAI?)
+--------------------------------------------------------------------------------
+
+[A] CUSTOM PAGE BUILDER (Admin Page Builder & Live Editor)
+  - URL: /admin/pages/{id}/edit
+  - Navy Dark Toolbar, Split-Pane Live Preview (Desktop, Tablet, Mobile).
+  - Drag & Drop Section, Row, Column, aur Widget Hierarchy.
+  - Category-grouped Widgets (Hero, Text, Media, Gallery, Admission Form, etc.).
+  - Keyboard Shortcuts: Ctrl+S (Save), P (Preview), A (Add Section), R (Reload).
+
+[B] ACADEMIC CALENDAR SYSTEM
+  - Public Page: /academic-calendar
+  - Features:
+    * Session & Term Management (e.g. 2026-2027 Academic Session).
+    * Monthly View: FullCalendar 6 integration with color-coded categories:
+        - Exam / Assessment (Yellow/Red)
+        - Holiday / Vacation (Red)
+        - Important Date / PTM (Blue)
+        - Working Day Note (Grey)
+    * Full Year View: 12-month visual grid overview.
+    * Real-time Working Days & Holidays counter per month.
+    * PDF Export (/academic-calendar/export-pdf).
+
+[C] MESS MENU SYSTEM (HOSTEL & CANTEEN)
+  - Public Page: /mess-menu
+  - PDF Download: /mess-menu/pdf
+  - Features:
+    * Weekly schedule (Monday to Sunday) for Breakfast, Lunch, Snacks, Dinner.
+    * "Today's Special" meal overrides.
+    * Day filter, search dish bar, dish emojis, status badges ("Serving Now", "Scheduled").
+    * Quick View Modal & PDF Download option.
+
+[D] ADMISSIONS & ONLINE ENQUIRY SYSTEM
+  - Widget: Admissions Page Multi-step Enquiry Form.
+  - Admin Leads View: /admin/applications
+  - Parent admission enquiry logging, class selection, contact collection.
+
+[E] POPUP & WIDGET BUILDER
+  - URL: /admin/popup-builder, /admin/widget-builder
+  - Dynamic promotional popups, leads collection, analytics.
+
+[F] SYSTEM ADMIN DASHBOARD
+  - URL: /admin
+  - Premium Navy theme UI with real-time stats, quick action shortcuts, recent leads.
+
+[G] THEME & SEO ENGINE
+  - SEO Manager: Automatic meta tags, open-graph tags, dynamic slug routing.
+  - Theme Renderer: Centralized header, footer, brand primary colors (#0b2545 navy & #c79a3b gold).
+
+3. KEY DIRECTORY STRUCTURE (FOLDER LOCATION)
+--------------------------------------------------------------------------------
+- app/Http/Controllers/          : Page Controllers (AcademicCalendar, MessMenu, Admin Controllers)
+- app/Livewire/                  : Livewire Components (AcademicCalendarView, etc.)
+- app/Models/                    : Eloquent Models (AcademicSession, CalendarEntry, MessMenu, Page)
+- resources/views/               : Blade View Templates
+  ├── admin/                     : Admin panel views (editor.blade.php, dashboard.blade.php)
+  ├── academic-calendar/          : Calendar public views
+  ├── widgets/                   : Reusable Page Widgets (mess-menu, admissions)
+  └── themes/school/             : School website layouts & footers
+- routes/web.php                 : All Application Web Routes
+- public/site.css                : Main Frontend CSS Design Tokens
+
+================================================================================
+                              END OF LOG FILE
+================================================================================

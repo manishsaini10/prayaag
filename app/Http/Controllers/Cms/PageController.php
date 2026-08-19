@@ -11,6 +11,7 @@ use App\Core\Theme\ThemeRenderer;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Serves built pages on the public front-end (single-site). Pages are looked
@@ -49,7 +50,7 @@ class PageController extends Controller
         // Render page content safely – if rendering fails, fall back to a placeholder
         $content = rescue(fn () => $renderer->renderCached($page), '', false);
         if (empty($content)) {
-            \Log::warning('PageRenderer returned empty content for slug: ' . $slug);
+            Log::warning('PageRenderer returned empty content for slug: ' . $slug);
             $content = view('themes.school.partials.empty-page')->render();
         }
         $isHome = $slug === 'home';

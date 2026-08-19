@@ -235,7 +235,7 @@
 <script>
 (function () {
     var rows = document.getElementById('fieldRows');
-    var TYPES = ['text', 'textarea', 'image', 'url', 'number'];
+    var TYPES = ['text', 'textarea', 'color', 'image', 'url', 'number'];
     var existing = @json(old('fields', $widget->fields ?? []));
 
     function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }

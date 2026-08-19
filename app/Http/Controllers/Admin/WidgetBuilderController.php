@@ -17,14 +17,49 @@ use Illuminate\View\View;
  * fields + HTML template) with no code. Saved definitions are picked up by
  * CoreServiceProvider at boot and rendered by DynamicWidget, so a new widget
  * appears in the Page Builder palette immediately after saving.
+ *
+ * The WidgetStudio tab exposes all built-in registered widgets as a
+ * Widget Studio Library, letting admins one-click-seed any built-in into the DB for
+ * further customisation.
  */
 class WidgetBuilderController extends Controller
 {
-    public function index(): View
+    public function index(WidgetRegistry $registry): View
     {
-        return view('admin.widget-builder.index', [
-            'widgets' => WidgetDefinition::orderBy('name')->get(),
-        ]);
+        $customWidgets = WidgetDefinition::orderBy('name')->get();
+
+        // Build WidgetStudio library from all registered widgets
+        $allWidgets = collect($registry->all())->map(function ($widget) use ($customWidgets) {
+            $seeded = $customWidgets->firstWhere('slug', $widget->type());
+            return [
+                'type'        => $widget->type(),
+                'label'       => $widget->label(),
+                'category'    => $widget->category(),
+                'is_dynamic'  => $widget->isDynamic(),
+                'is_seeded'   => $seeded !== null,
+                'seeded_id'   => $seeded?->id,
+                'defaults'    => $widget->defaultSettings(),
+                'field_count' => count($widget->defaultSettings()),
+            ];
+        })->sortBy('label')->groupBy('category');
+
+        $categoryMeta = [
+            'hero'         => ['icon' => '🏛️',  'label' => 'Hero & Banners'],
+            'school'       => ['icon' => '🎓',  'label' => 'School Modules'],
+            'content'      => ['icon' => '📝',  'label' => 'Content Blocks'],
+            'media'        => ['icon' => '🖼️',  'label' => 'Media & Gallery'],
+            'forms'        => ['icon' => '📩',  'label' => 'Forms & Leads'],
+            'dynamic'      => ['icon' => '⚡',  'label' => 'Dynamic Widgets'],
+            'general'      => ['icon' => '🧩',  'label' => 'General Elements'],
+            'pro-general'  => ['icon' => '👑',  'label' => 'PRO General'],
+            'pro-advanced' => ['icon' => '👑',  'label' => 'PRO Advanced'],
+            'pro-creative' => ['icon' => '👑',  'label' => 'PRO Creative'],
+            'pro-features' => ['icon' => '👑',  'label' => 'PRO Features & Marketing'],
+            'pro-social'   => ['icon' => '👑',  'label' => 'PRO Reviews & Social'],
+            'custom'       => ['icon' => '✨',  'label' => 'Custom'],
+        ];
+
+        return view('admin.widget-builder.index', compact('customWidgets', 'allWidgets', 'categoryMeta'));
     }
 
     public function create(): View
@@ -54,6 +89,85 @@ class WidgetBuilderController extends Controller
 
         return redirect()->route('admin.widgets.index')
             ->with('status', 'Widget created — it is now available in the Page Builder.');
+    }
+
+    /**
+     * Seed a built-in registered widget into the DB as a WidgetDefinition,
+     * making it visible in "My Widgets" and customisable via the form editor.
+     */
+    public function seed(string $type, WidgetRegistry $registry): RedirectResponse
+    {
+        $widget = $registry->get($type);
+
+        if (! $widget) {
+            return back()->with('error', "Widget type \"{$type}\" not found in registry.");
+        }
+
+        // Prevent duplicate seeds
+        if (WidgetDefinition::where('slug', $type)->exists()) {
+            return redirect()->route('admin.widgets.index')
+                ->with('status', "\"{$widget->label()}\" is already in My Widgets.");
+        }
+
+        // Render full HTML output with default settings
+        $defaults = $widget->defaultSettings();
+        $fullHtml = $widget->render($defaults);
+        $template = $fullHtml;
+
+        // Convert defaultSettings to field definitions and interpolate into template
+        $fields = [];
+        foreach ($defaults as $key => $default) {
+            if (is_array($default)) continue; // Skip complex array fields
+            $valStr = (string) $default;
+            if ($valStr !== '') {
+                $template = str_replace(htmlspecialchars($valStr, ENT_QUOTES, 'UTF-8'), "{{ {$key} }}", $template);
+                $template = str_replace($valStr, "{{ {$key} }}", $template);
+            }
+            $fieldType = is_numeric($default) ? 'number' : (strlen($valStr) > 80 ? 'textarea' : 'text');
+            $fields[] = [
+                'key'     => $key,
+                'label'   => ucwords(str_replace('_', ' ', $key)),
+                'type'    => $fieldType,
+                'default' => $valStr,
+            ];
+        }
+
+        WidgetDefinition::create([
+            'name'      => $widget->label(),
+            'slug'      => $type,
+            'category'  => $widget->category(),
+            'template'  => $template,
+            'fields'    => $fields,
+            'is_active' => true,
+        ]);
+
+        Cache::flush();
+
+        return redirect()->route('admin.widgets.index')
+            ->with('status', "✅ \"{$widget->label()}\" added to My Widgets — you can now customise it.");
+    }
+
+    /**
+     * Render a widget in an isolated full-page preview with site.css.
+     * Used inside an iframe so it picks up the real frontend styles.
+     */
+    public function preview(string $type, WidgetRegistry $registry): \Illuminate\Http\Response
+    {
+        $widget = $registry->get($type);
+
+        if (! $widget) {
+            return response("<p style='font-family:sans-serif;padding:40px;color:#ef4444;text-align:center'>Widget type <strong>{$type}</strong> not found in registry.</p>");
+        }
+
+        $widgetHtml = $widget->render($widget->defaultSettings(), []);
+
+        return response(view('admin.widget-builder.preview', [
+            'label'     => $widget->label(),
+            'type'      => $type,
+            'category'  => $widget->category(),
+            'html'      => $widgetHtml,
+            'isDynamic' => $widget->isDynamic(),
+        ]));
     }
 
     public function edit(int $id): View
@@ -101,7 +215,6 @@ class WidgetBuilderController extends Controller
 
         $slug = $validated['slug'] ?: Str::slug($validated['name']);
 
-        // Reject clashes with another custom widget or a built-in widget type.
         $clashesDb = WidgetDefinition::where('slug', $slug)
             ->when($current, fn ($q) => $q->where('id', '!=', $current->id))
             ->exists();

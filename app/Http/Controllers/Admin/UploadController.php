@@ -62,4 +62,20 @@ class UploadController extends Controller
 
         return back()->with('status', $count . ' ' . Str::plural('file', $count) . ' uploaded to the media library.');
     }
+
+    public function destroy(string $id): RedirectResponse
+    {
+        $media = Media::findOrFail($id);
+
+        // Delete from storage disk
+        if ($media->path) {
+            Storage::disk($media->disk ?? 'public')->delete($media->path);
+        }
+
+        $name = $media->original_name ?: 'File';
+        $media->delete();
+
+        return back()->with('status', "✅ '{$name}' has been deleted successfully.");
+    }
 }
+

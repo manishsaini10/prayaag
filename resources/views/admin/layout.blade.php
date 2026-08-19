@@ -85,6 +85,10 @@
                     <a href="{{ url('/admin/m/'.$key) }}" class="nav-link {{ $is('admin/m/'.$key.'*') }}"><x-admin.icon name="{{ $ic }}"/><span x-show="!collapsed">{{ $lbl }}</span></a>
                 @endif
             @endforeach
+            <a href="{{ route('admin.video-testimonials.index') }}" class="nav-link {{ request()->is('admin/video-testimonials*') ? 'active' : '' }}">
+                <x-admin.icon name="video-camera"/>
+                <span x-show="!collapsed">Video Testimonials</span>
+            </a>
 
             <div x-show="!collapsed" class="nav-section">Admissions</div>
             <a href="{{ url('/admin/leads') }}" class="nav-link {{ $is('admin/leads*') }}"><x-admin.icon name="users"/><span x-show="!collapsed">Leads</span></a>
@@ -131,15 +135,26 @@
                 </div>
             </div>
 
+            <div x-show="!collapsed" class="nav-section">Email & Communications</div>
+            <a href="{{ url('/admin/settings/email-providers') }}" class="nav-link {{ $is('admin/settings/email-providers*') }}"><x-admin.icon name="cog"/><span x-show="!collapsed">Email Providers</span></a>
+            <a href="{{ url('/admin/settings/email-templates') }}" class="nav-link {{ $is('admin/settings/email-templates*') }}"><x-admin.icon name="document"/><span x-show="!collapsed">Email Templates</span></a>
+            <a href="{{ url('/admin/email-logs') }}" class="nav-link {{ $is('admin/email-logs*') }}"><x-admin.icon name="inbox"/><span x-show="!collapsed">Email Logs</span></a>
+            <a href="{{ url('/admin/newsletter/campaigns') }}" class="nav-link {{ $is('admin/newsletter/campaigns*') }}"><x-admin.icon name="megaphone"/><span x-show="!collapsed">Newsletter Campaigns</span></a>
+
             <div x-show="!collapsed" class="nav-section">System</div>
-            <a href="{{ url('/admin/settings') }}" class="nav-link {{ $is('admin/settings*') }}"><x-admin.icon name="cog"/><span x-show="!collapsed">Settings</span></a>
+            <a href="{{ url('/admin/settings') }}" class="nav-link {{ $is('admin/settings') }}"><x-admin.icon name="cog"/><span x-show="!collapsed">Settings</span></a>
             <a href="{{ url('/admin/theme') }}" class="nav-link {{ $is('admin/theme*') }}"><x-admin.icon name="rectangle-stack"/><span x-show="!collapsed">Theme Builder</span></a>
             <a href="{{ url('/admin/m/activitylog') }}" class="nav-link {{ $is('admin/m/activitylog*') }}"><x-admin.icon name="bolt"/><span x-show="!collapsed">Activity Logs</span></a>
             <a href="{{ url('/admin/notifications') }}" class="nav-link {{ $is('admin/notifications*') }}"><x-admin.icon name="bell"/><span x-show="!collapsed">Notifications</span></a>
             <a href="{{ url('/admin/system-health') }}" class="nav-link {{ $is('admin/system-health*') }}"><x-admin.icon name="server"/><span x-show="!collapsed">System Health</span></a>
             <a href="{{ url('/admin/api-tokens') }}" class="nav-link {{ $is('admin/api-tokens*') }}"><x-admin.icon name="lock"/><span x-show="!collapsed">API Tokens</span></a>
+            <a href="{{ url('/admin/updates') }}" class="nav-link {{ $is('admin/updates*') }}">
+                <x-admin.icon name="upload"/>
+                <span x-show="!collapsed">CMS Updates</span>
+            </a>
             <a href="{{ url('/2fa/setup') }}" class="nav-link {{ $is('2fa/setup') }}"><x-admin.icon name="shield"/><span x-show="!collapsed">2FA</span></a>
         </nav>
+
 
         {{-- Collapse toggle (desktop) --}}
         <button @click="toggleCollapse()" class="hidden md:flex items-center gap-2 px-4 h-12 shrink-0 text-[13px]" style="border-top:1px solid var(--border);color:var(--text-muted)">
@@ -164,11 +179,28 @@
 
             <div class="flex-1"></div>
 
+            {{-- New Update Available Glowing Alert Button --}}
+            @php
+                $cmsUpdateStatus = rescue(fn() => app(\App\Core\Updater\AutoDeployerService::class)->checkForRemoteUpdates(), []);
+            @endphp
+            @if(!empty($cmsUpdateStatus['update_available']))
+                <a href="{{ url('/admin/updates') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold text-white transition transform hover:scale-105"
+                   style="background:linear-gradient(135deg,#e11d48,#f59e0b);box-shadow:0 0 14px rgba(225,29,72,.6);border:1px solid rgba(255,255,255,.3);animation:pulse 2s infinite"
+                   title="New update available on GitHub! Click to backup & install">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    <span>⚡ New Update Available!</span>
+                </a>
+            @endif
+
             {{-- Theme switcher --}}
             <button @click="toggleTheme()" class="btn-sm" style="border:1px solid var(--border);width:38px;height:38px;display:grid;place-items:center" title="Toggle theme">
                 <span x-show="!dark"><x-admin.icon name="moon" style="width:18px;height:18px"/></span>
                 <span x-show="dark" x-cloak><x-admin.icon name="sun" style="width:18px;height:18px"/></span>
             </button>
+
 
             {{-- Notifications --}}
             <div class="relative" x-data="{ open:false }" @click.outside="open=false">

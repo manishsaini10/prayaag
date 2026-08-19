@@ -129,7 +129,7 @@ class SportsPageSeeder extends Seeder
                                 'heading'      => 'Join the Champions',
                                 'text'         => 'Give your child access to world-class sports facilities and coaching at Prayaag International School.',
                                 'button_label' => 'Apply Now →',
-                                'button_url'   => 'https://pisp.accevate.com/registration/',
+                                'button_url'   => '/registration',
                             ],
                         ]],
                     ]],

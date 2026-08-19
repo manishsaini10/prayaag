@@ -31,7 +31,7 @@ class AdmissionCtaWidget extends AbstractWidget
             'heading'      => 'Admission Open 2026-27',
             'text'         => 'Give your child the Prayaag advantage. Register online today.',
             'button_label' => 'Online Registration →',
-            'button_url'   => 'https://pisp.accevate.com/registration/',
+            'button_url'   => '/registration',
         ];
     }
 

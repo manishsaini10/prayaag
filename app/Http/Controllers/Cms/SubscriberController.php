@@ -26,16 +26,22 @@ class SubscriberController extends Controller
             'source' => 'nullable|string|max:255',
         ]);
 
-        Subscriber::updateOrCreate(
-            ['email' => $data['email']],
-            [
-                'name'            => $data['name'] ?? null,
-                'source'          => $data['source'] ?? null,
-                'status'          => 'subscribed',
-                'subscribed_at'   => now(),
-                'unsubscribed_at' => null,
-            ]
+        $subscriber = \App\Models\NewsletterSubscriber::createPending(
+            email: $data['email'],
+            source: $data['source'] ?? 'website_footer',
+            name: $data['name'] ?? null
         );
+
+        if ($subscriber->confirm_token) {
+            $confirmUrl = route('newsletter.confirm', ['token' => $subscriber->confirm_token]);
+            try {
+                app(\App\Core\Mail\MailManager::class)->send('newsletter_subscribe_confirm', [
+                    'confirm_url' => $confirmUrl,
+                ], $subscriber->email);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send newsletter confirm email: " . $e->getMessage());
+            }
+        }
 
         return back()->with('subscribed', true);
     }

@@ -20,6 +20,18 @@ class CompanyController extends Controller
         return view('chatbot.admin.companies.index', compact('companies'));
     }
 
+    public function create()
+    {
+        Gate::authorize('chatbot.contacts.create');
+        return view('chatbot.admin.companies.index', ['companies' => Company::withCount('contacts')->orderBy('name')->paginate(20), 'showCreateModal' => true]);
+    }
+
+    public function edit(Company $company)
+    {
+        Gate::authorize('chatbot.contacts.update');
+        return view('chatbot.admin.companies.show', compact('company'));
+    }
+
     public function store(Request $request)
     {
         Gate::authorize('chatbot.contacts.create');

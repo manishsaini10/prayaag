@@ -140,14 +140,19 @@
 }
 .chatbot-prechat-form h4 { font-weight: 800; font-size: 16px; color: var(--cb-text); margin: 0 0 4px; text-align: center; }
 .chatbot-form-subtitle { font-size: 11px; color: var(--cb-text-secondary); text-align: center; margin: 0 0 8px; }
-.chatbot-prechat-form input, .chatbot-prechat-form select {
+.chatbot-prechat-form input, .chatbot-prechat-form select, .chatbot-prechat-form textarea {
     width: 100%; padding: 10px 14px;
     border: 1px solid var(--cb-border); border-radius: 10px;
     font-size: 13px; outline: none;
     background: var(--cb-input-bg); color: var(--cb-text);
 }
-.chatbot-prechat-form input:focus, .chatbot-prechat-form select:focus {
+.chatbot-prechat-form input:focus, .chatbot-prechat-form select:focus, .chatbot-prechat-form textarea:focus {
     border-color: var(--cb-primary);
+}
+.chatbot-prechat-form input::placeholder,
+.chatbot-prechat-form textarea::placeholder {
+    color: var(--cb-text-secondary);
+    opacity: 0.75;
 }
 .chatbot-prechat-form button[type="submit"] {
     margin-top: 6px; padding: 10px; border: none; border-radius: 10px;

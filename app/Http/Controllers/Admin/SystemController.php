@@ -344,6 +344,12 @@ class SystemController extends Controller
                     ? ['APP_DEBUG on in production', 'warn']
                     : [app()->environment() . ' · debug ' . ($debug ? 'on' : 'off'), 'ok'];
             }),
+            $probe('Sentry Monitoring', function () {
+                $dsn = config('sentry.dsn');
+                $enabled = !empty($dsn);
+
+                return [$enabled ? 'Configured (' . config('sentry.environment') . ')' : 'Disabled (Local mode)', 'ok'];
+            }),
         ];
     }
 }

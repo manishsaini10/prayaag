@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Core\Mail\MailManager::class);
     }
 
     public function boot(): void
@@ -72,15 +72,19 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        // --- Keep cached chrome (theme.header) fresh when menus change ---
-        $forgetChrome = fn () => Cache::forget('theme.header');
+        // --- Cache Invalidation Triggers ---
+        $forgetChrome = function () {
+            Cache::forget('theme.header');
+            \App\Core\Menu\MenuManager::flush();
+        };
         Menu::saved($forgetChrome);
         Menu::deleted($forgetChrome);
         MenuItem::saved($forgetChrome);
         MenuItem::deleted($forgetChrome);
 
-        // --- Keep cached pages fresh when Mess Menu updates ---
-        $clearPageCache = function () {
+        // --- Mess Menu Cache Invalidation ---
+        $clearMessMenuCache = function () {
+            \App\Core\Mess\Services\MessMenuService::flush();
             try {
                 $pages = \App\Models\Page::all();
                 $renderer = app(\App\Core\Builder\PageRenderer::class);
@@ -91,12 +95,21 @@ class AppServiceProvider extends ServiceProvider
                 // Ignore
             }
         };
-        \App\Models\Mess\MessMenu::saved($clearPageCache);
-        \App\Models\Mess\MessMenu::deleted($clearPageCache);
-        \App\Models\Mess\MessMenuItem::saved($clearPageCache);
-        \App\Models\Mess\MessMenuItem::deleted($clearPageCache);
-        \App\Models\Mess\MessMenuSpecialDay::saved($clearPageCache);
-        \App\Models\Mess\MessMenuSpecialDay::deleted($clearPageCache);
+        \App\Models\Mess\MessMenu::saved($clearMessMenuCache);
+        \App\Models\Mess\MessMenu::deleted($clearMessMenuCache);
+        \App\Models\Mess\MessMenuItem::saved($clearMessMenuCache);
+        \App\Models\Mess\MessMenuItem::deleted($clearMessMenuCache);
+        \App\Models\Mess\MessMenuSpecialDay::saved($clearMessMenuCache);
+        \App\Models\Mess\MessMenuSpecialDay::deleted($clearMessMenuCache);
+
+        // --- Testimonials & Job Listings Cache Invalidation ---
+        $clearTestimonials = fn () => Cache::forget('testimonials.featured');
+        \App\Models\Testimonial::saved($clearTestimonials);
+        \App\Models\Testimonial::deleted($clearTestimonials);
+
+        $clearJobListings = fn () => Cache::forget('job_listings.open');
+        \App\Models\JobListing::saved($clearJobListings);
+        \App\Models\JobListing::deleted($clearJobListings);
 
         // --- SEO: on page change, refresh the image sitemap + ping IndexNow ---
         $onPageChange = function (Page $page) {
@@ -220,5 +233,32 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('navUnreadCount', $count)->with('navNotifications', $items);
         });
+
+        // --- Video Testimonials: bust page cache + admin notifications ---
+        $bustVideoCache = function () {
+            rescue(function () {
+                $renderer = app(\App\Core\Builder\PageRenderer::class);
+                foreach (\App\Models\Page::all() as $page) {
+                    $renderer->forget($page);
+                }
+            }, null, false);
+        };
+
+        \App\Models\VideoTestimonial::created(function (\App\Models\VideoTestimonial $vt) {
+            AdminNotification::record('video_testimonial', "New video testimonial submitted: '{$vt->title}'", [
+                'body' => 'Awaiting moderation review',
+                'url'  => url('/admin/video-testimonials?status=pending'),
+                'icon' => 'video-camera',
+            ]);
+        });
+
+        \App\Models\VideoTestimonial::saved(function (\App\Models\VideoTestimonial $vt) use ($bustVideoCache) {
+            // Only bust cache when status or consent changes — avoid bust on every field edit
+            if ($vt->wasChanged('status') || $vt->wasChanged('consent_confirmed')) {
+                $bustVideoCache();
+            }
+        });
+
+        \App\Models\VideoTestimonial::deleted($bustVideoCache);
     }
 }

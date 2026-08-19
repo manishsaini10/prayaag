@@ -47,6 +47,10 @@
             'fv-04' => 'Footer 04 · Gradient Accent',
             'fv-05' => 'Footer 05 · Compact',
         ],
+        'recaptcha_version' => [
+            'v2' => 'Google reCAPTCHA v2 (Checkbox "I am not a robot")',
+            'v3' => 'Google reCAPTCHA v3 (Invisible Score Verification)',
+        ],
     ];
 
     $render = function ($s) use ($selectOptions) {

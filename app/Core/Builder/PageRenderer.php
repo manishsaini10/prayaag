@@ -68,9 +68,11 @@ class PageRenderer
                         );
                     }
                     $width = (int) ($column['width'] ?? 12);
-                    $columns .= "<div class=\"pb-col pb-col--{$width}\">{$widgets}</div>";
+                    $colAttr = $this->elementStyleAttr((array) ($column['settings'] ?? []));
+                    $columns .= "<div class=\"pb-col pb-col--{$width}\"{$colAttr}>{$widgets}</div>";
                 }
-                $rows .= "<div class=\"pb-row\">{$columns}</div>";
+                $rowAttr = $this->elementStyleAttr((array) ($row['settings'] ?? []));
+                $rows .= "<div class=\"pb-row\"{$rowAttr}>{$columns}</div>";
             }
             $type = htmlspecialchars((string) ($section['type'] ?? 'section'), ENT_QUOTES, 'UTF-8');
             [$cls, $attr] = $this->sectionExtras((array) ($section['settings'] ?? []));
@@ -137,8 +139,7 @@ class PageRenderer
 
     /**
      * Build optional class suffix + attribute string from a section's settings.
-     * Supports a CMS-controlled entrance animation and responsive visibility,
-     * applied uniformly to every section (and thus every widget within).
+     * Supports CMS-controlled entrance animation, responsive visibility, and custom colors.
      *
      * @return array{0:string,1:string} [classSuffix, attrString]
      */
@@ -146,6 +147,17 @@ class PageRenderer
     {
         $classes = [];
         $attrs = [];
+        $styles = [];
+
+        $customBg = (string) ($settings['_custom_bg'] ?? '');
+        if ($customBg !== '') {
+            $styles[] = 'background-color: ' . htmlspecialchars($customBg, ENT_QUOTES, 'UTF-8');
+        }
+
+        $customText = (string) ($settings['_custom_text'] ?? '');
+        if ($customText !== '') {
+            $styles[] = 'color: ' . htmlspecialchars($customText, ENT_QUOTES, 'UTF-8');
+        }
 
         $anim = (string) ($settings['_animation'] ?? '');
         if ($anim !== '' && $anim !== 'none') {
@@ -167,10 +179,27 @@ class PageRenderer
             $classes[] = 'pb-no-hover';
         }
 
+        if (! empty($styles)) {
+            $attrs[] = 'style="' . implode('; ', $styles) . '"';
+        }
+
         return [
             $classes ? ' ' . implode(' ', $classes) : '',
             $attrs ? ' ' . implode(' ', $attrs) : '',
         ];
+    }
+
+    protected function elementStyleAttr(array $settings): string
+    {
+        $styles = [];
+        if (! empty($settings['_custom_bg'])) {
+            $styles[] = 'background-color: ' . htmlspecialchars((string) $settings['_custom_bg'], ENT_QUOTES, 'UTF-8');
+        }
+        if (! empty($settings['_custom_text'])) {
+            $styles[] = 'color: ' . htmlspecialchars((string) $settings['_custom_text'], ENT_QUOTES, 'UTF-8');
+        }
+
+        return ! empty($styles) ? ' style="' . implode('; ', $styles) . '"' : '';
     }
 
     protected function renderRow(PageRow $row): string
@@ -179,8 +208,9 @@ class PageRenderer
         foreach ($row->columns as $column) {
             $columns .= $this->renderColumn($column);
         }
+        $rowAttr = $this->elementStyleAttr((array) ($row->settings ?? []));
 
-        return "<div class=\"pb-row\">{$columns}</div>";
+        return "<div class=\"pb-row\"{$rowAttr}>{$columns}</div>";
     }
 
     protected function renderColumn(PageColumn $column): string
@@ -191,8 +221,9 @@ class PageRenderer
         }
 
         $width = (int) ($column->width ?: 12);
+        $colAttr = $this->elementStyleAttr((array) ($column->settings ?? []));
 
-        return "<div class=\"pb-col pb-col--{$width}\">{$widgets}</div>";
+        return "<div class=\"pb-col pb-col--{$width}\"{$colAttr}>{$widgets}</div>";
     }
 
     protected function renderWidget(PageWidget $widget): string

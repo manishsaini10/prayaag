@@ -33,7 +33,7 @@ class HtmlWidget extends AbstractWidget
 
     public function defaultSettings(): array
     {
-        return ['html' => ''];
+        return ['html' => '<div class="custom-html-block"><p>Custom HTML content block</p></div>'];
     }
 
     public function render(array $settings, array $context = []): string

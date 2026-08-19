@@ -23,6 +23,8 @@
                     @empty
                         <li><a href="{{ url('/') }}">Home</a></li>
                     @endforelse
+                    <li><a href="{{ url('/academic-calendar') }}">📅 Academic Calendar</a></li>
+                    <li><a href="{{ url('/mess-menu') }}">🍽️ Mess Menu</a></li>
                 </ul>
             </div>
 

@@ -309,18 +309,20 @@
                 fields.forEach(f => {
                     const requiredAttr = f.is_required ? 'required' : '';
                     const value = f.field_key === 'name' && this.visitorName ? this.escHtml(this.visitorName) : '';
-                    const ph = f.placeholder ? this.escHtml(f.placeholder) : '';
+                    // Always fall back to the field label as placeholder so text is always visible
+                    const ph = (f.placeholder && f.placeholder.trim()) ? this.escHtml(f.placeholder) : this.escHtml(f.label);
+                    const labelHtml = `<label style="font-size:11px;font-weight:600;color:var(--cb-text-secondary);margin-bottom:3px;display:block">${this.escHtml(f.label)}${f.is_required ? ' <span style="color:#ef4444">*</span>' : ''}</label>`;
                     if (f.field_type === 'select') {
-                        let opts = '<option value="">' + (ph || 'Select ' + f.label) + '</option>';
+                        let opts = '<option value="">' + (ph || 'Select ' + this.escHtml(f.label)) + '</option>';
                         (f.options || []).forEach(o => {
                             opts += '<option value="' + this.escHtml(o) + '">' + this.escHtml(o) + '</option>';
                         });
-                        fieldsHtml += `<select name="${this.escHtml(f.field_key)}" ${requiredAttr}>${opts}</select>`;
+                        fieldsHtml += `<div style="display:flex;flex-direction:column">${labelHtml}<select name="${this.escHtml(f.field_key)}" ${requiredAttr}>${opts}</select></div>`;
                     } else if (f.field_type === 'textarea') {
-                        fieldsHtml += `<textarea name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr}></textarea>`;
+                        fieldsHtml += `<div style="display:flex;flex-direction:column">${labelHtml}<textarea name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr} style="width:100%;padding:10px 14px;border:1px solid var(--cb-border);border-radius:10px;font-size:13px;outline:none;background:var(--cb-input-bg);color:var(--cb-text);resize:vertical;min-height:72px;font-family:inherit"></textarea></div>`;
                     } else {
                         const inputType = f.field_type === 'email' ? 'email' : f.field_type === 'tel' ? 'tel' : f.field_type === 'number' ? 'number' : 'text';
-                        fieldsHtml += `<input type="${inputType}" name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr} value="${value}">`;
+                        fieldsHtml += `<div style="display:flex;flex-direction:column">${labelHtml}<input type="${inputType}" name="${this.escHtml(f.field_key)}" placeholder="${ph}" ${requiredAttr} value="${value}"></div>`;
                     }
                 });
             }
