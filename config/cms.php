@@ -3,10 +3,14 @@
 return [
     /*
      |--------------------------------------------------------------------------
-     | CMS Version
+     | CMS Version & Release Tracking
      |--------------------------------------------------------------------------
-     | This is updated automatically by the UpdateManager after each successful
-     | update. Do not edit manually unless you know what you are doing.
+     | This file is automatically updated by the AutoDeployer and UpdateManager
+     | after each deployment or update release.
      */
-    'version' => '1.0.0',
+    'version'     => '1.3.1',
+    'build'       => 'efd331d',
+    'branch'      => 'main',
+    'released_at' => '2026-08-19 10:50:00',
+    'changelog'   => 'CMS auto-update system, upload media delete option, alumni & chatbot fixes',
 ];

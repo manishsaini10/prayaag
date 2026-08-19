@@ -181,7 +181,10 @@ class AutoDeployerService
         // Step 3: Run Migrations
         $this->runMigrations();
 
-        // Step 4: Clear & Optimize Caches
+        // Step 4: Bump Version & Save Metadata
+        $this->bumpVersionAfterDeploy($branch);
+
+        // Step 5: Clear & Optimize Caches
         $this->clearCaches();
 
         $duration = round(microtime(true) - $startTime, 2);
@@ -194,6 +197,7 @@ class AutoDeployerService
             'logs'     => $this->logs,
         ];
     }
+
 
     /**
      * Create Pre-Update ZIP Backup
@@ -418,23 +422,82 @@ class AutoDeployerService
     }
 
     /**
-     * Get current git commit revision
+     * Get current git commit revision or fallback to config release
      */
     public function getCurrentGitRevision(): string
     {
         $cmd = "cd \"{$this->laravelRoot}\" && {$this->gitBinary} log -1 --pretty=format:\"%h - %s (%ci)\" 2>&1";
         $res = trim($this->execCommand($cmd));
-        return $res ?: 'Unknown / Git not initialized';
+
+        if (!empty($res) && !str_contains(strtolower($res), 'fatal') && !str_contains(strtolower($res), 'not a git')) {
+            return $res;
+        }
+
+        $ver   = config('cms.version', '1.3.1');
+        $build = config('cms.build', 'efd331d');
+        $date  = config('cms.released_at', date('Y-m-d H:i'));
+
+        return "v{$ver} · Build {$build} ({$date})";
     }
 
     /**
-     * Get short commit sha
+     * Get short commit sha or fallback to config build
      */
     public function getCurrentGitSha(): string
     {
         $cmd = "cd \"{$this->laravelRoot}\" && {$this->gitBinary} rev-parse --short HEAD 2>&1";
         $res = trim($this->execCommand($cmd));
-        return (strlen($res) <= 12 && ctype_alnum($res)) ? $res : 'unknown';
+
+        if (!empty($res) && strlen($res) <= 12 && ctype_alnum($res)) {
+            return $res;
+        }
+
+        return config('cms.build', 'efd331d');
+    }
+
+    /**
+     * Bump version number and save to config/cms.php after successful deploy
+     */
+    public function bumpVersionAfterDeploy(string $branch = 'main'): void
+    {
+        try {
+            $configFile = $this->laravelRoot . '/config/cms.php';
+            $currentVer = config('cms.version', '1.3.1');
+            $parts      = explode('.', $currentVer);
+
+            if (count($parts) === 3) {
+                $parts[2] = ((int) $parts[2]) + 1; // Increment patch version e.g. 1.3.1 -> 1.3.2
+                $newVer = implode('.', $parts);
+            } else {
+                $newVer = $currentVer . '.1';
+            }
+
+            $newSha = $this->getCurrentGitSha();
+            $now    = date('Y-m-d H:i:s');
+
+            $phpContent = <<<PHP
+<?php
+
+return [
+    /*
+     |--------------------------------------------------------------------------
+     | CMS Version & Release Tracking
+     |--------------------------------------------------------------------------
+     | Automatically updated by AutoDeployer on deploy.
+     */
+    'version'     => '{$newVer}',
+    'build'       => '{$newSha}',
+    'branch'      => '{$branch}',
+    'released_at' => '{$now}',
+    'changelog'   => 'Automated update applied via 1-Click Deployer',
+];
+
+PHP;
+            File::put($configFile, $phpContent);
+            $this->log("🔖 Version automatically updated to v{$newVer} (Build: {$newSha})");
+        } catch (\Throwable $e) {
+            $this->log("  ⚠ Version bump notice: " . $e->getMessage());
+        }
     }
 
     protected function execCommand(string $cmd): string
@@ -456,3 +519,4 @@ class AutoDeployerService
         Log::info('[AutoDeployer] ' . $msg);
     }
 }
+
