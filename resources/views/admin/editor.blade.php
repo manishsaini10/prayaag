@@ -848,7 +848,7 @@ function settingsForm(widget) {
         }
         const enums=(paletteFor(widget.type)||{}).options||{};
 
-        // If media-page, add nice section dividers
+        // If media-page or classrooms-page, add nice section dividers
         if (widget.type === 'media-page') {
             const sectionsMap = [
                 { divider: '🌟 Hero Banner Settings', keys: ['hero_icon', 'hero_eyebrow', 'hero_title', 'hero_subtitle'] },
@@ -857,6 +857,27 @@ function settingsForm(widget) {
                 { divider: '🎨 Arts & Craft Studio', keys: ['arts_craft_title', 'arts_craft_images'] },
                 { divider: '🎈 Fun Activities Zone', keys: ['fun_activities_title', 'fun_activities_images'] },
                 { divider: '📰 News Press Clippings & Slider', keys: ['news_title', 'news_images', 'autoplay', 'interval', 'animation_speed', 'pause_on_hover'] },
+            ];
+
+            sectionsMap.forEach(group => {
+                const div = el('div', 'settings-section-divider', group.divider);
+                form.appendChild(div);
+                group.keys.forEach(k => {
+                    if (k in widget.settings) {
+                        fieldEditor(form, widget.settings, k, () => { draw(); schedulePreview(); }, enums);
+                    }
+                });
+            });
+        } else if (widget.type === 'classrooms-page') {
+            const sectionsMap = [
+                { divider: '🌟 Hero Showcase Settings', keys: ['hero_eyebrow', 'hero_title', 'hero_subtitle', 'hero_bg_image'] },
+                { divider: '❄️ 4 Key Smart Infrastructure Badges', keys: ['highlights'] },
+                { divider: '🏫 Junior Wing Classrooms Tour', keys: ['junior_wing_title', 'junior_wing_desc', 'junior_wing_image', 'junior_wing_tags'] },
+                { divider: '🎓 Senior Wing Smart Classrooms Tour', keys: ['senior_wing_title', 'senior_wing_desc', 'senior_wing_image', 'senior_wing_tags'] },
+                { divider: '🧠 6 Pedagogical Pillars & Teaching Methodologies', keys: ['methodologies_title', 'methodologies_sub', 'methodologies'] },
+                { divider: '📸 Classrooms Photo Gallery', keys: ['gallery_title', 'gallery_images'] },
+                { divider: '🛡️ Safety & Hygiene Standards', keys: ['standards'] },
+                { divider: '🚀 Admissions Call to Action', keys: ['cta_title', 'cta_sub', 'cta_btn_primary', 'cta_btn_link', 'cta_btn_secondary', 'cta_btn_sec_link'] },
             ];
 
             sectionsMap.forEach(group => {
@@ -927,6 +948,34 @@ function createWidgetVisualPreview(widget, toggleCallback) {
                 <a href="/disclosure" target="_blank" class="wpb-link">👁️ View Public /disclosure ↗</a>
             </div>
         `;
+    } else if (t === 'classrooms-page') {
+        box.innerHTML = `
+            <div class="wpb-title">🏫 Classrooms &amp; Smart Learning Spaces Suite</div>
+            <div class="wpb-desc">Renders centralized air-conditioned smart classrooms, digital touchboards, Junior &amp; Senior wings tour, 6 pedagogical pillars, and photo gallery.</div>
+            <div class="wpb-galleries-grid">
+                <span class="wpb-pill">❄️ 100% Centralized AC</span>
+                <span class="wpb-pill">💻 Smart Digital Boards</span>
+                <span class="wpb-pill">👥 1:25 Student Ratio</span>
+                <span class="wpb-pill">🪑 Ergonomic Seating</span>
+                <span class="wpb-pill gold">📸 Photo Gallery with Lightbox</span>
+            </div>
+            <div class="wpb-thumbs">
+                <img src="/images/classrooms/junior-classroom.webp" alt="Junior" title="Junior Wing">
+                <img src="/images/classrooms/classroom-main.jpg" alt="Senior" title="Senior Wing">
+                <img src="/images/classrooms/senior-classroom.jpg" alt="Seating" title="Study Seating">
+                <img src="/images/classrooms/campus-overview.webp" alt="Campus" title="Campus Overview">
+            </div>
+            <div class="wpb-footer">
+                <button type="button" class="tb-btn primary edit-content-btn" style="height:28px;padding:0 12px;font-size:11.5px">
+                    ✏️ Edit Classrooms Content &amp; Photos
+                </button>
+                <a href="/classrooms" target="_blank" class="wpb-link">👁️ View Public /classrooms ↗</a>
+            </div>
+        `;
+        const editBtn = box.querySelector('.edit-content-btn');
+        if (editBtn && typeof toggleCallback === 'function') {
+            editBtn.addEventListener('click', toggleCallback);
+        }
     } else if (t === 'hero') {
         box.innerHTML = `
             <div class="wpb-title">🌟 Hero Banner Showcase</div>

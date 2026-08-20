@@ -42,6 +42,7 @@ use App\Core\Builder\Widgets\UpcomingEventsWidget;
 use App\Core\Builder\Widgets\VideosWidget;
 use App\Core\Builder\WidgetRegistry;
 use App\Core\Builder\Widgets\AdmissionsPageWidget;
+use App\Core\Builder\Widgets\ClassroomsPageWidget;
 use App\Core\Builder\Widgets\DynamicWidget;
 use App\Core\Builder\Widgets\MessMenuWidget;
 use App\Core\Builder\Widgets\VideoTestimonialWidget;
@@ -169,6 +170,7 @@ class CoreServiceProvider extends ServiceProvider
         DownloadsPageWidget::class,
         ContactUsPageWidget::class,
         DisclosurePageWidget::class,
+        ClassroomsPageWidget::class,
         MediaPageWidget::class,
         MediaGalleryWidget::class,
         NewsSliderWidget::class,
