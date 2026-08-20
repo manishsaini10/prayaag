@@ -30,6 +30,7 @@ class MediaPageWidget extends AbstractWidget
     public function defaultSettings(): array
     {
         return [
+            'hero_icon'            => '📸',
             'hero_eyebrow'         => 'Campus Life & Media Gallery',
             'hero_title'           => 'Life at Prayaag',
             'hero_subtitle'        => 'Explore life at Prayaag International School — performing arts studios, championship sports arenas, fine arts ateliers, early childhood play zones, and celebrated newspaper features.',

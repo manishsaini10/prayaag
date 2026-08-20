@@ -851,7 +851,7 @@ function settingsForm(widget) {
         // If media-page, add nice section dividers
         if (widget.type === 'media-page') {
             const sectionsMap = [
-                { divider: '🌟 Hero Banner Settings', keys: ['hero_eyebrow', 'hero_title', 'hero_subtitle'] },
+                { divider: '🌟 Hero Banner Settings', keys: ['hero_icon', 'hero_eyebrow', 'hero_title', 'hero_subtitle'] },
                 { divider: '💃 Dance & Music Gallery', keys: ['dance_music_title', 'dance_music_images'] },
                 { divider: '⚽ Sports Arena Gallery', keys: ['sports_title', 'sports_images'] },
                 { divider: '🎨 Arts & Craft Studio', keys: ['arts_craft_title', 'arts_craft_images'] },

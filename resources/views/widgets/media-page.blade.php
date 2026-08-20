@@ -9,6 +9,7 @@
     $animSpeed = (int) ($settings['animation_speed'] ?? 600);
     $pauseHover = (bool) ($settings['pause_on_hover'] ?? true);
 
+    $heroIcon = $settings['hero_icon'] ?? '📸';
     $heroEyebrow = $settings['hero_eyebrow'] ?? 'Campus Life & Media Gallery';
     $heroTitle = $settings['hero_title'] ?? 'Life at Prayaag';
     $heroSub = $settings['hero_subtitle'] ?? 'Explore life at Prayaag International School — performing arts studios, championship sports arenas, fine arts ateliers, early childhood play zones, and celebrated newspaper features.';
@@ -626,7 +627,7 @@
         <div class="med-hero__content">
             @if(!empty($heroEyebrow))
             <div class="med-eyebrow">
-                <span>📸</span> {{ $heroEyebrow }}
+                @if(!empty($heroIcon))<span>{{ $heroIcon }}</span>@endif {{ $heroEyebrow }}
             </div>
             @endif
             <h1 class="med-hero__title">
