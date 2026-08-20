@@ -1,11 +1,11 @@
 {{--
-    Media ("Life at Prayaag") Page Widget — Clean & Ultra-Premium Campus Galleries & News Slider
-    Designed with School Design System Tokens (Navy, Gold, Playfair/Poppins) + Interactive Swiper & Lightbox
+    Media ("Life at Prayaag") Page Widget — Clean & 100% Ultra Mobile Responsive
+    Designed with School Design System Tokens (Navy, Gold, Playfair/Poppins) + Touch Swiper & Lightbox
 --}}
 
 <style>
 /* ================================================================
-   MEDIA ("LIFE AT PRAYAAG") — SCOPED FULL-WIDTH CSS
+   MEDIA ("LIFE AT PRAYAAG") — FULL-WIDTH & 100% MOBILE RESPONSIVE
    ================================================================ */
 
 .med-wrapper {
@@ -78,21 +78,21 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: .14em;
+    letter-spacing: .12em;
     text-transform: uppercase;
     color: var(--gold-2, #f59e0b);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     background: rgba(245,158,11,0.12);
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 999px;
     border: 1px solid rgba(245,158,11,0.3);
 }
 
 .med-hero__title {
     font-family: var(--font-head, 'Playfair Display', serif);
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-size: clamp(2rem, 5vw, 3.8rem);
     font-weight: 700;
     color: #ffffff;
     line-height: 1.2;
@@ -104,7 +104,7 @@
 }
 
 .med-hero__sub {
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
     color: rgba(255,255,255,0.88);
     max-width: 780px;
     line-height: 1.7;
@@ -113,20 +113,21 @@
 
 .med-hero__actions {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
 .med-btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 8px;
     background: linear-gradient(135deg, var(--gold, #d97706), #b45309);
     color: #ffffff !important;
-    padding: 13px 26px;
+    padding: 12px 24px;
     border-radius: 10px;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-decoration: none;
     box-shadow: 0 4px 16px rgba(217,119,6,0.35);
     transition: all 0.3s ease;
@@ -140,13 +141,14 @@
 .med-btn-secondary {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     background: rgba(255,255,255,0.12);
     color: #ffffff !important;
-    padding: 13px 24px;
+    padding: 12px 22px;
     border-radius: 10px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-decoration: none;
     border: 1px solid rgba(255,255,255,0.25);
     backdrop-filter: blur(8px);
@@ -158,26 +160,32 @@
     transform: translateY(-2px);
 }
 
-/* ── Filter Tabs Bar ─────────────────────────────────────────────── */
+/* ── Filter Tabs Bar (Horizontal Touch Scrolling) ───────────────── */
 .med-filter-bar {
     position: sticky;
     top: 70px;
     z-index: 40;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 4px 16px -4px rgba(0,0,0,0.04);
-    padding: 14px 4vw;
+    padding: 12px 4vw;
     display: flex;
     align-items: center;
     gap: 10px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.med-filter-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .med-tab-btn {
-    padding: 9px 20px;
+    padding: 8px 18px;
     border-radius: 999px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: #475569;
     background: #f1f5f9;
@@ -185,6 +193,7 @@
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
+    flex-shrink: 0;
     transition: all 0.2s ease;
 }
 
@@ -211,7 +220,7 @@
 
 .med-section-header h2 {
     font-family: var(--font-head, 'Playfair Display', serif);
-    font-size: clamp(1.9rem, 3.5vw, 2.5rem);
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
     color: #0f172a;
     margin: 0 0 6px;
 }
@@ -219,7 +228,7 @@
 /* ── 3-Image Grid Layout ─────────────────────────────────────────── */
 .med-grid-3 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
 }
 
@@ -278,13 +287,13 @@
 .med-zoom-badge {
     background: rgba(255,255,255,0.95);
     color: #0b2545;
-    padding: 9px 18px;
+    padding: 8px 16px;
     border-radius: 999px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     transform: translateY(10px);
     transition: transform 0.3s ease;
@@ -303,12 +312,12 @@
 
 .news-slider-header {
     text-align: center;
-    margin-bottom: 36px;
+    margin-bottom: 30px;
 }
 
 .news-slider-header h2 {
     font-family: var(--font-head, 'Playfair Display', serif);
-    font-size: clamp(2rem, 3.5vw, 2.7rem);
+    font-size: clamp(1.9rem, 3.5vw, 2.7rem);
     color: #ffffff;
     margin: 0;
 }
@@ -317,6 +326,7 @@
     position: relative;
     max-width: 100%;
     margin: 0 auto;
+    touch-action: pan-y;
 }
 
 .news-carousel-track-wrapper {
@@ -330,13 +340,13 @@
 .news-carousel-track {
     display: flex;
     gap: 20px;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: transform;
 }
 
 .news-slide-card {
     flex: 0 0 calc(33.333% - 14px);
-    min-width: 280px;
+    min-width: 260px;
     background: #ffffff;
     border-radius: 16px;
     overflow: hidden;
@@ -348,12 +358,14 @@
 @media(max-width: 980px) {
     .news-slide-card {
         flex: 0 0 calc(50% - 10px);
+        min-width: 220px;
     }
 }
 
 @media(max-width: 640px) {
     .news-slide-card {
         flex: 0 0 100%;
+        min-width: 0;
     }
 }
 
@@ -387,20 +399,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 24px;
+    margin-top: 20px;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
 }
 
 .news-carousel-btn-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .news-nav-btn {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.25);
@@ -420,9 +432,9 @@
 .news-counter-pill {
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.2);
-    padding: 8px 18px;
+    padding: 8px 16px;
     border-radius: 999px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--gold-2, #f59e0b);
 }
@@ -437,7 +449,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -468,7 +480,7 @@
 
 .med-lightbox-header {
     background: rgba(255,255,255,0.06);
-    padding: 14px 24px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -477,13 +489,13 @@
 }
 
 .med-lightbox-close {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     background: rgba(255,255,255,0.12);
     border: none;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 18px;
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -499,17 +511,50 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
     background: #050e1a;
     overflow: auto;
 }
 
 .med-lightbox-body img {
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 78vh;
     object-fit: contain;
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* ── Specific Mobile Breakpoints ─────────────────────────────────── */
+@media(max-width: 640px) {
+    .med-hero {
+        min-height: 380px;
+    }
+    .med-hero__content {
+        padding: 70px 5vw 40px;
+    }
+    .med-hero__actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .med-btn-primary, .med-btn-secondary {
+        width: 100%;
+    }
+    .med-section {
+        padding: 36px 4vw 40px;
+    }
+    .med-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .news-slider-section {
+        padding: 40px 4vw 45px;
+    }
+    .news-carousel-track-wrapper {
+        padding: 12px;
+    }
+    .news-carousel-track {
+        gap: 12px;
+    }
 }
 </style>
 
@@ -520,7 +565,7 @@
         <div class="med-hero__overlay"></div>
         <div class="med-hero__content">
             <div class="med-eyebrow">
-                <span>📸</span> Campus Life, Activities &amp; Media Gallery
+                <span>📸</span> Campus Life &amp; Media Gallery
             </div>
             <h1 class="med-hero__title">
                 Life at Prayaag — <span>Media &amp; Press Gallery</span>
@@ -694,7 +739,7 @@
         </div>
     </section>
 
-    {{-- 📰 NEWS CAROUSEL SLIDER --}}
+    {{-- 📰 NEWS CAROUSEL SLIDER (TOUCH SWIPEABLE) --}}
     <section class="news-slider-section" id="news-section">
         <div class="news-slider-header">
             <h2>News</h2>
@@ -722,7 +767,7 @@
             ];
         @endphp
 
-        <div class="news-carousel-container">
+        <div class="news-carousel-container" id="newsCarouselContainer">
             <div class="news-carousel-track-wrapper" id="carouselWrapper">
                 <div class="news-carousel-track" id="carouselTrack">
                     @foreach($newsClippings as $idx => $imgSrc)
@@ -760,7 +805,7 @@
 <div id="mediaLightbox" class="med-lightbox-overlay" onclick="closeLightbox(event)">
     <div class="med-lightbox-container" onclick="event.stopPropagation()">
         <div class="med-lightbox-header">
-            <button type="button" class="med-lightbox-close" onclick="closeLightbox()">✕</button>
+            <button type="button" class="med-lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
         </div>
         <div class="med-lightbox-body">
             <img id="lightboxImg" src="" alt="Zoom Preview">
@@ -783,16 +828,22 @@ function getVisibleSlides() {
 
 function updateSlider() {
     const track = document.getElementById('carouselTrack');
+    if (!track || !track.children.length) return;
+    
     const visible = getVisibleSlides();
     const maxIndex = Math.max(0, totalSlides - visible);
     
     if (currentSlide > maxIndex) currentSlide = 0;
     if (currentSlide < 0) currentSlide = maxIndex;
 
-    const cardWidth = track.children[0].offsetWidth + 20; // 20px gap
+    const gap = window.innerWidth <= 640 ? 12 : 20;
+    const cardWidth = track.children[0].offsetWidth + gap;
     track.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
     
-    document.getElementById('slideCounter').innerText = `Slide ${currentSlide + 1} of ${totalSlides}`;
+    const counter = document.getElementById('slideCounter');
+    if (counter) {
+        counter.innerText = `Slide ${currentSlide + 1} of ${totalSlides}`;
+    }
 }
 
 function nextSlide() {
@@ -831,6 +882,32 @@ function toggleAutoPlay() {
     }
 }
 
+// ── MOBILE TOUCH SWIPE SUPPORT ──────────────────────────────────────
+(function initTouchSwipe() {
+    const container = document.getElementById('newsCarouselContainer');
+    if (!container) return;
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    container.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        stopAutoPlay();
+    }, { passive: true });
+
+    container.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 40) {
+            if (diff > 0) {
+                nextSlide(); // swipe left -> next
+            } else {
+                prevSlide(); // swipe right -> prev
+            }
+        }
+    }, { passive: true });
+})();
+
 // ── LIGHTBOX LOGIC ──────────────────────────────────────────────────
 function openLightbox(src) {
     document.getElementById('lightboxImg').src = src;
@@ -859,5 +936,6 @@ document.addEventListener('keydown', function(e) {
 window.addEventListener('resize', updateSlider);
 document.addEventListener('DOMContentLoaded', () => {
     startAutoPlay();
+    updateSlider();
 });
 </script>
