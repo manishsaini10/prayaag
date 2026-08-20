@@ -1,6 +1,6 @@
 {{--
     Media ("Life at Prayaag") Page Widget — Clean & 100% Ultra Mobile Responsive
-    Configurable Auto-Play (3s interval default), Smooth Animation & Lightbox
+    Configurable Auto-Play (3s interval default), Dynamic Image Galleries & Lightbox
 --}}
 
 @php
@@ -8,6 +8,58 @@
     $interval = (int) ($settings['interval'] ?? 3000);
     $animSpeed = (int) ($settings['animation_speed'] ?? 600);
     $pauseHover = (bool) ($settings['pause_on_hover'] ?? true);
+
+    $heroTitle = $settings['hero_title'] ?? 'Life at Prayaag';
+    $heroSub = $settings['hero_subtitle'] ?? 'Explore life at Prayaag International School — performing arts studios, championship sports arenas, fine arts ateliers, early childhood play zones, and celebrated newspaper features.';
+
+    $danceMusicTitle = $settings['dance_music_title'] ?? 'Dance & Music';
+    $danceMusicImages = (array) ($settings['dance_music_images'] ?? [
+        '/images/media/Dance_class.jpg',
+        '/images/media/student-playing-keyboard.webp',
+        '/images/media/Teacher-teaching-keyboard.webp',
+    ]);
+
+    $sportsTitle = $settings['sports_title'] ?? 'Sports';
+    $sportsImages = (array) ($settings['sports_images'] ?? [
+        '/images/media/Football.jpg',
+        '/images/media/Shooting.jpg',
+        '/images/media/Basket.jpg',
+    ]);
+
+    $artsCraftTitle = $settings['arts_craft_title'] ?? 'Arts & Craft';
+    $artsCraftImages = (array) ($settings['arts_craft_images'] ?? [
+        '/images/media/Painting-practice-prayaag-student.webp',
+        '/images/media/Painting-at-Prayaag-International-School.webp',
+        '/images/media/Prayaag-International-School-Laibrary.webp',
+    ]);
+
+    $funActivitiesTitle = $settings['fun_activities_title'] ?? 'Fun Activities';
+    $funActivitiesImages = (array) ($settings['fun_activities_images'] ?? [
+        '/images/media/Fun-Activity-for-Play-school-children-at-prayaag-International-School.webp',
+        '/images/media/Junior-children-playing.webp',
+        '/images/media/Children-playing-at-swimimg-pool.webp',
+    ]);
+
+    $newsTitle = $settings['news_title'] ?? 'News';
+    $newsClippings = (array) ($settings['news_images'] ?? [
+        '/images/media/WhatsApp-Image-2025-08-21-at-10.50.47-AM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-09-30-at-10.16.22-AM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-10-08-at-2.28.58-PM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-10-09-at-9.41.27-AM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-10-18-at-8.45.26-AM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-11-10-at-2.24.58-PM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-11-11-at-4.53.30-PM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-11-16-at-10.00.53-AM_1350x1350.jpg',
+        '/images/media/News-5.jpg',
+        '/images/media/WhatsApp-Image-2026-01-19-at-12.54.27-PM-1.jpeg',
+        '/images/media/WhatsApp-Image-2025-09-30-at-10.16.21-AM_1350x1350.jpg',
+        '/images/media/WhatsApp-Image-2025-09-30-at-10.16.19-AM_1350x1350.jpg',
+        '/images/media/News-6.jpg',
+        '/images/media/News-4.jpg',
+        '/images/media/News-2.jpg',
+        '/images/media/News-1.jpg',
+        '/images/media/news-123.jpeg',
+    ]);
 @endphp
 
 <style>
@@ -575,15 +627,15 @@
                 <span>📸</span> Campus Life &amp; Media Gallery
             </div>
             <h1 class="med-hero__title">
-                Life at Prayaag — <span>Media &amp; Press Gallery</span>
+                {{ $heroTitle }}
             </h1>
             <p class="med-hero__sub">
-                Explore life at Prayaag International School — performing arts studios, championship sports arenas, fine arts ateliers, early childhood play zones, and celebrated newspaper features.
+                {{ $heroSub }}
             </p>
             <div class="med-hero__actions">
                 <a href="#news-section" class="med-btn-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
-                    News
+                    {{ $newsTitle }}
                 </a>
                 <a href="#dance-music-section" class="med-btn-secondary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
@@ -595,184 +647,107 @@
 
     {{-- 🎛️ STICKY CATEGORY FILTER TABS --}}
     <div class="med-filter-bar">
-        <a href="#dance-music-section" class="med-tab-btn">Dance &amp; Music</a>
-        <a href="#sports-section" class="med-tab-btn">Sports</a>
-        <a href="#arts-craft-section" class="med-tab-btn">Arts &amp; Craft</a>
-        <a href="#fun-activities-section" class="med-tab-btn">Fun Activities</a>
-        <a href="#news-section" class="med-tab-btn" style="background:#fef3c7;color:#b45309;border-color:#fde68a">News</a>
+        <a href="#dance-music-section" class="med-tab-btn">{{ $danceMusicTitle }}</a>
+        <a href="#sports-section" class="med-tab-btn">{{ $sportsTitle }}</a>
+        <a href="#arts-craft-section" class="med-tab-btn">{{ $artsCraftTitle }}</a>
+        <a href="#fun-activities-section" class="med-tab-btn">{{ $funActivitiesTitle }}</a>
+        <a href="#news-section" class="med-tab-btn" style="background:#fef3c7;color:#b45309;border-color:#fde68a">{{ $newsTitle }}</a>
     </div>
 
     {{-- 💃 DANCE & MUSIC --}}
+    @if(count($danceMusicImages) > 0)
     <section class="med-section" id="dance-music-section">
         <div class="med-section-header">
-            <h2>Dance &amp; Music</h2>
+            <h2>{{ $danceMusicTitle }}</h2>
         </div>
 
         <div class="med-grid-3">
-            <div class="med-card" onclick="openLightbox('/images/media/Dance_class.jpg')">
+            @foreach($danceMusicImages as $img)
+            <div class="med-card" onclick="openLightbox('{{ $img }}')">
                 <div class="med-card__img-box">
-                    <img src="/images/media/Dance_class.jpg" alt="Dance & Music" loading="lazy">
+                    <img src="{{ $img }}" alt="{{ $danceMusicTitle }}" loading="lazy">
                     <div class="med-card__overlay">
                         <span class="med-zoom-badge">🔍 Click to Zoom</span>
                     </div>
                 </div>
             </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/student-playing-keyboard.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/student-playing-keyboard.webp" alt="Dance & Music" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Teacher-teaching-keyboard.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Teacher-teaching-keyboard.webp" alt="Dance & Music" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
+    @endif
 
     {{-- ⚽ SPORTS --}}
+    @if(count($sportsImages) > 0)
     <section class="med-section" id="sports-section" style="background:#f1f5f9">
         <div class="med-section-header">
-            <h2>Sports</h2>
+            <h2>{{ $sportsTitle }}</h2>
         </div>
 
         <div class="med-grid-3">
-            <div class="med-card" onclick="openLightbox('/images/media/Football.jpg')">
+            @foreach($sportsImages as $img)
+            <div class="med-card" onclick="openLightbox('{{ $img }}')">
                 <div class="med-card__img-box">
-                    <img src="/images/media/Football.jpg" alt="Sports" loading="lazy">
+                    <img src="{{ $img }}" alt="{{ $sportsTitle }}" loading="lazy">
                     <div class="med-card__overlay">
                         <span class="med-zoom-badge">🔍 Click to Zoom</span>
                     </div>
                 </div>
             </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Shooting.jpg')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Shooting.jpg" alt="Sports" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Basket.jpg')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Basket.jpg" alt="Sports" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
+    @endif
 
     {{-- 🎨 ARTS & CRAFT --}}
+    @if(count($artsCraftImages) > 0)
     <section class="med-section" id="arts-craft-section">
         <div class="med-section-header">
-            <h2>Arts &amp; Craft</h2>
+            <h2>{{ $artsCraftTitle }}</h2>
         </div>
 
         <div class="med-grid-3">
-            <div class="med-card" onclick="openLightbox('/images/media/Painting-practice-prayaag-student.webp')">
+            @foreach($artsCraftImages as $img)
+            <div class="med-card" onclick="openLightbox('{{ $img }}')">
                 <div class="med-card__img-box">
-                    <img src="/images/media/Painting-practice-prayaag-student.webp" alt="Arts & Craft" loading="lazy">
+                    <img src="{{ $img }}" alt="{{ $artsCraftTitle }}" loading="lazy">
                     <div class="med-card__overlay">
                         <span class="med-zoom-badge">🔍 Click to Zoom</span>
                     </div>
                 </div>
             </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Painting-at-Prayaag-International-School.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Painting-at-Prayaag-International-School.webp" alt="Arts & Craft" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Prayaag-International-School-Laibrary.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Prayaag-International-School-Laibrary.webp" alt="Arts & Craft" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
+    @endif
 
     {{-- 🎈 FUN ACTIVITIES --}}
+    @if(count($funActivitiesImages) > 0)
     <section class="med-section" id="fun-activities-section" style="background:#f1f5f9">
         <div class="med-section-header">
-            <h2>Fun Activities</h2>
+            <h2>{{ $funActivitiesTitle }}</h2>
         </div>
 
         <div class="med-grid-3">
-            <div class="med-card" onclick="openLightbox('/images/media/Fun-Activity-for-Play-school-children-at-prayaag-International-School.webp')">
+            @foreach($funActivitiesImages as $img)
+            <div class="med-card" onclick="openLightbox('{{ $img }}')">
                 <div class="med-card__img-box">
-                    <img src="/images/media/Fun-Activity-for-Play-school-children-at-prayaag-International-School.webp" alt="Fun Activities" loading="lazy">
+                    <img src="{{ $img }}" alt="{{ $funActivitiesTitle }}" loading="lazy">
                     <div class="med-card__overlay">
                         <span class="med-zoom-badge">🔍 Click to Zoom</span>
                     </div>
                 </div>
             </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Junior-children-playing.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Junior-children-playing.webp" alt="Fun Activities" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="med-card" onclick="openLightbox('/images/media/Children-playing-at-swimimg-pool.webp')">
-                <div class="med-card__img-box">
-                    <img src="/images/media/Children-playing-at-swimimg-pool.webp" alt="Fun Activities" loading="lazy">
-                    <div class="med-card__overlay">
-                        <span class="med-zoom-badge">🔍 Click to Zoom</span>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
+    @endif
 
     {{-- 📰 NEWS CAROUSEL SLIDER (TOUCH SWIPEABLE) --}}
+    @if(count($newsClippings) > 0)
     <section class="news-slider-section" id="news-section">
         <div class="news-slider-header">
-            <h2>News</h2>
+            <h2>{{ $newsTitle }}</h2>
         </div>
-
-        @php
-            $newsClippings = [
-                '/images/media/WhatsApp-Image-2025-08-21-at-10.50.47-AM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-09-30-at-10.16.22-AM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-10-08-at-2.28.58-PM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-10-09-at-9.41.27-AM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-10-18-at-8.45.26-AM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-11-10-at-2.24.58-PM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-11-11-at-4.53.30-PM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-11-16-at-10.00.53-AM_1350x1350.jpg',
-                '/images/media/News-5.jpg',
-                '/images/media/WhatsApp-Image-2026-01-19-at-12.54.27-PM-1.jpeg',
-                '/images/media/WhatsApp-Image-2025-09-30-at-10.16.21-AM_1350x1350.jpg',
-                '/images/media/WhatsApp-Image-2025-09-30-at-10.16.19-AM_1350x1350.jpg',
-                '/images/media/News-6.jpg',
-                '/images/media/News-4.jpg',
-                '/images/media/News-2.jpg',
-                '/images/media/News-1.jpg',
-                '/images/media/news-123.jpeg',
-            ];
-        @endphp
 
         <div class="news-carousel-container" id="newsCarouselContainer">
             <div class="news-carousel-track-wrapper" id="carouselWrapper">
@@ -801,11 +776,12 @@
                     </button>
                 </div>
                 <div class="news-counter-pill" id="slideCounter">
-                    Slide 1 of 17
+                    Slide 1 of {{ count($newsClippings) }}
                 </div>
             </div>
         </div>
     </section>
+    @endif
 </div>
 
 {{-- 🔍 FULLSCREEN LIGHTBOX MODAL --}}
@@ -827,7 +803,7 @@ const CONFIG_INTERVAL     = {{ $interval }}; // 3000ms = 3 sec
 const CONFIG_PAUSE_HOVER  = {{ $pauseHover ? 'true' : 'false' }};
 
 let currentSlide = 0;
-const totalSlides = 17;
+const totalSlides = {{ count($newsClippings) }};
 let autoPlayInterval = null;
 let isAutoPlaying = CONFIG_AUTOPLAY;
 

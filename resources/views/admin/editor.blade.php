@@ -358,7 +358,7 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
   width:10px;height:10px;border-radius:50%;flex-shrink:0;
 }
 .widget-settings-panel{
-  padding:14px;background:#fafbfc;border-top:1px solid var(--border);
+  padding:18px;background:#f8fafc;border-top:1px solid var(--border);
   display:none;
 }
 .widget-settings-panel.open{display:block}
@@ -425,7 +425,7 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
   justify-content:space-between;
   font-size:11.5px;
   color:#64748b;
-  padding-top:8px;
+  padding-top:10px;
   border-top:1px dashed #e2e8f0;
 }
 .wpb-link{
@@ -436,6 +436,60 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 .wpb-link:hover{
   text-decoration:underline;
 }
+
+/* ─── Settings Field Groups & Image Inputs ───────────────────────── */
+.settings-section-divider{
+  margin:16px 0 10px;
+  padding-bottom:6px;
+  border-bottom:2px solid #e2e8f0;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  color:var(--navy);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.field{margin-bottom:12px}
+.field__label{
+  display:block;font-size:11.5px;font-weight:700;color:var(--muted);
+  margin-bottom:4px;text-transform:capitalize;letter-spacing:.02em;
+}
+.field__input{
+  width:100%;padding:8px 10px;
+  font:13px var(--ff);color:var(--text);
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius-sm);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.field__input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.field__input.bad{border-color:var(--red);background:var(--red-soft)}
+textarea.field__input{font-family:var(--mono);font-size:12px;resize:vertical;min-height:75px}
+
+/* ─── Array Editor ────────────────────────────────────────────────── */
+.arr{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.arr-row{
+  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
+  padding:10px;background:#fff;box-shadow:var(--shadow-sm);
+}
+.arr-row__head{
+  display:flex;align-items:center;gap:6px;margin-bottom:8px;
+  padding-bottom:6px;border-bottom:1px solid #f1f5f9;
+}
+.arr-row__head .idx-badge{
+  font-size:10px;font-weight:800;color:var(--blue);background:var(--blue-soft);
+  padding:2px 8px;border-radius:999px;
+}
+.arr-row__body{display:flex;flex-direction:column;gap:6px}
+.subobj{padding-left:12px;border-left:2px solid var(--border-dark);display:flex;flex-direction:column;gap:6px;margin:6px 0}
+
+/* ─── Checkbox ───────────────────────────────────────────────────── */
+.check-wrap{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;
+}
+.check-wrap input[type=checkbox]{accent-color:var(--blue);cursor:pointer}
 
 /* ─── Widget Add Dropdown ─────────────────────────────────────────── */
 .widget-adder{margin-top:8px}
@@ -468,47 +522,6 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 }
 .ic-btn.settings-toggle:hover{background:rgba(37,99,235,.15);color:var(--blue-2)}
 .ic-btn.settings-toggle.active{background:rgba(37,99,235,.2);color:var(--blue-2)}
-
-/* ─── Settings Fields ─────────────────────────────────────────────── */
-.field{margin-bottom:10px}
-.field__label{
-  display:block;font-size:11px;font-weight:700;color:var(--muted);
-  margin-bottom:4px;text-transform:capitalize;letter-spacing:.02em;
-}
-.field__input{
-  width:100%;padding:8px 10px;
-  font:13px var(--ff);color:var(--text);
-  background:#fff;border:1px solid var(--border);
-  border-radius:var(--radius-sm);outline:none;
-  transition:border-color .15s,box-shadow .15s;
-}
-.field__input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
-.field__input.bad{border-color:var(--red);background:var(--red-soft)}
-textarea.field__input{font-family:var(--mono);font-size:12px;resize:vertical;min-height:75px}
-
-/* ─── Array Editor ────────────────────────────────────────────────── */
-.arr{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-.arr-row{
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:10px;background:#fff;box-shadow:var(--shadow-sm);
-}
-.arr-row__head{
-  display:flex;align-items:center;gap:6px;margin-bottom:8px;
-  padding-bottom:6px;border-bottom:1px solid var(--border);
-}
-.arr-row__head .idx-badge{
-  font-size:10px;font-weight:800;color:var(--blue);background:var(--blue-soft);
-  padding:2px 8px;border-radius:999px;
-}
-.arr-row__body{display:flex;flex-direction:column;gap:6px}
-.subobj{padding-left:12px;border-left:2px solid var(--border-dark);display:flex;flex-direction:column;gap:6px;margin:6px 0}
-
-/* ─── Checkbox ───────────────────────────────────────────────────── */
-.check-wrap{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;
-}
-.check-wrap input[type=checkbox]{accent-color:var(--blue);cursor:pointer}
 
 /* ─── Animations ─────────────────────────────────────────────────── */
 @keyframes slideIn{
@@ -674,7 +687,7 @@ function cloneEmpty(v) {
     if (typeof v === 'number')  return 0;
     if (Array.isArray(v)) return [];
     if (v !== null && typeof v === 'object') { const o={}; Object.keys(v).forEach(k=>o[k]=cloneEmpty(v[k])); return o; }
-    return '';
+    return '/images/media/Dance_class.jpg';
 }
 function move(arr, i, dir) { const j=i+dir; if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; }
 const paletteFor = t => cfg.palette.find(p=>p.type===t);
@@ -746,8 +759,8 @@ function arrayEditor(arr, rerender) {
         }
         row.appendChild(body); box.appendChild(row);
     });
-    const addBtn = btn('+ Add Item','ic-btn',()=>{ arr.push(cloneEmpty(arr[0]??'')); rerender(); });
-    addBtn.style.cssText='margin-top:6px;width:auto;padding:4px 12px;font-size:11.5px;background:#fff;color:var(--blue);border-color:var(--blue);font-weight:700';
+    const addBtn = btn('+ Add Image / Item','ic-btn',()=>{ arr.push(cloneEmpty(arr[0]??'/images/media/Dance_class.jpg')); rerender(); });
+    addBtn.style.cssText='margin-top:6px;width:auto;padding:5px 14px;font-size:12px;background:#fff;color:var(--blue);border-color:var(--blue);font-weight:700;border-radius:6px;cursor:pointer;';
     box.appendChild(addBtn);
     return box;
 }
@@ -784,12 +797,42 @@ function fieldEditor(wrap, obj, key, rerender, enums) {
         Object.keys(val).forEach(k=>fieldEditor(sub,val,k,rerender));
         field.appendChild(sub);
     } else {
-        const long=/body|text|quote|desc|message|html|address|embed|content/i.test(String(key))||(typeof val==='string'&&val.length>60);
-        const i=document.createElement(long?'textarea':'input');
-        if(long) i.rows=3; else i.type='text';
-        i.value=(val==null?'':val); i.className='field__input';
-        i.addEventListener('input',()=>{ obj[key]=i.value; schedulePreview(); });
-        field.appendChild(i);
+        const isImg = typeof val === 'string' && (/\.(jpg|jpeg|png|webp|svg|gif)$/i.test(val) || val.startsWith('/images/'));
+        const long = /body|text|quote|desc|message|html|address|embed|content/i.test(String(key)) || (typeof val==='string' && val.length>80);
+
+        if (isImg) {
+            const rowBox = el('div', null);
+            rowBox.style.cssText = 'display:flex;align-items:center;gap:10px';
+            
+            const thumb = el('img', null);
+            thumb.src = val || '/images/media/Dance_class.jpg';
+            thumb.style.cssText = 'width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;background:#e2e8f0;flex-shrink:0';
+            thumb.onerror = () => { thumb.style.display = 'none'; };
+            
+            const i = document.createElement('input');
+            i.type = 'text';
+            i.value = (val == null ? '' : val);
+            i.placeholder = '/images/media/...';
+            i.className = 'field__input';
+            i.style.flex = '1';
+            i.addEventListener('input', () => {
+                obj[key] = i.value;
+                thumb.src = i.value;
+                thumb.style.display = 'block';
+                schedulePreview();
+            });
+            
+            rowBox.appendChild(thumb);
+            rowBox.appendChild(i);
+            field.appendChild(rowBox);
+        } else {
+            const i = document.createElement(long ? 'textarea' : 'input');
+            if (long) i.rows = 3; else i.type = 'text';
+            i.value = (val == null ? '' : val);
+            i.className = 'field__input';
+            i.addEventListener('input', () => { obj[key] = i.value; schedulePreview(); });
+            field.appendChild(i);
+        }
     }
     wrap.appendChild(field);
 }
@@ -804,40 +847,77 @@ function settingsForm(widget) {
             return; 
         }
         const enums=(paletteFor(widget.type)||{}).options||{};
-        keys.forEach(k=>fieldEditor(form,widget.settings,k,()=>{ draw(); schedulePreview(); },enums));
+
+        // If media-page, add nice section dividers
+        if (widget.type === 'media-page') {
+            const sectionsMap = [
+                { divider: '🌟 Hero Banner Settings', keys: ['hero_title', 'hero_subtitle'] },
+                { divider: '💃 Dance & Music Gallery', keys: ['dance_music_title', 'dance_music_images'] },
+                { divider: '⚽ Sports Arena Gallery', keys: ['sports_title', 'sports_images'] },
+                { divider: '🎨 Arts & Craft Studio', keys: ['arts_craft_title', 'arts_craft_images'] },
+                { divider: '🎈 Fun Activities Zone', keys: ['fun_activities_title', 'fun_activities_images'] },
+                { divider: '📰 News Press Clippings & Slider', keys: ['news_title', 'news_images', 'autoplay', 'interval', 'animation_speed', 'pause_on_hover'] },
+            ];
+
+            sectionsMap.forEach(group => {
+                const div = el('div', 'settings-section-divider', group.divider);
+                form.appendChild(div);
+                group.keys.forEach(k => {
+                    if (k in widget.settings) {
+                        fieldEditor(form, widget.settings, k, () => { draw(); schedulePreview(); }, enums);
+                    }
+                });
+            });
+        } else {
+            keys.forEach(k=>fieldEditor(form,widget.settings,k,()=>{ draw(); schedulePreview(); },enums));
+        }
     }
     draw();
     return form;
 }
 
 /* ── Rich Visual Widget Preview Renderer Inside Canvas ──────────── */
-function createWidgetVisualPreview(widget) {
+function createWidgetVisualPreview(widget, toggleCallback) {
     const box = el('div', 'widget-preview-box');
     const t = widget.type;
 
     if (t === 'media-page' || t === 'media-gallery' || t === 'news-slider') {
+        const s = widget.settings || {};
+        const danceCount = Array.isArray(s.dance_music_images) ? s.dance_music_images.length : 3;
+        const sportsCount = Array.isArray(s.sports_images) ? s.sports_images.length : 3;
+        const artsCount = Array.isArray(s.arts_craft_images) ? s.arts_craft_images.length : 3;
+        const funCount = Array.isArray(s.fun_activities_images) ? s.fun_activities_images.length : 3;
+        const newsCount = Array.isArray(s.news_images) ? s.news_images.length : 17;
+
         box.innerHTML = `
             <div class="wpb-title">📸 Life at Prayaag Campus Galleries &amp; News Slider Suite</div>
             <div class="wpb-desc">Renders complete campus performing arts studios, sports arenas, fine arts ateliers, splash pool activities, and news clippings carousel slider.</div>
             <div class="wpb-galleries-grid">
-                <span class="wpb-pill">💃 Dance &amp; Music (3)</span>
-                <span class="wpb-pill">⚽ Sports Arena (3)</span>
-                <span class="wpb-pill">🎨 Arts &amp; Craft (3)</span>
-                <span class="wpb-pill">🎈 Fun Activities (3)</span>
-                <span class="wpb-pill gold">📰 News Clippings Slider (17 Clippings · 3s AutoPlay)</span>
+                <span class="wpb-pill">💃 Dance &amp; Music (${danceCount})</span>
+                <span class="wpb-pill">⚽ Sports Arena (${sportsCount})</span>
+                <span class="wpb-pill">🎨 Arts &amp; Craft (${artsCount})</span>
+                <span class="wpb-pill">🎈 Fun Activities (${funCount})</span>
+                <span class="wpb-pill gold">📰 News Slider (${newsCount} Clippings · 3s AutoPlay)</span>
             </div>
             <div class="wpb-thumbs">
-                <img src="/images/media/Dance_class.jpg" alt="Dance" title="Dance & Music">
-                <img src="/images/media/Football.jpg" alt="Sports" title="Sports">
-                <img src="/images/media/Painting-practice-prayaag-student.webp" alt="Arts" title="Arts & Craft">
-                <img src="/images/media/Junior-children-playing.webp" alt="Activities" title="Fun Activities">
-                <img src="/images/media/News-5.jpg" alt="News" title="News Slider">
+                <img src="${(s.dance_music_images && s.dance_music_images[0]) || '/images/media/Dance_class.jpg'}" alt="Dance" title="Dance & Music">
+                <img src="${(s.sports_images && s.sports_images[0]) || '/images/media/Football.jpg'}" alt="Sports" title="Sports">
+                <img src="${(s.arts_craft_images && s.arts_craft_images[0]) || '/images/media/Painting-practice-prayaag-student.webp'}" alt="Arts" title="Arts & Craft">
+                <img src="${(s.fun_activities_images && s.fun_activities_images[0]) || '/images/media/Junior-children-playing.webp'}" alt="Activities" title="Fun Activities">
+                <img src="${(s.news_images && s.news_images[0]) || '/images/media/News-5.jpg'}" alt="News" title="News Slider">
             </div>
             <div class="wpb-footer">
-                <span>⚡ Touch-Swipe Mobile Responsive &amp; Lightbox Zoom Enabled</span>
+                <button type="button" class="tb-btn primary edit-content-btn" style="height:28px;padding:0 12px;font-size:11.5px">
+                    ✏️ Add / Edit Images &amp; Galleries
+                </button>
                 <a href="/media" target="_blank" class="wpb-link">👁️ View Public /media ↗</a>
             </div>
         `;
+
+        const editBtn = box.querySelector('.edit-content-btn');
+        if (editBtn && typeof toggleCallback === 'function') {
+            editBtn.addEventListener('click', toggleCallback);
+        }
     } else if (t === 'disclosure-page') {
         box.innerHTML = `
             <div class="wpb-title">📋 Mandatory Public Disclosure Hub</div>
@@ -1116,8 +1196,12 @@ function render() {
 
                     wCard.appendChild(wHead);
 
-                    /* Append Visual Content Preview Box */
-                    const previewBox = createWidgetVisualPreview(wg);
+                    /* Append Visual Content Preview Box with Edit Trigger callback */
+                    const previewBox = createWidgetVisualPreview(wg, () => {
+                        const isOpen = form.classList.toggle('open');
+                        toggleBtn.classList.toggle('active', isOpen);
+                        toggleBtn.textContent = isOpen ? 'Close ✕' : 'Settings ⚙';
+                    });
                     wCard.appendChild(previewBox);
 
                     /* Append Settings form */
