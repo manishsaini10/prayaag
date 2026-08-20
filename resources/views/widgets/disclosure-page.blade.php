@@ -1,6 +1,6 @@
 {{--
     Mandatory Public Disclosure Page Widget — Ultra-Premium Regulatory & CBSE Appendix IX Portal
-    Designed with School Design System Tokens (Navy, Gold, Playfair/Poppins)
+    Designed with School Design System Tokens (Navy, Gold, Playfair/Poppins) + Interactive Online PDF Preview
 --}}
 
 <style>
@@ -329,25 +329,46 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dsc-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .dsc-action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: #0b2545;
     color: #ffffff !important;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 0.88rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.84rem;
     font-weight: 700;
     text-decoration: none;
+    cursor: pointer;
+    border: none;
     transition: all 0.2s ease;
 }
 
 .dsc-action-btn:hover {
     background: var(--gold, #d97706);
     transform: translateY(-2px);
+}
+
+.dsc-action-btn.secondary {
+    background: #f1f5f9;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1;
+}
+
+.dsc-action-btn.secondary:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
 }
 
 /* ── All Disclosures Table & Filter ──────────────────────────────── */
@@ -407,11 +428,11 @@
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
-    padding: 18px 22px;
+    padding: 18px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 14px;
     text-decoration: none;
     color: #0f172a;
     transition: all 0.25s ease;
@@ -427,6 +448,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    flex: 1;
 }
 
 .dsc-dossier-icon {
@@ -448,7 +470,7 @@
 
 .dsc-dossier-text h4 {
     margin: 0 0 2px;
-    font-size: 0.98rem;
+    font-size: 0.96rem;
     font-weight: 700;
     color: #0f172a;
     line-height: 1.35;
@@ -460,7 +482,14 @@
     color: #64748b;
 }
 
-.dsc-download-arrow {
+.dsc-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.dsc-icon-btn {
     width: 36px;
     height: 36px;
     border-radius: 8px;
@@ -469,14 +498,20 @@
     display: grid;
     place-items: center;
     color: #0f172a;
-    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s ease;
 }
 
-.dsc-dossier-item:hover .dsc-download-arrow {
+.dsc-icon-btn:hover {
     background: #0b2545;
     color: #ffffff;
     border-color: #0b2545;
+}
+
+.dsc-icon-btn.preview:hover {
+    background: var(--gold, #d97706);
+    border-color: var(--gold, #d97706);
 }
 
 /* ── CBSE Compliance Formal Declaration Banner ───────────────────── */
@@ -547,6 +582,128 @@
     color: #4ade80;
     flex-shrink: 0;
 }
+
+/* ── Online PDF Viewer Modal ─────────────────────────────────────── */
+.pdf-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 37, 69, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pdf-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.pdf-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 1100px;
+    height: 90vh;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px -15px rgba(0,0,0,0.5);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.pdf-modal-overlay.active .pdf-modal-container {
+    transform: scale(1);
+}
+
+.pdf-modal-header {
+    background: #0b2545;
+    color: #ffffff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.pdf-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdf-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.pdf-modal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    color: #ffffff !important;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pdf-modal-btn:hover {
+    background: rgba(255,255,255,0.28);
+}
+
+.pdf-modal-btn.primary {
+    background: var(--gold, #d97706);
+}
+
+.pdf-modal-btn.primary:hover {
+    background: #b45309;
+}
+
+.pdf-modal-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pdf-modal-close-btn:hover {
+    background: #dc2626;
+}
+
+.pdf-modal-body {
+    flex: 1;
+    background: #525659;
+    position: relative;
+}
+
+.pdf-modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
 </style>
 
 <div class="dsc-wrapper">
@@ -562,7 +719,7 @@
                 Mandatory Public <span>Disclosure</span>
             </h1>
             <p class="dsc-hero__sub">
-                In strict adherence to the Central Board of Secondary Education (CBSE) Appendix IX mandate, Prayaag International School publicly discloses all statutory affiliation, infrastructure safety, financial, and governance certificates.
+                In strict adherence to the Central Board of Secondary Education (CBSE) Appendix IX mandate, Prayaag International School publicly discloses all statutory affiliation, infrastructure safety, financial, and governance certificates with instant online PDF preview and direct downloads.
             </p>
             <div class="dsc-hero__actions">
                 <a href="#key-documents" class="dsc-btn-primary">
@@ -602,10 +759,10 @@
                 </div>
             </div>
             <div class="dsc-stat-item">
-                <div class="dsc-stat-icon">📥</div>
+                <div class="dsc-stat-icon">👁️</div>
                 <div class="dsc-stat-info">
-                    <h4>Local PDF Storage</h4>
-                    <p>Instant Direct Downloads</p>
+                    <h4>Instant PDF Preview</h4>
+                    <p>Browser Reader &amp; Direct Downloads</p>
                 </div>
             </div>
         </div>
@@ -635,10 +792,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Current Session</span>
-                    <a href="/docs/Fee_Structure_2026-27.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/Fee_Structure_2026-27.pdf', 'Fee Structure (2026–27)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/Fee_Structure_2026-27.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -655,10 +818,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">Current Session</span>
-                    <a href="/docs/Transport_Fee_Structure-2026-27.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/Transport_Fee_Structure-2026-27.pdf', 'Transport Fee Structure (2026–27)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/Transport_Fee_Structure-2026-27.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -675,10 +844,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#64748b;font-weight:600">CBSE Mandate</span>
-                    <a href="/docs/Mandatory-Public-Disclosure.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/Mandatory_Public_Disclosure.pdf', 'Mandatory Public Disclosure (Appendix IX)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/Mandatory_Public_Disclosure.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -695,10 +870,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#16a34a;font-weight:700">✓ Validated 2024</span>
-                    <a href="/docs/BSC.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/BSC.pdf', 'Building Safety Certificate (BSC)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/BSC.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -715,10 +896,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#16a34a;font-weight:700">✓ Validated 2024</span>
-                    <a href="/docs/TSC.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/TSC.pdf', 'Transport Safety Certificate (TSC)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/TSC.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -735,10 +922,16 @@
                 </div>
                 <div class="dsc-card__action">
                     <span style="font-size:12px;color:#16a34a;font-weight:700">✓ Validated 2024</span>
-                    <a href="/docs/FSC.pdf" target="_blank" class="dsc-action-btn">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download PDF
-                    </a>
+                    <div class="dsc-btn-group">
+                        <button type="button" class="dsc-action-btn secondary" onclick="openPdfModal('/storage/pdfs/FSC.pdf', 'Fire Safety Certificate (FSC)')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview
+                        </button>
+                        <a href="/storage/pdfs/FSC.pdf" target="_blank" download class="dsc-action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -755,7 +948,7 @@
         {{-- Search filter --}}
         <div class="dsc-filter-bar">
             <div style="font-size:0.92rem;font-weight:700;color:#0f172a">
-                📁 Document Archive List
+                📁 Document Archive List (Click to Preview or Download)
             </div>
             <div class="dsc-search-box">
                 <svg class="dsc-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -764,257 +957,48 @@
         </div>
 
         <div class="dsc-dossiers-grid" id="dossiersGrid">
-            {{-- 1. Affiliation Certificate --}}
-            <a href="/docs/Afflitation-Certificate.pdf" target="_blank" class="dsc-dossier-item" data-title="affiliation certificate cbse decree">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">📜</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Affiliation Certificate</h4>
-                        <p>CBSE Official Affiliation Decree</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
+            @php
+                $allDossiers = [
+                    ['title' => 'Affiliation Certificate', 'sub' => 'CBSE Official Affiliation Decree', 'file' => '/storage/pdfs/Afflitation-Certificate.pdf', 'icon' => '📜', 'tags' => 'affiliation certificate cbse decree'],
+                    ['title' => 'Drinking Water & Sanitary Certificate', 'sub' => 'Public Health & Hygiene Inspection', 'file' => '/storage/pdfs/Drinking-Water-And-Sanitary-Certificate-2022-23.pdf', 'icon' => '💧', 'tags' => 'drinking water and sanitary certificate hygiene health'],
+                    ['title' => 'CBSE Mandatory Disclosure', 'sub' => 'General Information & Documents', 'file' => '/storage/pdfs/CBSE-MANDATORY-DISCLOSURE.pdf', 'icon' => '🏛️', 'tags' => 'cbse mandatory disclosure general details'],
+                    ['title' => 'Fire Safety (2022–23 Archive)', 'sub' => 'Fire Safety Compliance NOC', 'file' => '/storage/pdfs/Fire-safety-22-23.pdf', 'icon' => '🚒', 'tags' => 'fire safety 22-23 certificate noc'],
+                    ['title' => 'NOC by DSE', 'sub' => 'Directorate of School Education Haryana', 'file' => '/storage/pdfs/NOC-BY-DSE.pdf', 'icon' => '📑', 'tags' => 'noc by dse directorate school education'],
+                    ['title' => 'Recognition Certificate', 'sub' => 'Haryana State Education Dept. Approval', 'file' => '/storage/pdfs/RecognitionCertificate.pdf', 'icon' => '🎓', 'tags' => 'recognition certificate government approval'],
+                    ['title' => 'Building Safety Certificate (Archive)', 'sub' => 'Structural Stability Certificate Archive', 'file' => '/storage/pdfs/Building-Safety-certificate.pdf', 'icon' => '🏢', 'tags' => 'building safety certificate archival structure'],
+                    ['title' => 'Activity Calendar (2022–23)', 'sub' => 'Academic & Co-Curricular Schedule', 'file' => '/storage/pdfs/Activity-Calander-2022-23.pdf', 'icon' => '📅', 'tags' => 'activity calendar 2022-23 events schedule'],
+                    ['title' => 'Trust Deed', 'sub' => 'Educational Trust Constitution', 'file' => '/storage/pdfs/Trust-Deed.pdf', 'icon' => '⚖️', 'tags' => 'trust deed society registration constitution'],
+                    ['title' => 'Certificate by DEO for Affiliation', 'sub' => 'District Education Officer Certificate', 'file' => '/storage/pdfs/Certificate-By-DEO-for-affliation.pdf', 'icon' => '🏅', 'tags' => 'certificate by deo for affiliation district education office'],
+                    ['title' => 'Food & Mess Menu', 'sub' => 'School Dining Nutrition Chart', 'file' => '/storage/pdfs/FOOD-MENU-FROM-9TH-MAY-TO-22-MAY-2022.pdf', 'icon' => '🍱', 'tags' => 'food menu mess dining nutrition'],
+                    ['title' => 'School Management Committee (SMC)', 'sub' => 'Governing Body & Member List', 'file' => '/storage/pdfs/School-Management-Committee.pdf', 'icon' => '👥', 'tags' => 'school management committee smc members governance'],
+                    ['title' => 'School Details & Infrastructure', 'sub' => 'Land Area, Facilities & Classrooms', 'file' => '/storage/pdfs/School-Detail.pdf', 'icon' => '📐', 'tags' => 'school details campus land infrastructure'],
+                    ['title' => 'Activities & Academic Calendar', 'sub' => 'Annual Academic Curriculum Overview', 'file' => '/storage/pdfs/Activity-Academic-Calendar.pdf', 'icon' => '🗓️', 'tags' => 'activities and academic calendar term schedule'],
+                    ['title' => 'General Information', 'sub' => 'Official Institutional Profile', 'file' => '/storage/pdfs/GENERAL-INFORMATION.pdf', 'icon' => 'ℹ️', 'tags' => 'general information school profile'],
+                    ['title' => 'Transport Safety Certificate (Archive)', 'sub' => 'Historical Vehicle Fitness Archive', 'file' => '/storage/pdfs/Transport-Safety-Certificate.pdf', 'icon' => '🚌', 'tags' => 'transport safety certificate archival bus fleet'],
+                    ['title' => 'Non-Proprietary Character Affidavit', 'sub' => 'Notarized Legal Affidavit', 'file' => '/storage/pdfs/Non-Proprietry-affidavit.pdf', 'icon' => '⚖️', 'tags' => 'non property affidavit non proprietary character'],
+                    ['title' => 'Hygienic Certificate', 'sub' => 'Campus Sanitation & Health Clearance', 'file' => '/storage/pdfs/HygenicCertificate.pdf', 'icon' => '🧼', 'tags' => 'hygienic certificate health clean campus sanitation'],
+                ];
+            @endphp
 
-            {{-- 2. Drinking Water & Sanitary --}}
-            <a href="/docs/Drinking-Water-And-Sanitary-Certificate-2022-23.pdf" target="_blank" class="dsc-dossier-item" data-title="drinking water and sanitary certificate hygiene health">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">💧</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Drinking Water &amp; Sanitary Certificate</h4>
-                        <p>Public Health &amp; Hygiene Inspection</p>
+            @foreach($allDossiers as $doc)
+                <div class="dsc-dossier-item" data-title="{{ $doc['tags'] }}">
+                    <div class="dsc-dossier-info">
+                        <div class="dsc-dossier-icon">{{ $doc['icon'] }}</div>
+                        <div class="dsc-dossier-text">
+                            <h4>{{ $doc['title'] }}</h4>
+                            <p>{{ $doc['sub'] }}</p>
+                        </div>
+                    </div>
+                    <div class="dsc-item-actions">
+                        <button type="button" class="dsc-icon-btn preview" title="Preview Online" onclick="openPdfModal('{{ $doc['file'] }}', '{{ $doc['title'] }}')">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                        <a href="{{ $doc['file'] }}" target="_blank" download class="dsc-icon-btn" title="Download Document">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </a>
                     </div>
                 </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 3. CBSE Mandatory Disclosure --}}
-            <a href="/docs/CBSE-MANDATORY-DISCLOSURE.pdf" target="_blank" class="dsc-dossier-item" data-title="cbse mandatory disclosure general details">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🏛️</div>
-                    <div class="dsc-dossier-text">
-                        <h4>CBSE Mandatory Disclosure</h4>
-                        <p>General Information &amp; Documents</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 4. Fire Safety 22-23 --}}
-            <a href="/docs/Fire-safety-22-23.pdf" target="_blank" class="dsc-dossier-item" data-title="fire safety 22-23 certificate noc">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🚒</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Fire Safety (2022–23 Archive)</h4>
-                        <p>Fire Safety Compliance NOC</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 5. NOC by DSE --}}
-            <a href="/docs/NOC-BY-DSE.pdf" target="_blank" class="dsc-dossier-item" data-title="noc by dse directorate school education">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">📑</div>
-                    <div class="dsc-dossier-text">
-                        <h4>NOC by DSE</h4>
-                        <p>Directorate of School Education Haryana</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 6. Recognition Certificate --}}
-            <a href="/docs/RecognitionCertificate.pdf" target="_blank" class="dsc-dossier-item" data-title="recognition certificate government approval">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🎓</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Recognition Certificate</h4>
-                        <p>Haryana State Education Dept. Approval</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 7. Building Safety Certificate (Archival) --}}
-            <a href="/docs/Building-Safety-certificate.pdf" target="_blank" class="dsc-dossier-item" data-title="building safety certificate archival structure">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🏢</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Building Safety Certificate (Archive)</h4>
-                        <p>Structural Stability Certificate Archive</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 8. Activity Calendar 2022-23 --}}
-            <a href="/docs/Activity-Calander-2022-23.pdf" target="_blank" class="dsc-dossier-item" data-title="activity calendar 2022-23 events schedule">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">📅</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Activity Calendar (2022–23)</h4>
-                        <p>Academic &amp; Co-Curricular Schedule</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 9. Trust Deed --}}
-            <a href="/docs/Trust-Deed.pdf" target="_blank" class="dsc-dossier-item" data-title="trust deed society registration constitution">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">⚖️</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Trust Deed</h4>
-                        <p>Educational Trust Constitution</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 10. Certificate By DEO for Affiliation --}}
-            <a href="/docs/Certificate-By-DEO-for-affliation.pdf" target="_blank" class="dsc-dossier-item" data-title="certificate by deo for affiliation district education office">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🏅</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Certificate by DEO for Affiliation</h4>
-                        <p>District Education Officer Certificate</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 11. Food Menu --}}
-            <a href="/docs/FOOD-MENU-FROM-9TH-MAY-TO-22-MAY-2022.pdf" target="_blank" class="dsc-dossier-item" data-title="food menu mess dining nutrition">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🍱</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Food &amp; Mess Menu</h4>
-                        <p>School Dining Nutrition Chart</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 12. School Management Committee --}}
-            <a href="/docs/School-Management-Committee.pdf" target="_blank" class="dsc-dossier-item" data-title="school management committee smc members governance">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">👥</div>
-                    <div class="dsc-dossier-text">
-                        <h4>School Management Committee (SMC)</h4>
-                        <p>Governing Body &amp; Member List</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 13. School Details --}}
-            <a href="/docs/School-Detail.pdf" target="_blank" class="dsc-dossier-item" data-title="school details campus land infrastructure">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">📐</div>
-                    <div class="dsc-dossier-text">
-                        <h4>School Details &amp; Infrastructure</h4>
-                        <p>Land Area, Facilities &amp; Classrooms</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 14. Activities & Academic Calendar --}}
-            <a href="/docs/Activity-Academic-Calendar.pdf" target="_blank" class="dsc-dossier-item" data-title="activities and academic calendar term schedule">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🗓️</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Activities &amp; Academic Calendar</h4>
-                        <p>Annual Academic Curriculum Overview</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 15. General Information --}}
-            <a href="/docs/GENERAL-INFORMATION.pdf" target="_blank" class="dsc-dossier-item" data-title="general information school profile">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">ℹ️</div>
-                    <div class="dsc-dossier-text">
-                        <h4>General Information</h4>
-                        <p>Official Institutional Profile</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 16. Transport Safety Certificate (Archival) --}}
-            <a href="/docs/Transport-Safety-Certificate.pdf" target="_blank" class="dsc-dossier-item" data-title="transport safety certificate archival bus fleet">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🚌</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Transport Safety Certificate (Archive)</h4>
-                        <p>Historical Vehicle Fitness Archive</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 17. Non Property Affidavit --}}
-            <a href="/docs/Non-Proprietry-affidavit.pdf" target="_blank" class="dsc-dossier-item" data-title="non property affidavit non proprietary character">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">⚖️</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Non-Proprietary Character Affidavit</h4>
-                        <p>Notarized Legal Affidavit</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
-
-            {{-- 18. Hygienic Certificate --}}
-            <a href="/docs/HygenicCertificate.pdf" target="_blank" class="dsc-dossier-item" data-title="hygienic certificate health clean campus sanitation">
-                <div class="dsc-dossier-info">
-                    <div class="dsc-dossier-icon">🧼</div>
-                    <div class="dsc-dossier-text">
-                        <h4>Hygienic Certificate</h4>
-                        <p>Campus Sanitation &amp; Health Clearance</p>
-                    </div>
-                </div>
-                <div class="dsc-download-arrow">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-            </a>
+            @endforeach
         </div>
 
         {{-- 🏛️ FORMAL COMPLIANCE DECLARATION --}}
@@ -1057,17 +1041,43 @@
                 For physical document verifications or Right to Information (RTI) records, please contact the School Administrative Office.
             </p>
             <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
-                <a href="tel:+919350748851" class="dsc-action-btn">
+                <a href="tel:+919350748851" class="dsc-action-btn" style="padding:12px 22px">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     Call Compliance Desk: +91 93507 48851
                 </a>
-                <a href="mailto:mailus@pisp.in" class="dsc-action-btn" style="background:#f1f5f9;color:#0f172a !important;border:1px solid #cbd5e1">
+                <a href="mailto:mailus@pisp.in" class="dsc-action-btn secondary" style="padding:12px 22px">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     Email: mailus@pisp.in
                 </a>
             </div>
         </div>
     </section>
+</div>
+
+{{-- 👁️ ULTRA-PREMIUM INTERACTIVE PDF PREVIEW MODAL --}}
+<div id="pdfPreviewModal" class="pdf-modal-overlay" onclick="closePdfModal(event)">
+    <div class="pdf-modal-container" onclick="event.stopPropagation()">
+        <div class="pdf-modal-header">
+            <div class="pdf-modal-title">
+                <span>📄</span>
+                <span id="pdfModalDocTitle">Document Preview</span>
+            </div>
+            <div class="pdf-modal-actions">
+                <a id="pdfModalNewTabBtn" href="#" target="_blank" class="pdf-modal-btn" title="Open in New Tab">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Full Tab
+                </a>
+                <a id="pdfModalDownloadBtn" href="#" download class="pdf-modal-btn primary" title="Download Document">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download PDF
+                </a>
+                <button type="button" class="pdf-modal-close-btn" onclick="closePdfModal()" aria-label="Close Preview">✕</button>
+            </div>
+        </div>
+        <div class="pdf-modal-body">
+            <iframe id="pdfModalIframe" src="about:blank"></iframe>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1084,4 +1094,31 @@ function searchDossiers() {
         }
     });
 }
+
+function openPdfModal(fileUrl, title) {
+    document.getElementById('pdfModalDocTitle').innerText = title || 'Document Preview';
+    document.getElementById('pdfModalNewTabBtn').href = fileUrl;
+    document.getElementById('pdfModalDownloadBtn').href = fileUrl;
+    document.getElementById('pdfModalIframe').src = fileUrl + '#toolbar=1&navpanes=1';
+    
+    const modal = document.getElementById('pdfPreviewModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePdfModal(e) {
+    if (e && e.target !== e.currentTarget && !e.target.classList.contains('pdf-modal-close-btn')) {
+        return;
+    }
+    const modal = document.getElementById('pdfPreviewModal');
+    modal.classList.remove('active');
+    document.getElementById('pdfModalIframe').src = 'about:blank';
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePdfModal();
+    }
+});
 </script>

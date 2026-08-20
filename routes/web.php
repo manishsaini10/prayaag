@@ -496,8 +496,11 @@ Route::get('/storage/pdfs/{filename}', function (string $filename) {
     foreach ($candidates as $file) {
         if (file_exists($file) && is_file($file)) {
             return response()->file($file, [
-                'Content-Type' => 'application/pdf',
-                'Cache-Control' => 'public, max-age=86400',
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . basename($file) . '"',
+                'Accept-Ranges'       => 'bytes',
+                'X-Frame-Options'     => 'SAMEORIGIN',
+                'Cache-Control'       => 'public, max-age=86400, must-revalidate',
             ]);
         }
     }
@@ -522,8 +525,11 @@ Route::get('/docs/{filename}', function (string $filename) {
                 default => 'application/octet-stream',
             };
             return response()->file($file, [
-                'Content-Type' => $contentType,
-                'Cache-Control' => 'public, max-age=86400',
+                'Content-Type'        => $contentType,
+                'Content-Disposition' => 'inline; filename="' . basename($file) . '"',
+                'Accept-Ranges'       => 'bytes',
+                'X-Frame-Options'     => 'SAMEORIGIN',
+                'Cache-Control'       => 'public, max-age=86400, must-revalidate',
             ]);
         }
     }
