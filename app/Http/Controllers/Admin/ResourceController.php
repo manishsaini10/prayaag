@@ -41,10 +41,16 @@ class ResourceController extends Controller
             });
         }
 
+        // Optional category filter if column exists in table/fields
+        $category = trim((string) $request->get('category', ''));
+        if ($category !== '' && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
         [$orderCol, $orderDir] = $def['order'] ?? ['created_at', 'desc'];
         $items = $query->orderBy($orderCol, $orderDir)->paginate(15)->withQueryString();
 
-        return view('admin.resource.index', compact('def', 'resource', 'items', 'q'));
+        return view('admin.resource.index', compact('def', 'resource', 'items', 'q', 'category'));
     }
 
     public function create(string $resource): View

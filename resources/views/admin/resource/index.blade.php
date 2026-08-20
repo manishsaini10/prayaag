@@ -12,13 +12,28 @@
 
 @section('actions')
     <div class="flex items-center gap-2 flex-wrap">
-        @if (! empty($def['search']))
-            <form method="GET" action="{{ url('/admin/m/'.$resource) }}" class="flex items-center gap-2">
-                <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Search…" class="inline-select" style="min-width:200px;padding:8px 12px">
-                <button class="btn-sm" type="submit">Search</button>
-                @if (!empty($q))<a class="btn-sm" href="{{ url('/admin/m/'.$resource) }}">Clear</a>@endif
-            </form>
-        @endif
+        @php
+            $catField = collect($def['fields'] ?? [])->firstWhere('key', 'category');
+        @endphp
+        <form method="GET" action="{{ url('/admin/m/'.$resource) }}" class="flex items-center gap-2 flex-wrap">
+            @if ($catField && !empty($catField['options']))
+                <select name="category" class="inline-select" onchange="this.form.submit()" style="padding:8px 12px">
+                    <option value="">All Categories</option>
+                    @foreach ($catField['options'] as $ckey => $clabel)
+                        <option value="{{ $ckey }}" @selected(($category ?? '') === (string)$ckey)>{{ $clabel }}</option>
+                    @endforeach
+                </select>
+            @endif
+
+            @if (! empty($def['search']))
+                <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Search…" class="inline-select" style="min-width:180px;padding:8px 12px">
+                <button class="btn-sm" type="submit">Filter</button>
+            @endif
+
+            @if (!empty($q) || !empty($category))
+                <a class="btn-sm" href="{{ url('/admin/m/'.$resource) }}">Clear</a>
+            @endif
+        </form>
         @if ($canCreate)
             <a href="{{ url('/admin/m/'.$resource.'/create') }}" class="btn primary"><x-admin.icon name="plus"/> New {{ strtolower($def['singular'] ?? 'item') }}</a>
         @endif

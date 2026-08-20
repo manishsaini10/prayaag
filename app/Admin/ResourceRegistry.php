@@ -88,9 +88,10 @@ class ResourceRegistry
 
             'events' => [
                 'model' => Event::class, 'label' => 'Events', 'singular' => 'Event', 'icon' => 'calendar',
-                'order' => ['starts_at', 'desc'], 'search' => ['title', 'location'],
+                'order' => ['starts_at', 'desc'], 'search' => ['title', 'category', 'location'],
                 'columns' => [
                     ['key' => 'title', 'label' => 'Title'],
+                    ['key' => 'category', 'label' => 'Category', 'type' => 'badge'],
                     ['key' => 'starts_at', 'label' => 'Starts', 'type' => 'datetime'],
                     ['key' => 'ends_at', 'label' => 'Ends', 'type' => 'datetime'],
                     ['key' => 'location', 'label' => 'Location'],
@@ -98,6 +99,7 @@ class ResourceRegistry
                 'fields' => [
                     ['key' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|string|max:255'],
                     ['key' => 'slug', 'label' => 'Slug', 'type' => 'slug', 'rules' => 'required|string|max:255', 'unique' => 'events,slug'],
+                    ['key' => 'category', 'label' => 'Category', 'type' => 'select', 'options' => Event::CATEGORIES, 'rules' => 'required|string|max:100'],
                     ['key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 6, 'rules' => 'nullable|string'],
                     ['key' => 'starts_at', 'label' => 'Starts at', 'type' => 'datetime', 'rules' => 'required|date'],
                     ['key' => 'ends_at', 'label' => 'Ends at', 'type' => 'datetime', 'rules' => 'nullable|date'],
