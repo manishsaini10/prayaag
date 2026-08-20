@@ -644,7 +644,6 @@
                 <div class="cnt-card-info">
                     <h4>Email Inquiries</h4>
                     <p><a href="mailto:mailus@pisp.in">mailus@pisp.in</a></p>
-                    <p><a href="mailto:info@prayaaginternationalschool.com" style="font-size:0.8rem;color:#64748b">info@prayaaginternationalschool.com</a></p>
                 </div>
             </div>
             <div class="cnt-card-item">
@@ -778,11 +777,8 @@
                         <div class="cnt-info-item">
                             <div class="cnt-info-item-icon">✉️</div>
                             <div class="cnt-info-item-text">
-                                <h5>Official Email IDs</h5>
-                                <p>
-                                    General: <a href="mailto:mailus@pisp.in">mailus@pisp.in</a><br>
-                                    Admissions: <a href="mailto:info@prayaaginternationalschool.com">info@prayaaginternationalschool.com</a>
-                                </p>
+                                <h5>Official Email ID</h5>
+                                <p><a href="mailto:mailus@pisp.in">mailus@pisp.in</a></p>
                             </div>
                         </div>
 
