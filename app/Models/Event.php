@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Event extends BaseModel
 {
-    public const CATEGORIES = [
+    public const DEFAULT_CATEGORIES = [
         'Academic'        => 'Academic',
         'Sports'          => 'Sports & Athletics',
         'Cultural'        => 'Cultural & Arts',
@@ -25,6 +25,15 @@ class Event extends BaseModel
         'starts_at' => 'datetime',
         'ends_at'   => 'datetime',
     ];
+
+    public static function categories(): array
+    {
+        try {
+            return EventCategory::options();
+        } catch (\Throwable $e) {
+            return self::DEFAULT_CATEGORIES;
+        }
+    }
 
     public function scopeUpcoming(Builder $query): Builder
     {

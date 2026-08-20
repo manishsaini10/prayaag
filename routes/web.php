@@ -220,6 +220,14 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
     Route::put('/admin/m/{resource}/{id}', [ResourceController::class, 'update'])->name('admin.resource.update');
     Route::delete('/admin/m/{resource}/{id}', [ResourceController::class, 'destroy'])->name('admin.resource.destroy');
 
+    // Event Categories Management
+    Route::prefix('/admin/events/categories')->name('admin.events.categories.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EventCategoryController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\EventCategoryController::class, 'store'])->name('store');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\EventCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\EventCategoryController::class, 'destroy'])->name('destroy');
+    });
+
     // Role/User permission management
     Route::get('/admin/role-permissions', [\App\Http\Controllers\Admin\RolePermissionController::class, 'index'])->name('admin.role-permissions.index');
     Route::get('/admin/role-permissions/{role}/edit', [\App\Http\Controllers\Admin\RolePermissionController::class, 'edit'])->name('admin.role-permissions.edit');
