@@ -40,7 +40,7 @@ class FeeStructurePageWidget extends AbstractWidget
             'hero_subtitle'          => 'Explore the comprehensive fee schedule for the academic year 2026-27 at Prayaag International School, Panipat. Transparent, inclusive, and structured to support all-round academic, sports, and holistic development.',
             'hero_bg_image'          => '/images/classrooms/classroom-main.jpg',
 
-            'registration_url'       => 'https://pisp.accevate.com/registration/',
+            'registration_url'       => '/registration',
             'online_payment_url'     => 'https://pisp.accevate.com/online/main',
             'pdf_fee_url'            => '/docs/Fee_Structure_2026-27.pdf',
             'pdf_transport_url'      => '/docs/Transport_Fee_Structure-2026-27.pdf',

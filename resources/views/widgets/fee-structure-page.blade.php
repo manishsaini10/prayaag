@@ -9,7 +9,7 @@
     $heroSub          = $settings['hero_subtitle'] ?? 'Explore the comprehensive fee schedule for the academic year 2026-27 at Prayaag International School, Panipat.';
     $heroBg           = $settings['hero_bg_image'] ?? '/images/classrooms/classroom-main.jpg';
 
-    $regUrl           = $settings['registration_url'] ?? 'https://pisp.accevate.com/registration/';
+    $regUrl           = $settings['registration_url'] ?? '/registration';
     $payUrl           = $settings['online_payment_url'] ?? 'https://pisp.accevate.com/online/main';
     $feePdfUrl        = $settings['pdf_fee_url'] ?? '/docs/Fee_Structure_2026-27.pdf';
     $transPdfUrl      = $settings['pdf_transport_url'] ?? '/docs/Transport_Fee_Structure-2026-27.pdf';
