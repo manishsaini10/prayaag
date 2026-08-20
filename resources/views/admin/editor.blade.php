@@ -113,7 +113,7 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 /* ─── Canvas Panel (Blueprint Grid Background) ─────────────────── */
 .canvas-panel{
   flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:32px 4vw 80px;
+  padding:24px 3vw 80px;
   scroll-behavior:smooth;
   background-color: #f8fafc;
   background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
@@ -122,6 +122,59 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 .canvas-container{
   max-width: 1120px;
   margin: 0 auto;
+}
+
+/* ─── Page Info Header Banner ───────────────────────────────────── */
+.canvas-page-banner{
+  background:#ffffff;
+  border:1px solid #e2e8f0;
+  border-radius:var(--radius);
+  padding:14px 20px;
+  margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:var(--shadow-sm);
+  flex-wrap:wrap;
+  gap:12px;
+}
+.cpb-info{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.cpb-icon{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:var(--blue-soft);
+  color:var(--blue);
+  display:grid;
+  place-items:center;
+  font-size:18px;
+}
+.cpb-title{
+  font-size:15px;
+  font-weight:800;
+  color:#0f172a;
+}
+.cpb-slug{
+  font-size:12px;
+  color:#64748b;
+  font-family:var(--mono);
+}
+.cpb-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.cpb-badge{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:#166534;
 }
 
 /* ─── Split Screen Preview Panel ────────────────────────────────── */
@@ -275,7 +328,7 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 /* ─── Widget Card ─────────────────────────────────────────────────── */
 .widget-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius-sm);margin-bottom:8px;
+  border-radius:var(--radius-sm);margin-bottom:10px;
   overflow:hidden;
   box-shadow:var(--shadow-sm);
   transition:box-shadow .15s,transform .15s,border-color .15s;
@@ -285,9 +338,9 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 .widget-card.dragging{opacity:.4;transform:scale(.97)}
 .widget-head{
   display:flex;align-items:center;gap:8px;
-  padding:8px 10px;
+  padding:10px 12px;
   background:linear-gradient(135deg,#ffffff,#f8fafc);
-  border-bottom:1px solid transparent;
+  border-bottom:1px solid #e2e8f0;
   cursor:default;
 }
 .widget-handle{
@@ -299,7 +352,7 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
 .widget-handle:active{cursor:grabbing}
 .widget-type-badge{
   flex:1;display:flex;align-items:center;gap:8px;
-  font-size:12.5px;font-weight:700;color:var(--text);
+  font-size:13px;font-weight:800;color:var(--text);
 }
 .widget-type-dot{
   width:10px;height:10px;border-radius:50%;flex-shrink:0;
@@ -309,6 +362,80 @@ body{font:13.5px/1.5 var(--ff);color:var(--text);background:var(--bg);display:fl
   display:none;
 }
 .widget-settings-panel.open{display:block}
+
+/* ─── Rich Visual Widget Preview Card Inside Canvas ──────────────── */
+.widget-preview-box{
+  padding:14px 16px;
+  background:#ffffff;
+  border-top:1px solid #f1f5f9;
+}
+.wpb-title{
+  font-size:13px;
+  font-weight:700;
+  color:#0f172a;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.wpb-desc{
+  font-size:12px;
+  color:#64748b;
+  line-height:1.5;
+  margin-bottom:10px;
+}
+.wpb-galleries-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:12px;
+}
+.wpb-pill{
+  font-size:11px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#f1f5f9;
+  color:#334155;
+  border:1px solid #e2e8f0;
+}
+.wpb-pill.gold{
+  background:#fef3c7;
+  color:#b45309;
+  border-color:#fde68a;
+}
+.wpb-thumbs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:6px 0;
+  margin-bottom:10px;
+}
+.wpb-thumbs img{
+  width:72px;
+  height:54px;
+  object-fit:cover;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+  box-shadow:0 2px 6px rgba(0,0,0,0.06);
+}
+.wpb-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:11.5px;
+  color:#64748b;
+  padding-top:8px;
+  border-top:1px dashed #e2e8f0;
+}
+.wpb-link{
+  color:var(--blue);
+  font-weight:700;
+  text-decoration:none;
+}
+.wpb-link:hover{
+  text-decoration:underline;
+}
 
 /* ─── Widget Add Dropdown ─────────────────────────────────────────── */
 .widget-adder{margin-top:8px}
@@ -487,6 +614,8 @@ window.__EDITOR__ = {
     treeUrl: @json(url('/admin/pages/'.$page->id.'/tree')),
     previewUrl: @json(url('/admin/pages/'.$page->id.'/preview')),
     csrf: @json(csrf_token()),
+    pageTitle: @json($page->title),
+    pageSlug: @json($page->slug),
 };
 </script>
 @verbatim
@@ -681,9 +810,101 @@ function settingsForm(widget) {
     return form;
 }
 
+/* ── Rich Visual Widget Preview Renderer Inside Canvas ──────────── */
+function createWidgetVisualPreview(widget) {
+    const box = el('div', 'widget-preview-box');
+    const t = widget.type;
+
+    if (t === 'media-page' || t === 'media-gallery' || t === 'news-slider') {
+        box.innerHTML = `
+            <div class="wpb-title">📸 Life at Prayaag Campus Galleries &amp; News Slider Suite</div>
+            <div class="wpb-desc">Renders complete campus performing arts studios, sports arenas, fine arts ateliers, splash pool activities, and news clippings carousel slider.</div>
+            <div class="wpb-galleries-grid">
+                <span class="wpb-pill">💃 Dance &amp; Music (3)</span>
+                <span class="wpb-pill">⚽ Sports Arena (3)</span>
+                <span class="wpb-pill">🎨 Arts &amp; Craft (3)</span>
+                <span class="wpb-pill">🎈 Fun Activities (3)</span>
+                <span class="wpb-pill gold">📰 News Clippings Slider (17 Clippings · 3s AutoPlay)</span>
+            </div>
+            <div class="wpb-thumbs">
+                <img src="/images/media/Dance_class.jpg" alt="Dance" title="Dance & Music">
+                <img src="/images/media/Football.jpg" alt="Sports" title="Sports">
+                <img src="/images/media/Painting-practice-prayaag-student.webp" alt="Arts" title="Arts & Craft">
+                <img src="/images/media/Junior-children-playing.webp" alt="Activities" title="Fun Activities">
+                <img src="/images/media/News-5.jpg" alt="News" title="News Slider">
+            </div>
+            <div class="wpb-footer">
+                <span>⚡ Touch-Swipe Mobile Responsive &amp; Lightbox Zoom Enabled</span>
+                <a href="/media" target="_blank" class="wpb-link">👁️ View Public /media ↗</a>
+            </div>
+        `;
+    } else if (t === 'disclosure-page') {
+        box.innerHTML = `
+            <div class="wpb-title">📋 Mandatory Public Disclosure Hub</div>
+            <div class="wpb-desc">Displays 36+ Government &amp; CBSE Compliance Certificates, Fee Structure 2026-27, Building Safety, Fire Safety with inline PDF previews.</div>
+            <div class="wpb-footer">
+                <span>📁 Hosted from Local Secure Storage</span>
+                <a href="/disclosure" target="_blank" class="wpb-link">👁️ View Public /disclosure ↗</a>
+            </div>
+        `;
+    } else if (t === 'hero') {
+        box.innerHTML = `
+            <div class="wpb-title">🌟 Hero Banner Showcase</div>
+            <div class="wpb-desc">Full-screen visual hero with background video/image slider, CTA buttons, and entrance typography.</div>
+        `;
+    } else if (t === 'video-testimonial') {
+        box.innerHTML = `
+            <div class="wpb-title">🎥 Video Testimonials &amp; Parent Reviews</div>
+            <div class="wpb-desc">Interactive video modal player showcasing student distinctions and parent video stories.</div>
+        `;
+    } else if (t === 'contact-us-page' || t === 'contact-form') {
+        box.innerHTML = `
+            <div class="wpb-title">📞 Contact Us &amp; Campus Map Suite</div>
+            <div class="wpb-desc">Direct contact information, admission enquiry form, and interactive Google Map embed.</div>
+        `;
+    } else if (t === 'book-list') {
+        box.innerHTML = `
+            <div class="wpb-title">📚 Academic Book List &amp; Stationery Hub</div>
+            <div class="wpb-desc">Class-by-class syllabus, NCERT prescribed booklists, and direct download links.</div>
+        `;
+    } else if (t === 'mess-menu') {
+        box.innerHTML = `
+            <div class="wpb-title">🍽️ Weekly Campus Mess Menu Digest</div>
+            <div class="wpb-desc">Daily nutritious breakfast, lunch, and snack menus with PDF export option.</div>
+        `;
+    } else {
+        const p = paletteFor(t);
+        box.innerHTML = `
+            <div class="wpb-title">📦 ${p ? p.label : t}</div>
+            <div class="wpb-desc" style="margin-bottom:0">Click <strong>Settings ⚙</strong> above to customize options and layout values.</div>
+        `;
+    }
+
+    return box;
+}
+
 /* ── RENDER ─────────────────────────────────────────────────────── */
 function render() {
     canvas.innerHTML='';
+
+    /* Add Page Meta Information Banner */
+    const banner = el('div', 'canvas-page-banner');
+    banner.innerHTML = `
+        <div class="cpb-info">
+            <div class="cpb-icon">📄</div>
+            <div>
+                <div class="cpb-title">${cfg.pageTitle}</div>
+                <div class="cpb-slug">Slug: /${cfg.pageSlug}</div>
+            </div>
+        </div>
+        <div class="cpb-actions">
+            <span class="cpb-badge">● Published</span>
+            <a href="/${cfg.pageSlug === 'home' ? '' : cfg.pageSlug}" target="_blank" class="tb-btn" style="height:30px;padding:0 10px;font-size:11.5px;color:#0f172a;background:#f1f5f9;border-color:#cbd5e1">
+                View Public Page ↗
+            </a>
+        </div>
+    `;
+    canvas.appendChild(banner);
 
     if (!state.sections.length) {
         const empty=el('div','empty-state');
@@ -894,6 +1115,12 @@ function render() {
                     wHead.appendChild(btn('✕','ic-btn danger',()=>{c.widgets.splice(wi,1);render();},'Delete Widget'));
 
                     wCard.appendChild(wHead);
+
+                    /* Append Visual Content Preview Box */
+                    const previewBox = createWidgetVisualPreview(wg);
+                    wCard.appendChild(previewBox);
+
+                    /* Append Settings form */
                     wCard.appendChild(form);
                     cCard.appendChild(wCard);
                 });

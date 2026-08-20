@@ -111,6 +111,8 @@ use App\Core\Builder\Widgets\DownloadsPageWidget;
 use App\Core\Builder\Widgets\ContactUsPageWidget;
 use App\Core\Builder\Widgets\DisclosurePageWidget;
 use App\Core\Builder\Widgets\MediaPageWidget;
+use App\Core\Builder\Widgets\MediaGalleryWidget;
+use App\Core\Builder\Widgets\NewsSliderWidget;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -168,6 +170,8 @@ class CoreServiceProvider extends ServiceProvider
         ContactUsPageWidget::class,
         DisclosurePageWidget::class,
         MediaPageWidget::class,
+        MediaGalleryWidget::class,
+        NewsSliderWidget::class,
         // Media & Social Proof
         VideoTestimonialWidget::class,
         // PRO Suite
