@@ -483,8 +483,55 @@ Route::get('/privacy/verify/{token}', [\App\Core\Privacy\Http\Controllers\Privac
 Route::get('/newsletter/confirm/{token}', [\App\Http\Controllers\Cms\NewsletterController::class, 'confirm'])->name('newsletter.confirm');
 Route::get('/newsletter/unsubscribe/{id}', [\App\Http\Controllers\Cms\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
+// --- Public File & Document Serving (/storage/pdfs/..., /storage/..., /docs/...) ---
+Route::get('/storage/pdfs/{filename}', function (string $filename) {
+    $candidates = [
+        public_path('storage/pdfs/' . $filename),
+        storage_path('app/public/pdfs/' . $filename),
+        public_path('docs/' . $filename),
+        public_path('docs/' . str_replace('_', '-', $filename)),
+        public_path('docs/' . str_replace('-', '_', $filename)),
+        storage_path('app/public/' . $filename),
+    ];
+    foreach ($candidates as $file) {
+        if (file_exists($file) && is_file($file)) {
+            return response()->file($file, [
+                'Content-Type' => 'application/pdf',
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+    }
+    abort(404, 'Document not found');
+})->where('filename', '.*')->name('storage.pdfs');
+
+Route::get('/docs/{filename}', function (string $filename) {
+    $candidates = [
+        public_path('docs/' . $filename),
+        public_path('docs/' . str_replace('_', '-', $filename)),
+        public_path('docs/' . str_replace('-', '_', $filename)),
+        public_path('storage/pdfs/' . $filename),
+        storage_path('app/public/pdfs/' . $filename),
+    ];
+    foreach ($candidates as $file) {
+        if (file_exists($file) && is_file($file)) {
+            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            $contentType = match ($ext) {
+                'pdf'  => 'application/pdf',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'doc'  => 'application/msword',
+                default => 'application/octet-stream',
+            };
+            return response()->file($file, [
+                'Content-Type' => $contentType,
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+    }
+    abort(404, 'Document not found');
+})->where('filename', '.*')->name('docs.show');
+
 // --- Public CMS (kept last; catch-all excludes reserved paths) ---
 Route::get('/cms-home', [PageController::class, 'home'])->name('cms.home'); // alias of /
 Route::get('/{slug}', [PageController::class, 'show'])
     ->middleware('http.cache:300')
-    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|registration$|admissions/store$|legacy-home$|cms-home$|testimonials$|video-testimonials$|api$|privacy$|privacy/)[A-Za-z0-9\-_/]+');
+    ->where('slug', '(?!up$|login$|logout$|admin$|enquiries$|jobs$|subscribe$|search$|registration$|admissions/store$|legacy-home$|cms-home$|testimonials$|video-testimonials$|api$|privacy$|privacy/|storage$|storage/|docs$|docs/)[A-Za-z0-9\-_/]+');
