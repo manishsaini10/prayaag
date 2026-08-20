@@ -54,8 +54,11 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
 
     // Page editor
     Route::get('/admin/pages', [EditorController::class, 'index'])->name('admin.pages.index');
+    Route::post('/admin/pages', [EditorController::class, 'store'])->name('admin.pages.store');
     Route::get('/admin/pages/builder', [EditorController::class, 'builder'])->name('admin.pages.builder');
     Route::get('/admin/pages/{page}/edit', [EditorController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/admin/pages/{page}/meta', [EditorController::class, 'updateMeta'])->name('admin.pages.updateMeta');
+    Route::delete('/admin/pages/{page}', [EditorController::class, 'destroy'])->name('admin.pages.destroy');
     Route::get('/admin/pages/{page}/tree', [EditorController::class, 'tree'])->name('admin.pages.tree');
     Route::put('/admin/pages/{page}/tree', [EditorController::class, 'save'])->name('admin.pages.tree.save');
     Route::post('/admin/pages/{page}/preview', [EditorController::class, 'preview'])->name('admin.pages.preview');
