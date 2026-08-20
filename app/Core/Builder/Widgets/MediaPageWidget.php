@@ -28,11 +28,52 @@ class MediaPageWidget extends AbstractWidget
 
     public function defaultSettings(): array
     {
-        return [];
+        return [
+            'autoplay'        => true,
+            'interval'        => 3000, // 3000ms = 3s interval
+            'animation_speed' => 600,  // 600ms ultra-smooth easing
+            'pause_on_hover'  => true,
+        ];
+    }
+
+    public function fieldOptions(): array
+    {
+        return [
+            'autoplay' => [
+                'type'    => 'boolean',
+                'label'   => 'Auto Play News Slider',
+                'default' => true,
+            ],
+            'interval' => [
+                'type'    => 'number',
+                'label'   => 'Auto Play Interval (ms)',
+                'default' => 3000,
+                'min'     => 1000,
+                'max'     => 10000,
+                'step'    => 500,
+            ],
+            'animation_speed' => [
+                'type'    => 'number',
+                'label'   => 'Animation Speed (ms)',
+                'default' => 600,
+                'min'     => 200,
+                'max'     => 2000,
+                'step'    => 100,
+            ],
+            'pause_on_hover' => [
+                'type'    => 'boolean',
+                'label'   => 'Pause on Hover',
+                'default' => true,
+            ],
+        ];
     }
 
     public function render(array $settings, array $context = []): string
     {
-        return view('widgets.media-page')->render();
+        $mergedSettings = array_merge($this->defaultSettings(), $settings);
+
+        return view('widgets.media-page', [
+            'settings' => $mergedSettings,
+        ])->render();
     }
 }

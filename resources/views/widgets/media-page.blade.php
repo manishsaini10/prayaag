@@ -1,7 +1,14 @@
 {{--
     Media ("Life at Prayaag") Page Widget — Clean & 100% Ultra Mobile Responsive
-    Designed with School Design System Tokens (Navy, Gold, Playfair/Poppins) + Touch Swiper & Lightbox
+    Configurable Auto-Play (3s interval default), Smooth Animation & Lightbox
 --}}
+
+@php
+    $autoplay = (bool) ($settings['autoplay'] ?? true);
+    $interval = (int) ($settings['interval'] ?? 3000);
+    $animSpeed = (int) ($settings['animation_speed'] ?? 600);
+    $pauseHover = (bool) ($settings['pause_on_hover'] ?? true);
+@endphp
 
 <style>
 /* ================================================================
@@ -340,7 +347,7 @@
 .news-carousel-track {
     display: flex;
     gap: 20px;
-    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform {{ $animSpeed }}ms cubic-bezier(0.25, 1, 0.5, 1);
     will-change: transform;
 }
 
@@ -814,11 +821,15 @@
 </div>
 
 <script>
-// ── NEWS SLIDER LOGIC ───────────────────────────────────────────────
+// ── CONFIGURABLE WIDGET SETTINGS ────────────────────────────────────
+const CONFIG_AUTOPLAY     = {{ $autoplay ? 'true' : 'false' }};
+const CONFIG_INTERVAL     = {{ $interval }}; // 3000ms = 3 sec
+const CONFIG_PAUSE_HOVER  = {{ $pauseHover ? 'true' : 'false' }};
+
 let currentSlide = 0;
 const totalSlides = 17;
 let autoPlayInterval = null;
-let isAutoPlaying = true;
+let isAutoPlaying = CONFIG_AUTOPLAY;
 
 function getVisibleSlides() {
     if (window.innerWidth <= 640) return 1;
@@ -847,18 +858,31 @@ function updateSlider() {
 }
 
 function nextSlide() {
-    currentSlide++;
+    const visible = getVisibleSlides();
+    const maxIndex = Math.max(0, totalSlides - visible);
+    if (currentSlide >= maxIndex) {
+        currentSlide = 0;
+    } else {
+        currentSlide++;
+    }
     updateSlider();
 }
 
 function prevSlide() {
-    currentSlide--;
+    const visible = getVisibleSlides();
+    const maxIndex = Math.max(0, totalSlides - visible);
+    if (currentSlide <= 0) {
+        currentSlide = maxIndex;
+    } else {
+        currentSlide--;
+    }
     updateSlider();
 }
 
 function startAutoPlay() {
+    if (!CONFIG_AUTOPLAY && !isAutoPlaying) return;
     stopAutoPlay();
-    autoPlayInterval = setInterval(nextSlide, 3500);
+    autoPlayInterval = setInterval(nextSlide, CONFIG_INTERVAL);
     isAutoPlaying = true;
     const btn = document.getElementById('playPauseBtn');
     if (btn) btn.innerText = '⏸️';
@@ -882,6 +906,19 @@ function toggleAutoPlay() {
     }
 }
 
+// ── MOUSE HOVER PAUSE & RESUME ──────────────────────────────────────
+if (CONFIG_PAUSE_HOVER) {
+    const container = document.getElementById('newsCarouselContainer');
+    if (container) {
+        container.addEventListener('mouseenter', () => {
+            if (isAutoPlaying) stopAutoPlay();
+        });
+        container.addEventListener('mouseleave', () => {
+            startAutoPlay();
+        });
+    }
+}
+
 // ── MOBILE TOUCH SWIPE SUPPORT ──────────────────────────────────────
 (function initTouchSwipe() {
     const container = document.getElementById('newsCarouselContainer');
@@ -900,10 +937,13 @@ function toggleAutoPlay() {
         const diff = touchStartX - touchEndX;
         if (Math.abs(diff) > 40) {
             if (diff > 0) {
-                nextSlide(); // swipe left -> next
+                nextSlide();
             } else {
-                prevSlide(); // swipe right -> prev
+                prevSlide();
             }
+        }
+        if (CONFIG_AUTOPLAY) {
+            setTimeout(startAutoPlay, 2000);
         }
     }, { passive: true });
 })();
@@ -925,6 +965,9 @@ function closeLightbox(e) {
     modal.classList.remove('active');
     document.getElementById('lightboxImg').src = '';
     document.body.style.overflow = '';
+    if (CONFIG_AUTOPLAY) {
+        startAutoPlay();
+    }
 }
 
 document.addEventListener('keydown', function(e) {
@@ -935,7 +978,9 @@ document.addEventListener('keydown', function(e) {
 
 window.addEventListener('resize', updateSlider);
 document.addEventListener('DOMContentLoaded', () => {
-    startAutoPlay();
+    if (CONFIG_AUTOPLAY) {
+        startAutoPlay();
+    }
     updateSlider();
 });
 </script>
