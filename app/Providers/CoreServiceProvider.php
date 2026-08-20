@@ -108,6 +108,7 @@ use App\Core\Builder\Widgets\PostListWidget;
 use App\Core\Builder\Widgets\AlumniPageWidget;
 use App\Core\Builder\Widgets\BookListWidget;
 use App\Core\Builder\Widgets\DownloadsPageWidget;
+use App\Core\Builder\Widgets\ContactUsPageWidget;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -162,6 +163,7 @@ class CoreServiceProvider extends ServiceProvider
         AlumniPageWidget::class,
         BookListWidget::class,
         DownloadsPageWidget::class,
+        ContactUsPageWidget::class,
         // Media & Social Proof
         VideoTestimonialWidget::class,
         // PRO Suite
