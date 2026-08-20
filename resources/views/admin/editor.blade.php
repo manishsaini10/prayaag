@@ -889,6 +889,27 @@ function settingsForm(widget) {
                     }
                 });
             });
+        } else if (widget.type === 'fee-structure-page') {
+            const sectionsMap = [
+                { divider: '🌟 Hero Banner Settings', keys: ['hero_eyebrow', 'hero_title', 'hero_subtitle', 'hero_bg_image'] },
+                { divider: '🔗 Action Links & PDF Documents', keys: ['registration_url', 'online_payment_url', 'pdf_fee_url', 'pdf_transport_url'] },
+                { divider: '✨ Key Transparency Badges', keys: ['highlights'] },
+                { divider: '📊 Grade-Wise Tuition Fee Table', keys: ['tuition_fees'] },
+                { divider: '🏷️ One-Time & Other Charges Table', keys: ['other_charges'] },
+                { divider: '📝 Official Fee Policy Notes', keys: ['notes'] },
+                { divider: '🤝 Quality Education Commitment', keys: ['closing_title', 'closing_text'] },
+                { divider: '📞 Helpline Contact Info', keys: ['admin_phone', 'admin_email', 'admin_hours'] },
+            ];
+
+            sectionsMap.forEach(group => {
+                const div = el('div', 'settings-section-divider', group.divider);
+                form.appendChild(div);
+                group.keys.forEach(k => {
+                    if (k in widget.settings) {
+                        fieldEditor(form, widget.settings, k, () => { draw(); schedulePreview(); }, enums);
+                    }
+                });
+            });
         } else {
             keys.forEach(k=>fieldEditor(form,widget.settings,k,()=>{ draw(); schedulePreview(); },enums));
         }
@@ -970,6 +991,27 @@ function createWidgetVisualPreview(widget, toggleCallback) {
                     ✏️ Edit Classrooms Content &amp; Photos
                 </button>
                 <a href="/classrooms" target="_blank" class="wpb-link">👁️ View Public /classrooms ↗</a>
+            </div>
+        `;
+        const editBtn = box.querySelector('.edit-content-btn');
+        if (editBtn && typeof toggleCallback === 'function') {
+            editBtn.addEventListener('click', toggleCallback);
+        }
+    } else if (t === 'fee-structure-page') {
+        box.innerHTML = `
+            <div class="wpb-title">💳 Fee Structure 2026-27 Suite</div>
+            <div class="wpb-desc">Displays Grade-Wise Tuition Fee Schedule (Pre-Nursery to XII), One-Time Charges, Policy Notes, Estimator, and PDF downloads.</div>
+            <div class="wpb-galleries-grid">
+                <span class="wpb-pill">🏫 5 Grade Categories</span>
+                <span class="wpb-pill">🏷️ ₹1K Reg · ₹10K Sec · ₹20K Adm</span>
+                <span class="wpb-pill">📄 Fee Structure 2026-27 PDF</span>
+                <span class="wpb-pill gold">🚌 Transport Fee PDF</span>
+            </div>
+            <div class="wpb-footer">
+                <button type="button" class="tb-btn primary edit-content-btn" style="height:28px;padding:0 12px;font-size:11.5px">
+                    ✏️ Edit Fee Structure Amounts &amp; Policies
+                </button>
+                <a href="/fee-structure" target="_blank" class="wpb-link">👁️ View Public /fee-structure ↗</a>
             </div>
         `;
         const editBtn = box.querySelector('.edit-content-btn');
