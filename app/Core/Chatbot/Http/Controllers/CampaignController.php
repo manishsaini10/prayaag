@@ -66,6 +66,13 @@ class CampaignController extends Controller
         return view('chatbot.admin.campaigns.form', compact('campaign'));
     }
 
+    public function show(Campaign $campaign)
+    {
+        Gate::authorize('chatbot.campaigns.view');
+        return redirect()->route('admin.chatbot.campaigns.edit', $campaign);
+    }
+
+
     public function update(Request $request, Campaign $campaign)
     {
         Gate::authorize('chatbot.campaigns.update');

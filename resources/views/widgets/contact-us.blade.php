@@ -688,7 +688,7 @@
                     </div>
                 @endif
 
-                @if($errors->any())
+                @if(isset($errors) && $errors->any())
                     <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:14px 18px;border-radius:10px;margin-bottom:20px;font-size:0.92rem">
                         ⚠️ Please check the required form fields.
                     </div>

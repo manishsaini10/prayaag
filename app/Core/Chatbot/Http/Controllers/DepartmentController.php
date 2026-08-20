@@ -48,6 +48,13 @@ class DepartmentController extends Controller
         return view('chatbot.admin.departments.form', compact('department'));
     }
 
+    public function show(Department $department)
+    {
+        Gate::authorize('chatbot.departments.view');
+        return redirect()->route('admin.chatbot.departments.edit', $department);
+    }
+
+
     public function update(Request $request, Department $department)
     {
         Gate::authorize('chatbot.departments.update');

@@ -244,10 +244,11 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::post('academic-calendar-entries/import/ai', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'importAi'])->name('academic-calendar-entries.import.ai');
         Route::post('academic-calendar-entries/import/save-review', [\App\Http\Controllers\Admin\AcademicCalendarImportController::class, 'saveReviewed'])->name('academic-calendar-entries.import.save-review');
 
-        Route::resource('academic-calendar-entries', \App\Http\Controllers\Admin\AcademicCalendarEntryController::class);
+        Route::resource('academic-calendar-entries', \App\Http\Controllers\Admin\AcademicCalendarEntryController::class)->except(['show']);
         Route::post('academic-sessions/{academic_session}/toggle', [\App\Http\Controllers\Admin\AcademicSessionController::class, 'toggle'])->name('academic-sessions.toggle');
-        Route::resource('academic-sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
-        Route::resource('academic-terms', \App\Http\Controllers\Admin\AcademicTermController::class);
+        Route::resource('academic-sessions', \App\Http\Controllers\Admin\AcademicSessionController::class)->except(['show']);
+        Route::resource('academic-terms', \App\Http\Controllers\Admin\AcademicTermController::class)->except(['show']);
+
 
         // Mess Menu CRUD
         Route::get('mess-menus', [\App\Http\Controllers\Admin\MessMenuController::class, 'index'])->name('mess-menus.index');

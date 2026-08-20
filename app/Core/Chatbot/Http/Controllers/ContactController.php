@@ -50,6 +50,19 @@ class ContactController extends Controller
         return view('chatbot.admin.contacts.show', compact('contact'));
     }
 
+    public function create()
+    {
+        Gate::authorize('chatbot.contacts.create');
+        return redirect()->route('admin.chatbot.contacts.index');
+    }
+
+    public function edit(Contact $contact)
+    {
+        Gate::authorize('chatbot.contacts.update');
+        return redirect()->route('admin.chatbot.contacts.show', $contact);
+    }
+
+
     public function store(Request $request)
     {
         Gate::authorize('chatbot.contacts.create');

@@ -115,6 +115,16 @@ use App\Core\Builder\Widgets\DisclosurePageWidget;
 use App\Core\Builder\Widgets\MediaPageWidget;
 use App\Core\Builder\Widgets\MediaGalleryWidget;
 use App\Core\Builder\Widgets\NewsSliderWidget;
+use App\Core\Builder\Widgets\LabsPageWidget;
+use App\Core\Builder\Widgets\LibraryPageWidget;
+use App\Core\Builder\Widgets\SportsPageWidget;
+use App\Core\Builder\Widgets\TransportationPageWidget;
+use App\Core\Builder\Widgets\SafetySecurityPageWidget;
+use App\Core\Builder\Widgets\ToursExcursionsPageWidget;
+use App\Core\Builder\Widgets\UnescoPageWidget;
+use App\Core\Builder\Widgets\SummerCampPageWidget;
+use App\Core\Builder\Widgets\JuniorWingPageWidget;
+use App\Core\Builder\Widgets\SeniorWingPageWidget;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -176,6 +186,17 @@ class CoreServiceProvider extends ServiceProvider
         MediaPageWidget::class,
         MediaGalleryWidget::class,
         NewsSliderWidget::class,
+        // Facility & Wing pages (modern redesign)
+        LabsPageWidget::class,
+        LibraryPageWidget::class,
+        SportsPageWidget::class,
+        TransportationPageWidget::class,
+        SafetySecurityPageWidget::class,
+        ToursExcursionsPageWidget::class,
+        UnescoPageWidget::class,
+        SummerCampPageWidget::class,
+        JuniorWingPageWidget::class,
+        SeniorWingPageWidget::class,
         // Media & Social Proof
         VideoTestimonialWidget::class,
         // PRO Suite
