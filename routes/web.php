@@ -194,6 +194,8 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::get('/settings', [\App\Http\Controllers\Admin\Instagram\SettingsController::class, 'index'])->name('settings');
         Route::get('/oauth/connect', [\App\Http\Controllers\Admin\Instagram\OAuthController::class, 'redirect'])->name('oauth.connect');
         Route::get('/oauth/callback', [\App\Http\Controllers\Admin\Instagram\OAuthController::class, 'callback'])->name('oauth.callback');
+        Route::post('/connect-handle', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'connectHandle'])->name('connect.handle');
+        Route::post('/save-token', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'saveToken'])->name('save.token');
         Route::post('/sync/{account}', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'sync'])->name('sync');
         Route::post('/sync-all', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'syncAll'])->name('sync.all');
         Route::post('/tokens/refresh', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'refreshTokens'])->name('tokens.refresh');

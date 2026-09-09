@@ -6,14 +6,18 @@ namespace App\Http\Controllers\Admin\Instagram;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncInstagramMedia;
+use App\Models\InstagramAccount;
 use App\Services\Instagram\InstagramService;
+use App\Services\Instagram\PublicInstagramService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function __construct(
         private readonly InstagramService $instagram,
+        private readonly PublicInstagramService $publicInstagram,
     ) {}
 
     public function index(): View
@@ -32,8 +36,64 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * 1-Click Connect by Instagram Handle (No Meta App / .env setup required)
+     */
+    public function connectHandle(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'username' => 'required|string|min:2|max:100',
+        ]);
+
+        try {
+            $account = $this->publicInstagram->connectByUsername(
+                $request->input('username'),
+                $request->input('manual_token')
+            );
+
+            return redirect()->route('admin.instagram.dashboard')
+                ->with('status', "Instagram account @{$account->username} connected successfully! Posts are now live on website.");
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.instagram.dashboard')
+                ->withErrors(['connect' => 'Failed to connect Instagram: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Save / Update Direct Instagram Access Token without touching .env
+     */
+    public function saveToken(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'username'     => 'required|string',
+            'access_token' => 'required|string|min:10',
+        ]);
+
+        try {
+            $account = $this->publicInstagram->connectByUsername(
+                $request->input('username'),
+                $request->input('access_token')
+            );
+
+            return redirect()->route('admin.instagram.dashboard')
+                ->with('status', "Access token saved for @{$account->username} and posts synced successfully!");
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.instagram.dashboard')
+                ->withErrors(['save_token' => 'Failed to save token: ' . $e->getMessage()]);
+        }
+    }
+
     public function sync(string $id): RedirectResponse
     {
+        $account = InstagramAccount::findOrFail($id);
+
+        // If it's a public / 1-click account, use PublicInstagramService
+        if (str_starts_with($account->instagram_business_id, 'public_') || empty(config('instagram.app_id'))) {
+            $this->publicInstagram->fetchPublicPosts($account);
+            return redirect()->route('admin.instagram.dashboard')
+                ->with('status', "Feed for @{$account->username} synced successfully.");
+        }
+
         if (config('instagram.enable_queue')) {
             SyncInstagramMedia::dispatch($id);
             $message = 'Sync dispatched to queue.';
@@ -48,18 +108,20 @@ class DashboardController extends Controller
 
     public function syncAll(): RedirectResponse
     {
-        if (config('instagram.enable_queue')) {
-            foreach (\App\Models\InstagramAccount::connected()->pluck('id') as $id) {
-                SyncInstagramMedia::dispatch($id);
+        $accounts = InstagramAccount::connected()->get();
+
+        foreach ($accounts as $account) {
+            if (str_starts_with($account->instagram_business_id, 'public_') || empty(config('instagram.app_id'))) {
+                $this->publicInstagram->fetchPublicPosts($account);
+            } elseif (config('instagram.enable_queue')) {
+                SyncInstagramMedia::dispatch($account->id);
+            } else {
+                $this->instagram->sync($account->id);
             }
-            $message = 'Sync dispatched for all accounts.';
-        } else {
-            $results = $this->instagram->syncAll();
-            $message = collect($results)->pluck('message')->implode(' | ');
         }
 
         return redirect()->route('admin.instagram.dashboard')
-            ->with('status', $message);
+            ->with('status', 'Sync completed for all connected Instagram accounts.');
     }
 
     public function refreshTokens(): RedirectResponse
