@@ -35,7 +35,7 @@
      STEP 1: Enter Meta App Credentials (WordPress Plugin Style — No .env)
 ════════════════════════════════════════════════════════════════════════════════ --}}
 <div class="ig-section">
-    <p class="ig-h">🔑 Step 1 — Meta App Credentials (Admin Panel me save karein — .env ki zaroorat nahi)</p>
+    <p class="ig-h">🔑 Step 1 — Meta App Credentials (Stored in Database — No .env editing needed)</p>
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:22px">
 
         {{-- Status badges --}}
@@ -61,7 +61,7 @@
                     <label>Facebook / Meta App Secret</label>
                     <input type="password" name="facebook_app_secret" placeholder="Enter App Secret" autocomplete="off"
                            style="font-family:monospace" required>
-                    <p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0">Same page → App Secret → Show</p>
+                    <p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0">developers.facebook.com → Settings → Basic → App Secret → Show</p>
                 </div>
             </div>
             <div style="display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap">
@@ -71,7 +71,7 @@
                         🔗 Connect Instagram via OAuth Popup
                     </a>
                 @endif
-                <span style="font-size:12px;color:var(--text-muted)">Credentials database me save hote hain — .env file touch karne ki zaroorat nahi.</span>
+                <span style="font-size:12px;color:var(--text-muted)">Credentials are saved directly to the database without modifying your .env file.</span>
             </div>
         </form>
     </div>
@@ -81,30 +81,30 @@
      STEP 2: How to get App ID/Secret — Inline Guide
 ════════════════════════════════════════════════════════════════════════════════ --}}
 <div class="ig-section">
-    <p class="ig-h">📖 Step 2 — Meta App kaise banayein (5 minute setup)</p>
+    <p class="ig-h">📖 Step 2 — How to Create a Meta Developer App (5-Minute Setup Guide)</p>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:13px;line-height:1.7;color:var(--text-soft)">
 
         <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">1</div>
             <div>
-                <strong style="color:var(--text)">Facebook Developer Console open karein</strong><br>
-                <a href="https://developers.facebook.com/apps" target="_blank" style="color:var(--primary)">developers.facebook.com/apps</a> → <strong>Create App</strong> → Type: <strong>Business</strong> → App naam dein (e.g. Prayaag School)
+                <strong style="color:var(--text)">Open Meta Developer Console</strong><br>
+                Visit <a href="https://developers.facebook.com/apps" target="_blank" style="color:var(--primary)">developers.facebook.com/apps</a> → Click <strong>Create App</strong> → Select <strong>Business</strong> type → Enter your App Name.
             </div>
         </div>
 
         <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">2</div>
             <div>
-                <strong style="color:var(--text)">Instagram Graph API add karein</strong><br>
-                App Dashboard → <strong>Add Product</strong> → <strong>Instagram Graph API</strong> → Set Up
+                <strong style="color:var(--text)">Add Instagram Graph API</strong><br>
+                In App Dashboard → Click <strong>Add Product</strong> → Choose <strong>Instagram Graph API</strong> → Click Set Up.
             </div>
         </div>
 
         <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">3</div>
             <div>
-                <strong style="color:var(--text)">Redirect URI configure karein</strong><br>
-                Instagram Graph API → Configure → Valid OAuth Redirect URIs me ye add karein:<br>
+                <strong style="color:var(--text)">Configure OAuth Redirect URI</strong><br>
+                Under <strong>Instagram Graph API → Settings</strong>, enter the following authorized Redirect URI:<br>
                 <code style="word-break:break-all;background:var(--bg-soft);padding:3px 8px;border-radius:4px;font-size:12px">{{ $env['redirect_uri'] }}</code>
             </div>
         </div>
@@ -112,16 +112,16 @@
         <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">4</div>
             <div>
-                <strong style="color:var(--text)">App ID aur App Secret copy karein</strong><br>
-                Settings → Basic → <strong>App ID</strong> copy karein + <strong>App Secret</strong> (Show button dabao) copy karein
+                <strong style="color:var(--text)">Copy App ID and App Secret</strong><br>
+                Navigate to <strong>Settings → Basic</strong> → Copy your <strong>App ID</strong> and click Show to copy your <strong>App Secret</strong>.
             </div>
         </div>
 
         <div style="display:flex;gap:12px">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">5</div>
             <div>
-                <strong style="color:var(--text)">Upar Step 1 form me paste karein</strong><br>
-                App ID aur Secret upar ke form me paste karein → Save karein → "Connect Instagram via OAuth Popup" button dikhega → Click karein → Login ho jayega!
+                <strong style="color:var(--text)">Paste into Step 1 Above</strong><br>
+                Paste the App ID and Secret into Step 1 form above and click Save. You can then connect via the official Meta popup!
             </div>
         </div>
     </div>

@@ -61,8 +61,8 @@ class SettingsController extends Controller
             'facebook_app_id'     => 'required|string|min:5|max:30',
             'facebook_app_secret' => 'required|string|min:10|max:100',
         ], [
-            'facebook_app_id.required'     => 'App ID required hai.',
-            'facebook_app_secret.required' => 'App Secret required hai.',
+            'facebook_app_id.required'     => 'The Meta App ID is required.',
+            'facebook_app_secret.required' => 'The Meta App Secret is required.',
         ]);
 
         $this->saveSetting('facebook_app_id',     trim($request->facebook_app_id));

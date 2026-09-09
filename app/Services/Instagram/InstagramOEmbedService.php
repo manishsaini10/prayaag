@@ -15,14 +15,13 @@ use Illuminate\Support\Str;
 /**
  * InstagramOEmbedService
  *
- * Uses Meta FREE tokenless Instagram oEmbed API — No App ID, No Secret!
- * Works exactly like WordPress "Insta Gallery" plugin concept:
- *   Admin panel me Instagram post URLs paste karo → Real embeds website par!
+ * Uses Meta's free tokenless Instagram oEmbed API — No App ID, No Secret required!
+ * Allows administrators to paste Instagram post/reel URLs to embed live posts on the website.
  *
  * oEmbed Endpoint: https://graph.facebook.com/v23.0/instagram_oembed?url={URL}
- * - No access token needed (Meta ne June 2026 me free kar diya)
- * - Rate limit: 1,000 req/hour (hum aggressively cache karte hain)
- * - Sirf PUBLIC posts ke liye kaam karta hai
+ * - No access token needed (made tokenless by Meta in June 2026)
+ * - Rate limit: 1,000 requests/hour (cached aggressively for 24 hours)
+ * - Compatible with all public posts and reels
  */
 final class InstagramOEmbedService
 {
@@ -30,7 +29,7 @@ final class InstagramOEmbedService
 
     /**
      * Fetch oEmbed data for a single Instagram post URL.
-     * 24 ghante cache — rate limit se bachao.
+     * Cached for 24 hours to prevent rate limit issues.
      */
     public function fetchEmbed(string $postUrl): ?array
     {
