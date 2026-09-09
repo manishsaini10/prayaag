@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Instagram;
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncInstagramMedia;
 use App\Models\InstagramAccount;
+use App\Models\InstagramMedia;
 use App\Services\Instagram\InstagramService;
 use App\Services\Instagram\InstagramOEmbedService;
 use App\Services\Instagram\PublicInstagramService;
@@ -25,6 +26,8 @@ class DashboardController extends Controller
     public function index(): View
     {
         $stats = $this->instagram->getDashboardStats();
+        $latestPosts = InstagramMedia::latest('posted_at')->take(12)->get();
+        $appIdSet = !empty(config('instagram.app_id'));
 
         return view('admin.instagram.dashboard', [
             'stats'             => $stats,
@@ -35,6 +38,8 @@ class DashboardController extends Controller
             'latestSync'        => $stats['latest_sync'],
             'expiringTokens'    => $stats['expiring_tokens'],
             'recentLogs'        => $stats['recent_logs'],
+            'latestPosts'       => $latestPosts,
+            'appIdSet'          => $appIdSet,
         ]);
     }
 

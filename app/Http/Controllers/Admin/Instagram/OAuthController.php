@@ -27,15 +27,18 @@ class OAuthController extends Controller
         return redirect()->away($this->instagram->oauth->authorizationUrl());
     }
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request): mixed
     {
         $code = $request->query('code');
         $state = $request->query('state');
 
         if (! $code) {
             $error = $request->query('error_message', 'Authorization was cancelled or denied.');
-            return redirect()->route('admin.instagram.dashboard')
-                ->withErrors(['oauth' => $error]);
+            return response()->view('admin.instagram.oauth-callback', [
+                'success'      => false,
+                'username'     => '',
+                'errorMessage' => $error,
+            ]);
         }
 
         try {
@@ -48,11 +51,17 @@ class OAuthController extends Controller
                 $this->instagram->sync($account->id);
             }
 
-            return redirect()->route('admin.instagram.dashboard')
-                ->with('status', "Instagram account @{$account->username} connected successfully! Feed is syncing.");
+            return response()->view('admin.instagram.oauth-callback', [
+                'success'      => true,
+                'username'     => $account->username,
+                'errorMessage' => '',
+            ]);
         } catch (\Throwable $e) {
-            return redirect()->route('admin.instagram.dashboard')
-                ->withErrors(['oauth' => $e->getMessage()]);
+            return response()->view('admin.instagram.oauth-callback', [
+                'success'      => false,
+                'username'     => '',
+                'errorMessage' => $e->getMessage(),
+            ]);
         }
     }
 }
