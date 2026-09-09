@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SyncInstagramMedia;
 use App\Models\InstagramAccount;
 use App\Services\Instagram\InstagramService;
+use App\Services\Instagram\InstagramOEmbedService;
 use App\Services\Instagram\PublicInstagramService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class DashboardController extends Controller
     public function __construct(
         private readonly InstagramService $instagram,
         private readonly PublicInstagramService $publicInstagram,
+        private readonly InstagramOEmbedService $oEmbed,
     ) {}
 
     public function index(): View
@@ -80,6 +82,42 @@ class DashboardController extends Controller
         } catch (\Throwable $e) {
             return redirect()->route('admin.instagram.dashboard')
                 ->withErrors(['save_token' => 'Failed to save token: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Add Instagram post URLs directly (oEmbed — No API Key, No Secret, No OAuth)
+     * Like Insta Gallery WordPress plugin — just paste post URLs.
+     */
+    public function addPostUrls(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'account_id' => 'required|string|exists:instagram_accounts,id',
+            'post_urls'  => 'required|string|min:5',
+        ]);
+
+        $account = InstagramAccount::findOrFail($request->input('account_id'));
+
+        // Parse textarea — one URL per line
+        $urls = array_filter(
+            array_map('trim', explode("\n", $request->input('post_urls'))),
+            fn ($u) => !empty($u) && str_contains($u, 'instagram.com')
+        );
+
+        if (empty($urls)) {
+            return redirect()->route('admin.instagram.dashboard')
+                ->withErrors(['post_urls' => 'Please enter valid Instagram post URLs (instagram.com/p/... or instagram.com/reel/...)']);
+        }
+
+        try {
+            $result = $this->oEmbed->savePostUrls($account, array_values($urls));
+
+            return redirect()->route('admin.instagram.dashboard')
+                ->with('status', "✅ {$result['saved']} Instagram posts added to website feed!" .
+                    ($result['failed'] > 0 ? " ({$result['failed']} invalid URLs skipped)" : ''));
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.instagram.dashboard')
+                ->withErrors(['post_urls' => 'Failed: ' . $e->getMessage()]);
         }
     }
 

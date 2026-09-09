@@ -201,6 +201,7 @@ Route::middleware(['auth', 'require.2fa'])->group(function () {
         Route::post('/tokens/refresh', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'refreshTokens'])->name('tokens.refresh');
         Route::post('/disconnect/{account}', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'disconnect'])->name('disconnect');
         Route::post('/settings/save-credentials', [\App\Http\Controllers\Admin\Instagram\SettingsController::class, 'saveAppCredentials'])->name('settings.save.credentials');
+        Route::post('/add-posts', [\App\Http\Controllers\Admin\Instagram\DashboardController::class, 'addPostUrls'])->name('add.posts');
     });
 
     // Media Library (dedicated view with grid/list/large modes + infinite scroll)
