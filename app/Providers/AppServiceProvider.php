@@ -24,6 +24,20 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // --- Instagram: load App ID/Secret from DB (WordPress plugin style — no .env needed) ---
+        rescue(function () {
+            $rows = \Illuminate\Support\Facades\DB::table('instagram_app_settings')
+                ->whereIn('key', ['facebook_app_id', 'facebook_app_secret'])
+                ->pluck('value', 'key');
+
+            if (!empty($rows['facebook_app_id'])) {
+                config(['instagram.app_id' => $rows['facebook_app_id']]);
+            }
+            if (!empty($rows['facebook_app_secret'])) {
+                config(['instagram.app_secret' => $rows['facebook_app_secret']]);
+            }
+        }, null, false);
+
         // --- Register custom 'google' storage driver ---
         \Illuminate\Support\Facades\Storage::extend('google', function ($app, $config) {
             $client = new \Google\Client();

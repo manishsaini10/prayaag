@@ -12,13 +12,16 @@
 <style>
     .ig-section{margin-bottom:24px}
     .ig-h{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin:0 0 12px}
-    .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
     .ig-field{margin-bottom:14px}
-    .ig-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:4px}
+    .ig-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px}
+    .ig-field input{width:100%;padding:10px 14px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:border-color .2s}
+    .ig-field input:focus{border-color:#0866ff}
     .ig-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:13px}
     .ig-row code{font-size:12px;background:var(--bg-soft);padding:2px 8px;border-radius:4px}
     .ig-log-row{font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--border);color:var(--text-soft);display:flex;justify-content:space-between}
     .ig-log-row:last-child{border:0}
+    .ig-badge-ok{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:var(--success-soft);color:var(--success);padding:3px 10px;border-radius:5px}
+    .ig-badge-miss{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:var(--danger-soft);color:var(--danger);padding:3px 10px;border-radius:5px}
 </style>
 
 @if (session('status'))
@@ -28,18 +31,106 @@
     <div class="card" style="border-color:var(--danger);background:var(--danger-soft);color:var(--danger);padding:12px 16px;margin-bottom:16px;font-size:13.5px">{{ $errors->first() }}</div>
 @endif
 
-{{-- Environment Configuration --}}
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 1: Enter Meta App Credentials (WordPress Plugin Style — No .env)
+════════════════════════════════════════════════════════════════════════════════ --}}
 <div class="ig-section">
-    <p class="ig-h">Environment Configuration</p>
+    <p class="ig-h">🔑 Step 1 — Meta App Credentials (Admin Panel me save karein — .env ki zaroorat nahi)</p>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:22px">
+
+        {{-- Status badges --}}
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+            <span class="{{ $env['app_id_set'] ? 'ig-badge-ok' : 'ig-badge-miss' }}">
+                {{ $env['app_id_set'] ? '✅' : '❌' }} App ID {{ $env['app_id_set'] ? 'Saved: '.$env['app_id'] : 'Not Set' }}
+            </span>
+            <span class="{{ $env['app_secret_set'] ? 'ig-badge-ok' : 'ig-badge-miss' }}">
+                {{ $env['app_secret_set'] ? '✅' : '❌' }} App Secret {{ $env['app_secret_set'] ? 'Saved' : 'Not Set' }}
+            </span>
+        </div>
+
+        <form method="POST" action="{{ route('admin.instagram.settings.save.credentials') }}">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="ig-field">
+                    <label>Facebook / Meta App ID</label>
+                    <input type="text" name="facebook_app_id" placeholder="e.g. 1234567890123456" autocomplete="off"
+                           style="font-family:monospace" required>
+                    <p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0">developers.facebook.com → Your App → Settings → Basic → App ID</p>
+                </div>
+                <div class="ig-field">
+                    <label>Facebook / Meta App Secret</label>
+                    <input type="password" name="facebook_app_secret" placeholder="Enter App Secret" autocomplete="off"
+                           style="font-family:monospace" required>
+                    <p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0">Same page → App Secret → Show</p>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap">
+                <button type="submit" class="btn primary" style="font-size:13px;padding:9px 22px">💾 Save Credentials</button>
+                @if ($env['app_id_set'] && $env['app_secret_set'])
+                    <a href="{{ route('admin.instagram.oauth.connect') }}" class="btn" style="font-size:13px;padding:9px 22px;background:linear-gradient(135deg,#0866ff,#0d47f0);color:#fff;border:none">
+                        🔗 Connect Instagram via OAuth Popup
+                    </a>
+                @endif
+                <span style="font-size:12px;color:var(--text-muted)">Credentials database me save hote hain — .env file touch karne ki zaroorat nahi.</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     STEP 2: How to get App ID/Secret — Inline Guide
+════════════════════════════════════════════════════════════════════════════════ --}}
+<div class="ig-section">
+    <p class="ig-h">📖 Step 2 — Meta App kaise banayein (5 minute setup)</p>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:13px;line-height:1.7;color:var(--text-soft)">
+
+        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">1</div>
+            <div>
+                <strong style="color:var(--text)">Facebook Developer Console open karein</strong><br>
+                <a href="https://developers.facebook.com/apps" target="_blank" style="color:var(--primary)">developers.facebook.com/apps</a> → <strong>Create App</strong> → Type: <strong>Business</strong> → App naam dein (e.g. Prayaag School)
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">2</div>
+            <div>
+                <strong style="color:var(--text)">Instagram Graph API add karein</strong><br>
+                App Dashboard → <strong>Add Product</strong> → <strong>Instagram Graph API</strong> → Set Up
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">3</div>
+            <div>
+                <strong style="color:var(--text)">Redirect URI configure karein</strong><br>
+                Instagram Graph API → Configure → Valid OAuth Redirect URIs me ye add karein:<br>
+                <code style="word-break:break-all;background:var(--bg-soft);padding:3px 8px;border-radius:4px;font-size:12px">{{ $env['redirect_uri'] }}</code>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">4</div>
+            <div>
+                <strong style="color:var(--text)">App ID aur App Secret copy karein</strong><br>
+                Settings → Basic → <strong>App ID</strong> copy karein + <strong>App Secret</strong> (Show button dabao) copy karein
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">5</div>
+            <div>
+                <strong style="color:var(--text)">Upar Step 1 form me paste karein</strong><br>
+                App ID aur Secret upar ke form me paste karein → Save karein → "Connect Instagram via OAuth Popup" button dikhega → Click karein → Login ho jayega!
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Current Config Status --}}
+<div class="ig-section">
+    <p class="ig-h">⚙️ Current Configuration Status</p>
     <div style="display:grid;gap:8px">
-        <div class="ig-row">
-            <span>App ID</span>
-            <span><code>{{ $env['app_id'] ?: 'Not configured' }}</code></span>
-        </div>
-        <div class="ig-row">
-            <span>App Secret</span>
-            <span><code>{{ $env['app_secret'] ?: 'Not configured' }}</code></span>
-        </div>
         <div class="ig-row">
             <span>OAuth Redirect URI</span>
             <span><code>{{ $env['redirect_uri'] }}</code></span>
@@ -53,10 +144,6 @@
             <span><code>{{ $env['cache_duration'] }}s</code></span>
         </div>
         <div class="ig-row">
-            <span>Sync Interval</span>
-            <span><code>{{ $env['sync_interval'] }} min</code></span>
-        </div>
-        <div class="ig-row">
             <span>Queue Jobs</span>
             <span><code>{{ $env['enable_queue'] ? 'Enabled' : 'Disabled' }}</code></span>
         </div>
@@ -64,61 +151,6 @@
             <span>Local Media Cache</span>
             <span><code>{{ $env['enable_cache'] ? 'Enabled' : 'Disabled' }}</code></span>
         </div>
-        <div class="ig-row">
-            <span>WebP Conversion</span>
-            <span><code>{{ $env['enable_webp'] ? 'Enabled' : 'Disabled' }}</code></span>
-        </div>
-    </div>
-</div>
-
-{{-- Setup Guide --}}
-<div class="ig-section">
-    <p class="ig-h">Setup Guide</p>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:13px;line-height:1.7;color:var(--text-soft)">
-
-        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">1</div>
-            <div>
-                <strong style="color:var(--text)">Create a Facebook App</strong><br>
-                Go to <a href="https://developers.facebook.com" target="_blank" style="color:var(--primary)">developers.facebook.com</a> → <strong>My Apps → Create App</strong> → Choose <strong>Business</strong> type.
-            </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">2</div>
-            <div>
-                <strong style="color:var(--text)">Add Instagram Graph API</strong><br>
-                In App Dashboard → <strong>Add Product</strong> → Select <strong>Instagram Graph API</strong>.
-            </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">3</div>
-            <div>
-                <strong style="color:var(--text)">Configure OAuth Redirect</strong><br>
-                In <strong>Instagram Graph API → Configure</strong>, add this Redirect URI:<br>
-                <code style="word-break:break-all">{{ $env['redirect_uri'] }}</code>
-            </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">4</div>
-            <div>
-                <strong style="color:var(--text)">Add Instagram Test User</strong><br>
-                <strong>App Roles → Roles → Add Instagram Tester</strong> → Add your Instagram account username. Accept the invite in the Instagram app.
-            </div>
-        </div>
-
-        <div style="display:flex;gap:12px">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0">5</div>
-            <div>
-                <strong style="color:var(--text)">Set .env Variables</strong><br>
-                <code>FACEBOOK_APP_ID=your_app_id</code><br>
-                <code>FACEBOOK_APP_SECRET=your_app_secret</code><br>
-                Then run: <code>php artisan config:clear</code>
-            </div>
-        </div>
-
     </div>
 </div>
 
