@@ -24,7 +24,7 @@
 @if (session('status'))
     <div class="card" style="border-color:var(--success);background:var(--success-soft);color:var(--success);padding:12px 16px;margin-bottom:16px;font-size:13.5px">{{ session('status') }}</div>
 @endif
-@if ($errors->any())
+@if (isset($errors) && $errors->any())
     <div class="card" style="border-color:var(--danger);background:var(--danger-soft);color:var(--danger);padding:12px 16px;margin-bottom:16px;font-size:13.5px">{{ $errors->first() }}</div>
 @endif
 
